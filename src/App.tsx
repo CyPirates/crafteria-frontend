@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { GlobalStyle } from './styles/GlobalStyles';
 import TopNavBar from './components/layout/TopNavBar';
 import HomePage from './pages/HomePage';
+import DesignMarket from './pages/DesignMarketPage';
 
 
 const App: React.FC = () => {
@@ -18,6 +19,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path='/' element={<Navigate to="/home" />} />
               <Route path='/home' element={<HomePage />} />
+              <Route path='/designMarket' element={<DesignMarket/>} />
             </Routes>
           </ContentContainer>
         </div>

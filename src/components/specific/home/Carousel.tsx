@@ -39,7 +39,7 @@ export default Carousel;
 
 const CarouselContainer = styled.div`
   position: relative;
-  width: 1000px;
+  width: 50vw;
   margin: auto;
   overflow: hidden;
   border-radius: 15px;
