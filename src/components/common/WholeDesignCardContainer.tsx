@@ -26,7 +26,7 @@ export default WholeDesignCardContainer;
 
 const Container = styled.div`
     margin-left: 4vw;
-
+    margin-top: 2vw;
 `
 
 const CategoryText = styled.div`

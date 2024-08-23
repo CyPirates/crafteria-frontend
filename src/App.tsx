@@ -6,6 +6,7 @@ import { GlobalStyle } from './styles/GlobalStyles';
 import TopNavBar from './components/layout/TopNavBar';
 import HomePage from './pages/HomePage';
 import DesignMarket from './pages/DesignMarketPage';
+import ScrollToTop from './components/layout/ScrollToTop';
 
 
 const App: React.FC = () => {
@@ -14,6 +15,7 @@ const App: React.FC = () => {
       <GlobalStyle />
       <BrowserRouter>
         <div className="App">
+          <ScrollToTop/>
           <TopNavBar />
           <ContentContainer>
             <Routes>
