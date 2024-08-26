@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 import { useCarousel } from '../../../hooks/useCarousel';
 
-const Carousel: React.FC = () => {
+const Carousel = () => {
   const images = [
     'https://via.placeholder.com/600x300/FF0000/FFFFFF?text=Slide+1',
     'https://via.placeholder.com/600x300/00FF00/FFFFFF?text=Slide+2',
@@ -53,7 +52,7 @@ const CarouselWrapper = styled.div<{ translateX: number; transition: string }>`
 
 const CarouselSlide = styled.div`
   min-width: 100%;
-  height: 400px;
+  height: 20vw;
   background-position: center;
 `;
 

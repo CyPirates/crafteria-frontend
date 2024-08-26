@@ -1,10 +1,9 @@
 import styled from "styled-components";
 
 import Carousel from "../components/specific/home/Carousel";
-import SummaryCard from "../components/common/SummaryCard";
 import WholeDesignCardContainer from "../components/common/WholeDesignCardContainer";
 
-const HomePage: React.FC = () => {
+const HomePage = () => {
 
     return (
         <>

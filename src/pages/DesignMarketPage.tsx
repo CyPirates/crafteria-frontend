@@ -1,7 +1,7 @@
 import WholeDesignCardContainer from "../components/common/WholeDesignCardContainer";
 import TopRankCardContainer from "../components/specific/designMarket/TopRankCardContainer";
 
-const DesignMarket: React.FC = () => {
+const DesignMarket = () => {
     return (
         <>
             <TopRankCardContainer category='작가'/>

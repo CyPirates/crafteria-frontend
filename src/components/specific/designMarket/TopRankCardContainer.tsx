@@ -7,7 +7,7 @@ type TopRankCardContainerProps = {
   category: string;
 }
 
-const TopRankCardContainer: React.FC<TopRankCardContainerProps> = ({category}) => {
+const TopRankCardContainer= ({category}: TopRankCardContainerProps) => {
   return (
     <>
       <Container>

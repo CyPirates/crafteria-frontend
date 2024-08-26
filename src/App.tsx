@@ -7,6 +7,7 @@ import TopNavBar from './components/layout/TopNavBar';
 import HomePage from './pages/HomePage';
 import DesignMarket from './pages/DesignMarketPage';
 import ScrollToTop from './components/layout/ScrollToTop';
+import MyDesignPage from './pages/MyDesignPage';
 
 
 const App: React.FC = () => {
@@ -22,6 +23,7 @@ const App: React.FC = () => {
               <Route path='/' element={<Navigate to="/home" />} />
               <Route path='/home' element={<HomePage />} />
               <Route path='/designMarket' element={<DesignMarket/>} />
+              <Route path='/myDesign' element={<MyDesignPage/>} />
             </Routes>
           </ContentContainer>
         </div>
@@ -34,4 +36,6 @@ export default App;
 
 const ContentContainer = styled.div`
     margin-top: 50px;
+    min-width: 1000px;
+    overflow-x: auto;
 `

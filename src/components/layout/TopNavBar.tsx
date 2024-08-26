@@ -6,7 +6,7 @@ import { AiOutlineUser } from "react-icons/ai";
 
 //TODO: 반응형 UI, 로고 들어오면 navigate 추가하기, params로 빨갛게 하기
 
-const TopNavBar: React.FC = () => {
+const TopNavBar = () => {
     const navigate = useNavigate();
 
     const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {

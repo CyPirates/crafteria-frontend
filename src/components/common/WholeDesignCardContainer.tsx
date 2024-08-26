@@ -4,7 +4,7 @@ import SummaryCard from "./SummaryCard";
 
 //TODO: Filter 기능 추가, SummaryCard 받아온 데이터로 변경
 
-const WholeDesignCardContainer: React.FC = () => {
+const WholeDesignCardContainer = () => {
     return (
         <>
             <Container>

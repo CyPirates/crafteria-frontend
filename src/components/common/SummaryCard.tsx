@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 //TODO: 내용물들 props처리, 누르면 세부정보로 라우팅
 
-const SummaryCard: React.FC = () => {
+const SummaryCard = () => {
     return(
         <>
         <CardContainer>
