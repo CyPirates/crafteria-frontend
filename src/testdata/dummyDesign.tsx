@@ -1,16 +1,20 @@
 export const designList = [
     {
-        'published' : '2020-01-01',
-        'name': 'test1',
+        'publishedDay' : '2020-01-01',
+        'name': '도면인데용',
         'size': '200KB',
         'price': 20000,
-        'salesVolume': 2000
+        'volume': 2000,
+        'id' : 0,
+        'filePath': '/stlRender/Dragon.stl'
     },
     {
-        'published' : '2020-02-02',
-        'name': 'test2',
+        'publishedDay' : '2020-02-02',
+        'name': '도면임',
         'size': '300KB',
         'price': 30000,
-        'salesVolume': 3000
+        'volume': 3000,
+        'id' : 1,
+        'filePath': '/stlRender/Dragon.stl'
     }
 ]

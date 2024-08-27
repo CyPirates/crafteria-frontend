@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-type DesignOutlineCardProps = {
+type DesignData = {
     published: boolean;
     publishedDay: string;
     name: string;
@@ -9,12 +9,19 @@ type DesignOutlineCardProps = {
     price: number;
     volume: number;
     id: number;
+    filePath: string;
 }
 
-const DesignOutlineCard = ({published, publishedDay, name, size, price, volume, id}:DesignOutlineCardProps) => {
+type DesignOutlineCardProps = {
+    designData: DesignData;
+}
+const DesignOutlineCard = ({designData}:DesignOutlineCardProps) => {
+    const { published, publishedDay, name, size, price, volume, id, filePath } = designData;
     const navigate = useNavigate();
     const handleOnclick = () => {
-        navigate(`/design/${id}`)
+        navigate(`/design/${id}`, {
+            state: { published, publishedDay, name, size, price, volume, id, filePath }
+        })
     }
     return (
         <>

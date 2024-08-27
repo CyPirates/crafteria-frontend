@@ -1,9 +1,68 @@
+import { useLocation } from "react-router-dom";
+import { StlViewer } from "react-stl-viewer";
+import styled from "styled-components";
+
+type StlRenderProps = {
+    filePath: string;
+}
 const DesignDetailPage = () => {
-    return(
+    const location = useLocation();
+    const { published, publishedDay, name, size, price, volume, id, filePath } = location.state;
+
+
+
+    return (
         <>
-        
+            <PageWrapper>
+                <Title>{name}</Title>
+                <StlRenderContainer filePath={filePath} />
+            </PageWrapper>
         </>
     )
 }
 
+const StlRenderContainer = ({ filePath }: StlRenderProps) => {
+    const stlStyle = {
+        width: '1000px',
+        height: '500px',
+        top: 0,
+        left: 0,
+    }
+    return (
+        <StlContainer>
+            <StlViewer
+                url={filePath}
+                style={stlStyle}
+                orbitControls={true}
+                shadows
+                showAxes
+                cameraProps={
+                    {
+                        initialPosition: {
+                            latitude: 0,
+                            longitude: 0,
+                            distance: 1.5
+                        }
+                    }
+                }
+            />
+        </StlContainer >
+    )
+}
+
 export default DesignDetailPage;
+
+const PageWrapper = styled.div`
+    margin: 20px 150px;
+`
+
+const Title = styled.div`
+    font-weight: bold;
+    font-size: 40px;
+`
+const StlContainer = styled.div`
+    width: 1000px;
+    height: 500px;
+    background-color: #E4E4E4;
+    margin-top: 20px
+`

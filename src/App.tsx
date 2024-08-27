@@ -39,5 +39,6 @@ export default App;
 const ContentContainer = styled.div`
     margin-top: 50px;
     min-width: 1000px;
+    min-height: 100vh;
     overflow-x: auto;
 `

@@ -21,23 +21,23 @@ const MyDesignPage = () => {
 }
 
 const DesignList = () => {
-    const [published, setPublished] = useState(false);
+    const [isPublished, setIsPublished] = useState(false);
 
     const handleFilterClick = (filterType: boolean) => {
-        setPublished(filterType);
+        setIsPublished(filterType);
     };
 
     return (
         <>
             <FilterTextContainer>
                 <FilterText
-                    isActive={!published}
+                    isActive={!isPublished}
                     onClick={() => handleFilterClick(false)}
                 >
                     구매한 도면
                 </FilterText>
                 <FilterText
-                    isActive={published}
+                    isActive={isPublished}
                     onClick={() => handleFilterClick(true)}
                 >
                     판매중 도면
@@ -47,13 +47,7 @@ const DesignList = () => {
                 data.map((e, i) => {
                     return(
                         <DesignOutlineCard 
-                        published={published}
-                        publishedDay={e.published}
-                        name={e.name}
-                        size={e.size}
-                        price={e.price}
-                        volume={e.salesVolume}
-                        id={i} />
+                        designData={{...e,'published': isPublished}}/>
                     )            
                 })
             }
