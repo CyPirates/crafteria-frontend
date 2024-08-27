@@ -1,20 +1,31 @@
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 type DesignOutlineCardProps = {
     published: boolean;
+    publishedDay: string;
+    name: string;
+    size: string;
+    price: number;
+    volume: number;
+    id: number;
 }
 
-const DesignOutlineCard = ({published}:DesignOutlineCardProps) => {
+const DesignOutlineCard = ({published, publishedDay, name, size, price, volume, id}:DesignOutlineCardProps) => {
+    const navigate = useNavigate();
+    const handleOnclick = () => {
+        navigate(`/design/${id}`)
+    }
     return (
         <>
-            <CardWrapper>
+            <CardWrapper onClick={handleOnclick}>
                 <ImageContainer>이미지</ImageContainer>
                 <InformationContainer>
-                    <Information>등록일</Information>
-                    <Information>도면명</Information>
-                    <Information>파일용량</Information>
-                    <Information>가격</Information>
-                    <Information>판매량</Information>
+                    <Information>{`등록일: ${publishedDay}`}</Information>
+                    <Information>{`도면명: ${name}`}</Information>
+                    <Information>{`파일용량: ${size}`}</Information>
+                    <Information>{`가격: ${price}원`}</Information>
+                    <Information>{`판매량: ${volume}`}</Information>
                 </InformationContainer>
                 <ButtonConatiner>
                     <Button>다운로드</Button>
@@ -33,6 +44,7 @@ const CardWrapper = styled.div`
     min-width: 800px;
     aspect-ratio: 1/0.2;
     padding: 1vw;
+    margin-bottom: 20px;
     background-color: #5C5C60;
     border-radius: 10px;
 

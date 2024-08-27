@@ -3,11 +3,18 @@ import styled from "styled-components"
 import DesignOutlineCard from "../components/specific/myDesign/DesignOutlineCard"
 import { useState } from "react"
 
+import { designList as data } from "../testdata/dummyDesign"
+
+//TODO: State 위치 조정, 채우기
+
 const MyDesignPage = () => {
     return (
         <>
             <PageWrapper>
                 <DesignList />
+                <CurrentStateContainer>
+                {/*채울 내용*/}
+                </CurrentStateContainer>
             </PageWrapper>
         </>
     )
@@ -36,7 +43,21 @@ const DesignList = () => {
                     판매중 도면
                 </FilterText>
             </FilterTextContainer>
-            <DesignOutlineCard published={published} />
+            {
+                data.map((e, i) => {
+                    return(
+                        <DesignOutlineCard 
+                        published={published}
+                        publishedDay={e.published}
+                        name={e.name}
+                        size={e.size}
+                        price={e.price}
+                        volume={e.salesVolume}
+                        id={i} />
+                    )            
+                })
+            }
+            
         </>
     )
 }
@@ -44,7 +65,8 @@ const DesignList = () => {
 export default MyDesignPage;
 
 const PageWrapper = styled.div`
-    margin: 50px 70px 0px;
+    margin: 50px 100px 0px;
+    height: auto;
 `
 
 
@@ -60,3 +82,15 @@ const FilterText = styled.div<{ isActive: boolean }>`
     cursor: pointer;
     color: ${({ isActive }) => (isActive ? "#F4351D" : "#B3B3B3")};
 `;
+
+const CurrentStateContainer = styled.div`
+    width: 20vw;
+    min-width: 320px;
+    aspect-ratio: 1/2;
+    background-color: #5C5C60;
+    border-radius: 10px;
+
+    position: absolute;
+    top: 100px;
+    right: 100px;
+`

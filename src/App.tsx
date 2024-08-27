@@ -8,6 +8,7 @@ import HomePage from './pages/HomePage';
 import DesignMarket from './pages/DesignMarketPage';
 import ScrollToTop from './components/layout/ScrollToTop';
 import MyDesignPage from './pages/MyDesignPage';
+import DesignDetailPage from './pages/DesignDetailPage';
 
 
 const App: React.FC = () => {
@@ -24,6 +25,7 @@ const App: React.FC = () => {
               <Route path='/home' element={<HomePage />} />
               <Route path='/designMarket' element={<DesignMarket/>} />
               <Route path='/myDesign' element={<MyDesignPage/>} />
+              <Route path='/design/:id' element={<DesignDetailPage/>} />
             </Routes>
           </ContentContainer>
         </div>
