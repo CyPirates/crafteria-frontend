@@ -7,7 +7,7 @@ type StlRenderProps = {
 }
 const DesignDetailPage = () => {
     const location = useLocation();
-    const { published, publishedDay, name, size, price, volume, id, filePath } = location.state;
+    const { published, publishedDay, name, size, price, volume, id, filePath, fileType } = location.state;
 
 
 
@@ -15,6 +15,7 @@ const DesignDetailPage = () => {
         <>
             <PageWrapper>
                 <Title>{name}</Title>
+                <Content>파일형식 : {fileType} 가격: {price}원</Content>
                 <StlRenderContainer filePath={filePath} />
             </PageWrapper>
         </>
@@ -57,8 +58,14 @@ const PageWrapper = styled.div`
 `
 
 const Title = styled.div`
+    width: 1000px;
     font-weight: bold;
     font-size: 40px;
+    margin-bottom: 10px;
+    border-bottom: 5px solid #464649;
+`
+const Content = styled.div`
+    font-size: 15px;
 `
 const StlContainer = styled.div`
     width: 1000px;

@@ -28,8 +28,8 @@ const TopNavBar = () => {
                 <LogoContainer>LOGO</LogoContainer>
                 <NavMenuContainer>
                     <NavMenu to='/home'>홈</NavMenu>
-                    <NavMenu to='/mydesign'>내 도면</NavMenu>
-                    <NavMenu to='/designMarket'>도면 장터</NavMenu>
+                    <NavMenu to='/my-design'>내 도면</NavMenu>
+                    <NavMenu to='/design-market'>도면 장터</NavMenu>
                     <NavMenu to='/order'>주문하기</NavMenu>
                 </NavMenuContainer>
                 <SearchBar onSearchSubmit={handleSearchSubmit} />

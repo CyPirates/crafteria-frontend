@@ -10,23 +10,25 @@ type DesignData = {
     volume: number;
     id: number;
     filePath: string;
+    fileType: string;
+    profileImage: string;
 }
 
 type DesignOutlineCardProps = {
     designData: DesignData;
 }
 const DesignOutlineCard = ({designData}:DesignOutlineCardProps) => {
-    const { published, publishedDay, name, size, price, volume, id, filePath } = designData;
+    const { published, publishedDay, name, size, price, volume, id, filePath, fileType, profileImage } = designData;
     const navigate = useNavigate();
     const handleOnclick = () => {
         navigate(`/design/${id}`, {
-            state: { published, publishedDay, name, size, price, volume, id, filePath }
+            state: { publishedDay, name, size, price, volume, id, filePath, fileType }
         })
     }
     return (
         <>
             <CardWrapper onClick={handleOnclick}>
-                <ImageContainer>이미지</ImageContainer>
+                <ImageContainer src={profileImage} alt="x"/>
                 <InformationContainer>
                     <Information>{`등록일: ${publishedDay}`}</Information>
                     <Information>{`도면명: ${name}`}</Information>
@@ -61,12 +63,13 @@ const CardWrapper = styled.div`
     position: relative;
 `
 
-const ImageContainer = styled.div`
+const ImageContainer = styled.img`
     width: 8vw;
     min-width: 128px;
     aspect-ratio: 1/1;
     background-color: #E4E4E4;
     margin-right: 20px;
+    object-fit: fill;
 `
 
 const InformationContainer = styled.div`
