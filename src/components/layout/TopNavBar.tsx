@@ -10,51 +10,49 @@ const TopNavBar = () => {
     const navigate = useNavigate();
 
     const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
+        if (e.key === "Enter") {
             const searchKeyword = e.currentTarget.value.trim();
             if (searchKeyword) {
                 navigate(`/search/${searchKeyword}`);
             }
         }
-    }
+    };
 
     const routeToMypage = () => {
-        navigate('/mypage');
-    }
+        navigate("/mypage");
+    };
 
     return (
         <>
             <NavContainer>
                 <LogoContainer>LOGO</LogoContainer>
                 <NavMenuContainer>
-                    <NavMenu to='/home'>홈</NavMenu>
-                    <NavMenu to='/my-design'>내 도면</NavMenu>
-                    <NavMenu to='/design-market'>도면 장터</NavMenu>
-                    <NavMenu to='/order'>주문하기</NavMenu>
+                    <NavMenu to="/home">홈</NavMenu>
+                    <NavMenu to="/my-design">내 도면</NavMenu>
+                    <NavMenu to="/design-market">도면 장터</NavMenu>
+                    <NavMenu to="/order">주문하기</NavMenu>
                 </NavMenuContainer>
                 <SearchBar onSearchSubmit={handleSearchSubmit} />
                 <LoginButton>로그인</LoginButton>
-                <MyPageButton onClick={routeToMypage}/>
+                <MyPageButton onClick={routeToMypage} />
             </NavContainer>
         </>
-    )
-}
+    );
+};
 
-const SearchBar: React.FC<{ onSearchSubmit: (e: React.KeyboardEvent<HTMLInputElement>) => void }> = ({ onSearchSubmit }) => {
+const SearchBar: React.FC<{
+    onSearchSubmit: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+}> = ({ onSearchSubmit }) => {
     return (
         <SearchContainer>
-            <IoSearchSharp />
             <SearchInput
                 onKeyUp={onSearchSubmit} // Enter 키 입력 시 검색 처리
             />
         </SearchContainer>
     );
-}
-
-
+};
 
 export default TopNavBar;
-
 
 const NavContainer = styled.div`
     width: 100%;
@@ -65,70 +63,70 @@ const NavContainer = styled.div`
     flex-direction: row;
     align-items: center;
     border-bottom: 5px solid #464649;
-    background-color: #39393C;
+    background-color: #39393c;
     z-index: 3000;
-`
+`;
 
 const LogoContainer = styled.div`
-    margin: 0px 150px;
-    font-size: 30px;
-    color: #9D9D9F;
-`
+    margin: 0px 10vw;
+    font-size: 2vw;
+    color: #9d9d9f;
+`;
 
 const NavMenuContainer = styled.div`
-    width: 500px;
+    width: 25vw;
     display: flex;
     justify-content: space-between;
-`
+`;
 
 const NavMenu = styled(Link)`
     text-decoration: none;
-    font-size: 20px;
-    color: #A5A5A7;
+    font-size: 1vw;
+    color: #a5a5a7;
 
-    &:hover{
+    &:hover {
         font-weight: bold;
     }
-`
+`;
 
 const SearchContainer = styled.div`
-    width: 420px;
+    width: 15vw;
     height: 34px;
-    margin: 0px 70px 0px 300px;
+    margin: 0px 10vw;
     padding-left: 20px;
     border-radius: 30px;
     background-color: white;
     display: flex;
     justify-content: start;
     align-items: center;
-`
+`;
 
 const SearchInput = styled.input`
-    width: 340px;
+    width: 12vw;
     margin-left: 10px;
     border: none;
     outline: none;
-    font-size: 15px;
-`
+    font-size: 1vw;
+`;
 
 const LoginButton = styled.div`
     text-decoration: none;
-    font-size: 20px;
-    color: #A5A5A7;
+    font-size: 1vw;
+    color: #a5a5a7;
 
-    &:hover{
+    &:hover {
         font-weight: bold;
     }
-`
+`;
 
 const MyPageButton = styled(AiOutlineUser)`
-    color: #A5A5A7;
-    width: 30px;
-    height: 30px;
+    color: #a5a5a7;
+    width: 2vw;
+    height: 2vw;
     margin-left: 60px;
 
-    &:hover{
-        width: 32px;
-        height: 32px;
+    &:hover {
+        width: 2.2vw;
+        height: 2.2vw;
     }
-`
+`;

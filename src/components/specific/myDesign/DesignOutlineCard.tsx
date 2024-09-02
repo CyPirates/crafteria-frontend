@@ -12,23 +12,49 @@ type DesignData = {
     filePath: string;
     fileType: string;
     profileImage: string;
-}
+    artist: string;
+    introduction: string;
+};
 
 type DesignOutlineCardProps = {
     designData: DesignData;
-}
-const DesignOutlineCard = ({designData}:DesignOutlineCardProps) => {
-    const { published, publishedDay, name, size, price, volume, id, filePath, fileType, profileImage } = designData;
+};
+const DesignOutlineCard = ({ designData }: DesignOutlineCardProps) => {
+    const {
+        published,
+        publishedDay,
+        name,
+        size,
+        price,
+        volume,
+        id,
+        filePath,
+        fileType,
+        profileImage,
+        artist,
+        introduction,
+    } = designData;
     const navigate = useNavigate();
     const handleOnclick = () => {
         navigate(`/design/${id}`, {
-            state: { publishedDay, name, size, price, volume, id, filePath, fileType }
-        })
-    }
+            state: {
+                publishedDay,
+                name,
+                size,
+                price,
+                volume,
+                id,
+                filePath,
+                fileType,
+                artist,
+                introduction,
+            },
+        });
+    };
     return (
         <>
             <CardWrapper onClick={handleOnclick}>
-                <ImageContainer src={profileImage} alt="x"/>
+                <ImageContainer src={profileImage} alt="x" />
                 <InformationContainer>
                     <Information>{`등록일: ${publishedDay}`}</Information>
                     <Information>{`도면명: ${name}`}</Information>
@@ -43,47 +69,43 @@ const DesignOutlineCard = ({designData}:DesignOutlineCardProps) => {
                 </ButtonConatiner>
             </CardWrapper>
         </>
-    )
-}
+    );
+};
 
 export default DesignOutlineCard;
 
 const CardWrapper = styled.div`
-    width: 50vw;
-    min-width: 800px;
-    aspect-ratio: 1/0.2;
-    padding: 1vw;
+    width: 700px;
+    padding: 15px;
     margin-bottom: 20px;
-    background-color: #5C5C60;
+    background-color: #5c5c60;
     border-radius: 10px;
 
     display: flex;
     align-items: center;
 
     position: relative;
-`
+`;
 
 const ImageContainer = styled.img`
-    width: 8vw;
-    min-width: 128px;
+    width: 150px;
     aspect-ratio: 1/1;
-    background-color: #E4E4E4;
+    background-color: #e4e4e4;
     margin-right: 20px;
     object-fit: fill;
-`
+`;
 
 const InformationContainer = styled.div`
-    height: 8vw;
-    min-height: 128px;
+    height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-`
+`;
 const Information = styled.div`
-    color: #D2D2D2;
+    color: #d2d2d2;
     font-size: 15px;
     font-weight: 600;
-`
+`;
 
 const ButtonConatiner = styled.div`
     display: flex;
@@ -93,7 +115,7 @@ const ButtonConatiner = styled.div`
     position: absolute;
     top: 10px;
     right: 10px;
-`
+`;
 const Button = styled.div`
     width: 100px;
     height: 20px;
@@ -104,4 +126,4 @@ const Button = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-`
+`;

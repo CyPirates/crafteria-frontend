@@ -4,21 +4,24 @@ import Carousel from "../components/specific/home/Carousel";
 import WholeDesignCardContainer from "../components/common/WholeDesignCardContainer";
 
 const HomePage = () => {
-
     return (
         <>
-            <Carousel />
-            <CurrentVisitContainer></CurrentVisitContainer>
-            <WholeDesignCardContainer/>
+            <PageWrapper>
+                <Carousel />
+                <CurrentVisitContainer></CurrentVisitContainer>
+                <WholeDesignCardContainer />
+            </PageWrapper>
         </>
-    )
-}
+    );
+};
 
 export default HomePage;
+
+const PageWrapper = styled.div``;
 
 const CurrentVisitContainer = styled.div`
     width: 100%;
     height: 200px;
-    background-color: #D9D9D9;
+    background-color: #d9d9d9;
     margin-top: 50px;
-`
+`;

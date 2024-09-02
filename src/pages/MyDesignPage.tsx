@@ -1,9 +1,9 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
-import DesignOutlineCard from "../components/specific/myDesign/DesignOutlineCard"
-import { useState } from "react"
+import DesignOutlineCard from "../components/specific/myDesign/DesignOutlineCard";
+import { useState } from "react";
 
-import { designList as data } from "../testdata/dummyDesign"
+import { designList as data } from "../testdata/dummyDesign";
 
 //TODO: State 위치 조정, 채우기
 
@@ -11,14 +11,14 @@ const MyDesignPage = () => {
     return (
         <>
             <PageWrapper>
-                <DesignList />
-                <CurrentStateContainer>
-                {/*채울 내용*/}
-                </CurrentStateContainer>
+                <DesignListContainer>
+                    <DesignList />
+                </DesignListContainer>
+                <CurrentStateContainer>{/*채울 내용*/}</CurrentStateContainer>
             </PageWrapper>
         </>
-    )
-}
+    );
+};
 
 const DesignList = () => {
     const [isPublished, setIsPublished] = useState(false);
@@ -43,32 +43,35 @@ const DesignList = () => {
                     판매중 도면
                 </FilterText>
             </FilterTextContainer>
-            {
-                data.map((e, i) => {
-                    return(
-                        <DesignOutlineCard 
-                        designData={{...e,'published': isPublished}}/>
-                    )            
-                })
-            }
-            
+            {data.map((e, i) => {
+                return (
+                    <DesignOutlineCard
+                        designData={{ ...e, published: isPublished }}
+                    />
+                );
+            })}
         </>
-    )
-}
+    );
+};
 
 export default MyDesignPage;
 
 const PageWrapper = styled.div`
-    margin: 50px 100px 0px;
+    margin-top: 50px;
     height: auto;
-`
 
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+`;
+
+const DesignListContainer = styled.div``;
 
 const FilterTextContainer = styled.div`
     margin-bottom: 1vw;
     display: flex;
     flex-direction: row;
-`
+`;
 
 const FilterText = styled.div<{ isActive: boolean }>`
     font-size: 15px;
@@ -78,13 +81,8 @@ const FilterText = styled.div<{ isActive: boolean }>`
 `;
 
 const CurrentStateContainer = styled.div`
-    width: 20vw;
-    min-width: 320px;
-    aspect-ratio: 1/2;
-    background-color: #5C5C60;
+    width: 500px;
+    height: 1000px;
+    background-color: #5c5c60;
     border-radius: 10px;
-
-    position: absolute;
-    top: 100px;
-    right: 100px;
-`
+`;

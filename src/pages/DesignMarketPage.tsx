@@ -4,11 +4,11 @@ import TopRankCardContainer from "../components/specific/designMarket/TopRankCar
 const DesignMarket = () => {
     return (
         <>
-            <TopRankCardContainer category='작가'/>
-            <TopRankCardContainer category='도면'/>
+            {/* <TopRankCardContainer category='작가'/>
+            <TopRankCardContainer category='도면'/> */}
             <WholeDesignCardContainer />
         </>
-    )
-}
+    );
+};
 
 export default DesignMarket;
