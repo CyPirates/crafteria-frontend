@@ -21,13 +21,13 @@ const StlRenderContainer = ({ filePath }: StlRenderProps) => {
                 orbitControls
                 shadows
                 showAxes
-                cameraProps={{
-                    initialPosition: {
-                        latitude: 0,
-                        longitude: 0,
-                        distance: 2,
-                    },
-                }}
+                // cameraProps={{
+                //     initialPosition: {
+                //         latitude: 0,
+                //         longitude: 0,
+                //         distance: 2,
+                //     },
+                // }}
             />
         </StlContainer>
     );

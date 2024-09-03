@@ -3,6 +3,8 @@ import styled from "styled-components";
 
 import StlRenderContainer from "../components/specific/designDetail/StlRenderContainer";
 import DesignInfo from "../components/specific/designDetail/DesignInfo";
+import { useState } from "react";
+import BuyDesignPopUp from "../components/specific/designDetail/BuyDesignPopUp";
 
 const DesignDetailPage = () => {
     const location = useLocation();
@@ -19,6 +21,8 @@ const DesignDetailPage = () => {
         introduction,
     } = location.state;
 
+    const [isPop, setIsPop] = useState<boolean>(false);
+
     return (
         <PageWrapper>
             <DesignContainer>
@@ -32,10 +36,12 @@ const DesignDetailPage = () => {
                     size={size}
                     fileType={fileType}
                     id={id}
+                    handleOnClick={setIsPop}
                 />
             </DesignContainer>
             <IntroductionTitle>소개말</IntroductionTitle>
             <IntroductionContents>{introduction}</IntroductionContents>
+            {isPop ? <BuyDesignPopUp handleOnClick={setIsPop} /> : null}
         </PageWrapper>
     );
 };

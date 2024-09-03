@@ -40,7 +40,10 @@ const App: React.FC = () => {
                                 path="/sell-design"
                                 element={<SellDesignPage />}
                             />
-                            <Route path="/order" element={<PrintOrderPage />} />
+                            <Route
+                                path="/print-order"
+                                element={<PrintOrderPage />}
+                            />
                         </Routes>
                     </ContentContainer>
                 </div>

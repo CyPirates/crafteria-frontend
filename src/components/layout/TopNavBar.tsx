@@ -30,7 +30,7 @@ const TopNavBar = () => {
                     <NavMenu to="/home">홈</NavMenu>
                     <NavMenu to="/my-design">내 도면</NavMenu>
                     <NavMenu to="/design-market">도면 장터</NavMenu>
-                    <NavMenu to="/order">주문하기</NavMenu>
+                    <NavMenu to="/print-order">주문하기</NavMenu>
                 </NavMenuContainer>
                 <SearchBar onSearchSubmit={handleSearchSubmit} />
                 <LoginButton>로그인</LoginButton>

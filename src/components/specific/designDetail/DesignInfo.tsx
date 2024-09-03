@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 type DesignInfoProps = {
@@ -9,6 +10,7 @@ type DesignInfoProps = {
     size: string;
     fileType: string;
     id: string;
+    handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const DesignInfo = ({
@@ -20,7 +22,9 @@ const DesignInfo = ({
     size,
     fileType,
     id,
+    handleOnClick,
 }: DesignInfoProps) => {
+    const navigate = useNavigate();
     return (
         <InfoContainer>
             <Title>{name}</Title>
@@ -48,7 +52,13 @@ const DesignInfo = ({
                 </Detail>
             </DetailContainer>
             <ButtonContainer>
-                <Button>구매하기</Button>
+                <Button
+                    onClick={() => {
+                        handleOnClick(true);
+                    }}
+                >
+                    구매하기
+                </Button>
                 <Button>문의하기</Button>
             </ButtonContainer>
         </InfoContainer>
