@@ -1,46 +1,67 @@
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
 
+import { DesignProps } from "../types/DesignType";
 import StlRenderContainer from "../components/specific/designDetail/StlRenderContainer";
 import DesignInfo from "../components/specific/designDetail/DesignInfo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BuyDesignPopUp from "../components/specific/designDetail/BuyDesignPopUp";
+import { newAxios } from "../utils/axiosWithUrl";
 
 const DesignDetailPage = () => {
-    const location = useLocation();
-    const {
-        publishedDay,
-        name,
-        size,
-        price,
-        volume,
-        id,
-        filePath,
-        fileType,
-        artist,
-        introduction,
-    } = location.state;
-
+    const [design, setDesign] = useState<DesignProps | undefined>(undefined);
     const [isPop, setIsPop] = useState<boolean>(false);
+    const { id } = useParams();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await newAxios.get(
+                    `/api/v1/user/model/model/${id}`
+                );
+                let data = response.data.data;
+                console.log(data);
+                setDesign(data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchData();
+    }, [id]);
+
+    if (!design) {
+        return <div>Loading...</div>; // 디자인이 로드되기 전 로딩 메시지 표시
+    }
+
+    const {
+        name,
+        description,
+        price,
+        downloadCount,
+        minimumSize,
+        modelFileUrl,
+    } = design;
 
     return (
         <PageWrapper>
             <DesignContainer>
-                <StlRenderContainer filePath={filePath} />
+                <StlRenderContainer
+                    filePath={modelFileUrl}
+                    width="500px"
+                    height="500px"
+                />
                 <DesignInfo
                     name={name}
-                    artist={artist}
-                    publishedDay={publishedDay}
+                    artist={"asdf"}
                     price={price}
-                    volume={volume}
-                    size={size}
-                    fileType={fileType}
+                    volume={downloadCount}
+                    size={minimumSize}
                     id={id}
                     handleOnClick={setIsPop}
                 />
             </DesignContainer>
             <IntroductionTitle>소개말</IntroductionTitle>
-            <IntroductionContents>{introduction}</IntroductionContents>
+            <IntroductionContents>{description}</IntroductionContents>
             {isPop ? <BuyDesignPopUp handleOnClick={setIsPop} /> : null}
         </PageWrapper>
     );

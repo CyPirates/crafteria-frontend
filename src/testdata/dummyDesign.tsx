@@ -58,7 +58,7 @@ export const designList = [
         price: 30000,
         volume: 3000,
         id: 1,
-        filePath: "/stlRender/Dragon.stl",
+        filePath: "/stlRender/zz",
         fileType: "stl",
         profileImage: "/stlRender/개죽이2.png",
         artist: "죽여줘",

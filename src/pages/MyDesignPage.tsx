@@ -29,7 +29,7 @@ const DesignList = () => {
 
     return (
         <>
-            <FilterTextContainer>
+            <HeaderContainer>
                 <FilterText
                     isActive={!isPublished}
                     onClick={() => handleFilterClick(false)}
@@ -42,7 +42,7 @@ const DesignList = () => {
                 >
                     판매중 도면
                 </FilterText>
-            </FilterTextContainer>
+            </HeaderContainer>
             {data.map((e, i) => {
                 return (
                     <DesignOutlineCard
@@ -67,7 +67,7 @@ const PageWrapper = styled.div`
 
 const DesignListContainer = styled.div``;
 
-const FilterTextContainer = styled.div`
+const HeaderContainer = styled.div`
     margin-bottom: 1vw;
     display: flex;
     flex-direction: row;

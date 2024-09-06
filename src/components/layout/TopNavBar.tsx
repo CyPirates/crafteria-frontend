@@ -18,8 +18,9 @@ const TopNavBar = () => {
         }
     };
 
-    const routeToMypage = () => {
-        navigate("/mypage");
+    const handleLoginClick = () => {
+        window.location.href =
+            "https://crafteria.co.kr/oauth2/authorization/google";
     };
 
     return (
@@ -31,10 +32,11 @@ const TopNavBar = () => {
                     <NavMenu to="/my-design">내 도면</NavMenu>
                     <NavMenu to="/design-market">도면 장터</NavMenu>
                     <NavMenu to="/print-order">주문하기</NavMenu>
+                    <NavMenu to="/sell-design">도면 판매</NavMenu>
                 </NavMenuContainer>
                 <SearchBar onSearchSubmit={handleSearchSubmit} />
-                <LoginButton>로그인</LoginButton>
-                <MyPageButton onClick={routeToMypage} />
+                <LoginButton onClick={handleLoginClick}>로그인</LoginButton>
+                <MyPageButton onClick={() => navigate("/mypage")} />
             </NavContainer>
         </>
     );

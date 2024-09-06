@@ -1,12 +1,32 @@
+import { useEffect, useState } from "react";
+import { newAxios } from "../../utils/axiosWithUrl";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import { Card } from "react-bootstrap";
 
-import { designList as data } from "../../testdata/dummyDesign";
+import { DesignProps } from "../../types/DesignType";
+import { Card } from "react-bootstrap";
 
 //TODO: Filter 기능 추가, SummaryCard 받아온 데이터로 변경
 
 const WholeDesignCardContainer = () => {
+    const [designList, setDesignList] = useState<DesignProps[]>([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await newAxios.get(
+                    "/api/v1/user/model/list/popular"
+                );
+                let data = response.data.data;
+                console.log(data);
+                setDesignList(data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchData();
+    }, []);
+
     return (
         <>
             <Container>
@@ -17,64 +37,48 @@ const WholeDesignCardContainer = () => {
                     <FilterText>최신순</FilterText>
                 </FilterTextContainer>
                 <CardContainer>
-                    <WholeDesignCards />
+                    {designList.map((e, i) => {
+                        return <WholeDesignCards designData={e} key={i} />;
+                    })}
                 </CardContainer>
             </Container>
         </>
     );
 };
 
-const WholeDesignCards = () => {
+const WholeDesignCards = ({ designData }: { designData: DesignProps }) => {
     const navigate = useNavigate();
+    const {
+        id,
+        name,
+        description,
+        rating,
+        price,
+        viewCount,
+        downloadCount,
+        maximumSize,
+        minimumSize,
+        modelFileUrl,
+    } = designData;
+
+    const handleOnClick = () => {
+        navigate(`/design/${id}`);
+    };
 
     return (
         <>
-            {data.map((e, i) => {
-                const {
-                    publishedDay,
-                    name,
-                    size,
-                    price,
-                    volume,
-                    id,
-                    filePath,
-                    fileType,
-                    profileImage,
-                    artist,
-                    introduction,
-                } = e;
-                const handleOnclick = () => {
-                    navigate(`/design/${id}`, {
-                        state: {
-                            publishedDay,
-                            name,
-                            size,
-                            price,
-                            volume,
-                            id,
-                            filePath,
-                            fileType,
-                            profileImage,
-                            artist,
-                            introduction,
-                        },
-                    });
-                };
-                return (
-                    <StyledCard onClick={handleOnclick}>
-                        <Card.Img variant="top" src={e.profileImage} />
-                        <Card.Body>
-                            <Card.Title>{e.name}</Card.Title>
-                            <Card.Text>
-                                <DetailText>가격: {price}원</DetailText>
-                                <DetailText>파일크기: {size}</DetailText>
-                                <DetailText>판매량: {volume}</DetailText>
-                                <DetailText>등록일: {publishedDay}</DetailText>
-                            </Card.Text>
-                        </Card.Body>
-                    </StyledCard>
-                );
-            })}
+            <StyledCard onClick={handleOnClick}>
+                <Card.Img variant="top" />
+                <Card.Body>
+                    <Card.Title>{name}</Card.Title>
+                    <Card.Text>
+                        <DetailText>가격: {price}원</DetailText>
+                        <DetailText>크기: {minimumSize}</DetailText>
+                        <DetailText>판매량: {downloadCount}</DetailText>
+                        <DetailText>조회수: {viewCount}</DetailText>
+                    </Card.Text>
+                </Card.Body>
+            </StyledCard>
         </>
     );
 };

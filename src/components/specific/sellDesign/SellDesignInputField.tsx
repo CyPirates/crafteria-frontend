@@ -1,30 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import styled from "styled-components";
-
-type designFormData = {
-    title: string;
-    description: string;
-    price: string;
-    file: File | null;
-}
+import { DesignFormData } from "../../../types/DesignType";
+import FileUploadContainer from "./FileUploadContainer";
+import InputDesignInfoContainer from "./InputDesignInfoContainer";
+import { newAxios } from "../../../utils/axiosWithUrl";
 
 const SellDesignInputField = () => {
-    const [designFormData, setDesignFormData] = useState<designFormData>({
-        title: '',
-        description: '',
-        price: '',
+    const [designFormData, setDesignFormData] = useState<DesignFormData>({
+        name: "",
+        description: "",
+        price: "",
+        minimumSize: "",
+        maximumSize: "",
         file: null,
     });
 
-    const [activeMenu, setActiveMenu] = useState<string>('title'); // 기본으로 'title' 메뉴를 활성화
+    const [activeMenu, setActiveMenu] = useState<string>("title");
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleInputChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
         const { name, value } = e.target;
         setDesignFormData((prevData) => ({
             ...prevData,
             [name]: value,
         }));
-        console.log(designFormData);
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,12 +36,65 @@ const SellDesignInputField = () => {
         }));
     };
 
+    const handleFileUploadClick = () => {
+        if (fileInputRef.current) {
+            fileInputRef.current.click();
+        }
+    };
+
+    const handleSubmit = async (designFormData: DesignFormData) => {
+        const formData = new FormData();
+
+        formData.append("name", designFormData.name);
+        formData.append("description", designFormData.description);
+        formData.append("price", designFormData.price);
+        formData.append("minimumSize", designFormData.minimumSize);
+        formData.append("maximumSize", designFormData.maximumSize);
+
+        if (designFormData.file) {
+            formData.append("file", designFormData.file);
+        }
+
+        try {
+            const response = await newAxios.post(
+                "/api/v1/user/model/model/upload",
+                formData,
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem(
+                            "accessToken"
+                        )}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            console.log("Design data submitted successfully:", response.data);
+            return response.data;
+        } catch (error) {
+            console.error("Error submitting design data:", error);
+            throw error;
+        }
+    };
+
     const renderDescription = () => {
         switch (activeMenu) {
-            case 'title':
-                return <InputDesignInfoContainer formData={designFormData} onInputChange={handleInputChange} />;
-            case 'fileUpload':
-                return <FileUploadContainer onFileChange={handleFileChange} />;
+            case "title":
+                return (
+                    <InputDesignInfoContainer
+                        formData={designFormData}
+                        onInputChange={handleInputChange}
+                    />
+                );
+            case "fileUpload":
+                return (
+                    <FileUploadContainer
+                        formData={designFormData}
+                        onFileChange={handleFileChange}
+                        onUploadClick={handleFileUploadClick}
+                        fileInputRef={fileInputRef}
+                    />
+                );
             default:
                 return null;
         }
@@ -49,77 +103,32 @@ const SellDesignInputField = () => {
     return (
         <Container>
             <MenuContainer>
-                <MenuItem 
-                    onClick={() => setActiveMenu('title')} 
-                    active={activeMenu === 'title'}
-                >
-                    제목 및 내용
-                </MenuItem>
-                <MenuItem 
-                    onClick={() => setActiveMenu('fileUpload')} 
-                    active={activeMenu === 'fileUpload'}
-                >
-                    파일 업로드
-                </MenuItem>
+                <div>
+                    <MenuItem
+                        onClick={() => setActiveMenu("title")}
+                        active={activeMenu === "title"}
+                    >
+                        제목 및 내용
+                    </MenuItem>
+                    <MenuItem
+                        onClick={() => setActiveMenu("fileUpload")}
+                        active={activeMenu === "fileUpload"}
+                    >
+                        파일 업로드
+                    </MenuItem>
+                </div>
+                <SubmitButton onClick={() => handleSubmit(designFormData)}>
+                    제출하기
+                </SubmitButton>
             </MenuContainer>
-            <DescriptionContainer>
-                {renderDescription()}
-            </DescriptionContainer>
+            <DescriptionContainer>{renderDescription()}</DescriptionContainer>
         </Container>
-    );
-};
-
-export default SellDesignInputField;
-
-const InputDesignInfoContainer: React.FC<{
-    formData: { title: string; description: string; price: string };
-    onInputChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-}> = ({ formData, onInputChange }) => {
-
-    return (
-        <>
-            <SectionTitle>제목</SectionTitle>
-            <InputField 
-                name="title" 
-                value={formData.title} 
-                onChange={onInputChange} 
-                placeholder="제목을 입력하세요" 
-            />
-            <SectionTitle>내용</SectionTitle>
-            <TextArea 
-                name="description" 
-                value={formData.description} 
-                onChange={onInputChange} 
-                placeholder="내용을 입력하세요" 
-            />
-            <SectionTitle>가격</SectionTitle>
-            <InputField 
-                name="price" 
-                value={formData.price} 
-                onChange={onInputChange} 
-                placeholder="가격을 입력하세요" 
-            />
-        </>
-    )
-};
-
-const FileUploadContainer: React.FC<{
-    onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}> = ({ onFileChange }) => {
-    return (
-        <>
-            <SectionTitle>파일 업로드</SectionTitle>
-            <input 
-                type="file" 
-                onChange={onFileChange} 
-            />
-        </>
     );
 };
 
 const Container = styled.div`
     width: 100%;
-    height: calc(100% - 50px);
+    height: 800px;
     display: flex;
     flex-direction: row;
 `;
@@ -131,20 +140,22 @@ const MenuContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 20px;
+    justify-content: space-between; /* 추가: MenuContainer의 요소들을 상하로 분산 */
 `;
 
 const MenuItem = styled.div<{ active?: boolean }>`
     padding: 10px;
     border-radius: 5px;
+    margin-bottom: 20px;
     cursor: pointer;
     text-align: center;
     position: relative;
-    font-weight: ${({ active }) => (active ? 'bold' : 'normal')};
+    font-weight: ${({ active }) => (active ? "bold" : "normal")};
 
     &::before {
-        content: '•';
+        content: "•";
         font-size: 24px;
-        color: ${({ active }) => (active ? 'green' : 'gray')};
+        color: ${({ active }) => (active ? "green" : "gray")};
         position: absolute;
         left: 10px;
         top: 50%;
@@ -156,6 +167,23 @@ const MenuItem = styled.div<{ active?: boolean }>`
     }
 `;
 
+const SubmitButton = styled.div`
+    width: 200px;
+    height: 50px;
+    background-color: #008ecc;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+        background-color: #4682b4;
+    }
+`;
+
 const DescriptionContainer = styled.div`
     width: calc(100% - 300px);
     height: 100%;
@@ -164,24 +192,4 @@ const DescriptionContainer = styled.div`
     padding: 20px;
 `;
 
-const SectionTitle = styled.div`
-    color: black;
-    font-weight: bold;
-    font-size: 23px;
-    margin-bottom: 20px;
-`;
-
-const InputField = styled.input`
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    font-size: 16px;
-`;
-
-const TextArea = styled.textarea`
-    width: 100%;
-    padding: 10px;
-    height: 100px;
-    margin-bottom: 20px;
-    font-size: 16px;
-`;
+export default SellDesignInputField;

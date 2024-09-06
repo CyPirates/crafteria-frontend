@@ -4,23 +4,19 @@ import styled from "styled-components";
 type DesignInfoProps = {
     name: string;
     artist: string;
-    publishedDay: string;
     price: string;
     volume: string;
     size: string;
-    fileType: string;
-    id: string;
+    id: string | undefined;
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const DesignInfo = ({
     name,
     artist,
-    publishedDay,
     price,
     volume,
     size,
-    fileType,
     id,
     handleOnClick,
 }: DesignInfoProps) => {
@@ -30,10 +26,6 @@ const DesignInfo = ({
             <Title>{name}</Title>
             <ArtistName>작가: {artist}</ArtistName>
             <DetailContainer>
-                <Detail>
-                    <DetailTitle>등록일</DetailTitle>
-                    <DetailContent>{publishedDay}</DetailContent>
-                </Detail>
                 <Detail>
                     <DetailTitle>가격</DetailTitle>
                     <DetailContent>{price}원</DetailContent>
@@ -45,10 +37,6 @@ const DesignInfo = ({
                 <Detail>
                     <DetailTitle>파일크기</DetailTitle>
                     <DetailContent>{size}</DetailContent>
-                </Detail>
-                <Detail>
-                    <DetailTitle>파일형식</DetailTitle>
-                    <DetailContent>{fileType}</DetailContent>
                 </Detail>
             </DetailContainer>
             <ButtonContainer>

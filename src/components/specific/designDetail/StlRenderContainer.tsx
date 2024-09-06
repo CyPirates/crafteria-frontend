@@ -3,18 +3,20 @@ import styled from "styled-components";
 
 type StlRenderProps = {
     filePath: string;
+    width: string;
+    height: string;
 };
 
-const StlRenderContainer = ({ filePath }: StlRenderProps) => {
+const StlRenderContainer = ({ filePath, width, height }: StlRenderProps) => {
     const stlStyle = {
-        width: "500px",
-        height: "500px",
+        width: width,
+        height: height,
         top: 0,
         left: 0,
     };
 
     return (
-        <StlContainer>
+        <StlContainer width={width} height={height}>
             <StlViewer
                 url={filePath}
                 style={stlStyle}
@@ -35,9 +37,9 @@ const StlRenderContainer = ({ filePath }: StlRenderProps) => {
 
 export default StlRenderContainer;
 
-const StlContainer = styled.div`
-    width: 500px;
-    height: 500px;
+const StlContainer = styled.div<{ width: string; height: string }>`
+    width: ${(props) => props.width};
+    height: ${(props) => props.height};
     background-color: #e4e4e4;
     margin-top: 20px;
 `;
