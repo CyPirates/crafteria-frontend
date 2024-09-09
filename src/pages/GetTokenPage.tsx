@@ -17,7 +17,7 @@ const GetTokenPage = () => {
             // 액세스 토큰을 로컬 스토리지에 저장
             console.log(accessToken);
             localStorage.setItem("accessToken", accessToken);
-            navigate(-1);
+            //navigate(-1);
         }
 
         // 선택적으로: 인증 후 다른 페이지로 리디렉션

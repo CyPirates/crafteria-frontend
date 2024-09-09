@@ -14,9 +14,7 @@ const WholeDesignCardContainer = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await newAxios.get(
-                    "/api/v1/user/model/list/popular"
-                );
+                const response = await newAxios.get("/api/v1/model/user/list/popular");
                 let data = response.data.data;
                 console.log(data);
                 setDesignList(data);
@@ -48,18 +46,7 @@ const WholeDesignCardContainer = () => {
 
 const WholeDesignCards = ({ designData }: { designData: DesignProps }) => {
     const navigate = useNavigate();
-    const {
-        id,
-        name,
-        description,
-        rating,
-        price,
-        viewCount,
-        downloadCount,
-        maximumSize,
-        minimumSize,
-        modelFileUrl,
-    } = designData;
+    const { id, name, description, rating, price, viewCount, downloadCount, maximumSize, minimumSize, modelFileUrl } = designData;
 
     const handleOnClick = () => {
         navigate(`/design/${id}`);

@@ -19,8 +19,7 @@ const TopNavBar = () => {
     };
 
     const handleLoginClick = () => {
-        window.location.href =
-            "https://crafteria.co.kr/oauth2/authorization/google";
+        window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/google";
     };
 
     return (

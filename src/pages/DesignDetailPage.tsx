@@ -16,9 +16,7 @@ const DesignDetailPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await newAxios.get(
-                    `/api/v1/user/model/model/${id}`
-                );
+                const response = await newAxios.get(`/api/v1/model/user/view/${id}`);
                 let data = response.data.data;
                 console.log(data);
                 setDesign(data);
@@ -33,32 +31,13 @@ const DesignDetailPage = () => {
         return <div>Loading...</div>; // 디자인이 로드되기 전 로딩 메시지 표시
     }
 
-    const {
-        name,
-        description,
-        price,
-        downloadCount,
-        minimumSize,
-        modelFileUrl,
-    } = design;
+    const { name, description, price, downloadCount, minimumSize, modelFileUrl } = design;
 
     return (
         <PageWrapper>
             <DesignContainer>
-                <StlRenderContainer
-                    filePath={modelFileUrl}
-                    width="500px"
-                    height="500px"
-                />
-                <DesignInfo
-                    name={name}
-                    artist={"asdf"}
-                    price={price}
-                    volume={downloadCount}
-                    size={minimumSize}
-                    id={id}
-                    handleOnClick={setIsPop}
-                />
+                <StlRenderContainer filePath={modelFileUrl} width="500px" height="500px" />
+                <DesignInfo name={name} artist={"asdf"} price={price} volume={downloadCount} size={minimumSize} id={id} handleOnClick={setIsPop} />
             </DesignContainer>
             <IntroductionTitle>소개말</IntroductionTitle>
             <IntroductionContents>{description}</IntroductionContents>
