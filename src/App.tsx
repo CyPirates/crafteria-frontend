@@ -25,30 +25,12 @@ const App: React.FC = () => {
                         <Routes>
                             <Route path="/" element={<Navigate to="/home" />} />
                             <Route path="/home" element={<HomePage />} />
-                            <Route
-                                path="/design-market"
-                                element={<DesignMarket />}
-                            />
-                            <Route
-                                path="/my-design"
-                                element={<MyDesignPage />}
-                            />
-                            <Route
-                                path="/design/:id"
-                                element={<DesignDetailPage />}
-                            />
-                            <Route
-                                path="/sell-design"
-                                element={<SellDesignPage />}
-                            />
-                            <Route
-                                path="/print-order"
-                                element={<PrintOrderPage />}
-                            />
-                            <Route
-                                path="/auth/success"
-                                element={<GetTokenPage />}
-                            />
+                            <Route path="/design-market" element={<DesignMarket />} />
+                            <Route path="/my-design" element={<MyDesignPage />} />
+                            <Route path="/design/:id" element={<DesignDetailPage />} />
+                            <Route path="/sell-design" element={<SellDesignPage />} />
+                            <Route path="/print-order" element={<PrintOrderPage />} />
+                            <Route path="/auth/success" element={<GetTokenPage />} />
                         </Routes>
                     </ContentContainer>
                 </div>

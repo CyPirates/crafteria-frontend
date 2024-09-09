@@ -8,18 +8,11 @@ type DesignInfoProps = {
     volume: string;
     size: string;
     id: string | undefined;
+    isPurchased: boolean;
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const DesignInfo = ({
-    name,
-    artist,
-    price,
-    volume,
-    size,
-    id,
-    handleOnClick,
-}: DesignInfoProps) => {
+const DesignInfo = ({ name, artist, price, volume, size, id, isPurchased, handleOnClick }: DesignInfoProps) => {
     const navigate = useNavigate();
     return (
         <InfoContainer>
@@ -42,10 +35,11 @@ const DesignInfo = ({
             <ButtonContainer>
                 <Button
                     onClick={() => {
+                        if (isPurchased) return;
                         handleOnClick(true);
                     }}
                 >
-                    구매하기
+                    {isPurchased ? "구매완료" : "구매하기"}
                 </Button>
                 <Button>문의하기</Button>
             </ButtonContainer>

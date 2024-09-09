@@ -11,6 +11,8 @@ import { newAxios } from "../utils/axiosWithUrl";
 const DesignDetailPage = () => {
     const [design, setDesign] = useState<DesignProps | undefined>(undefined);
     const [isPop, setIsPop] = useState<boolean>(false);
+    const [isPurchased, setIsPurchased] = useState<boolean>(false);
+
     const { id } = useParams();
 
     useEffect(() => {
@@ -37,11 +39,11 @@ const DesignDetailPage = () => {
         <PageWrapper>
             <DesignContainer>
                 <StlRenderContainer filePath={modelFileUrl} width="500px" height="500px" />
-                <DesignInfo name={name} artist={"asdf"} price={price} volume={downloadCount} size={minimumSize} id={id} handleOnClick={setIsPop} />
+                <DesignInfo name={name} artist={"asdf"} price={price} volume={downloadCount} size={minimumSize} id={id} handleOnClick={setIsPop} isPurchased={isPurchased} />
             </DesignContainer>
             <IntroductionTitle>소개말</IntroductionTitle>
             <IntroductionContents>{description}</IntroductionContents>
-            {isPop ? <BuyDesignPopUp handleOnClick={setIsPop} /> : null}
+            {isPop ? <BuyDesignPopUp handleOnClick={setIsPop} setIsPurchased={setIsPurchased} name={name} price={price} filePath={modelFileUrl} id={id} /> : null}
         </PageWrapper>
     );
 };

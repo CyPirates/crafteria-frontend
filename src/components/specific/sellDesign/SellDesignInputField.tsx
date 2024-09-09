@@ -4,6 +4,7 @@ import { DesignFormData } from "../../../types/DesignType";
 import FileUploadContainer from "./FileUploadContainer";
 import InputDesignInfoContainer from "./InputDesignInfoContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
+import { useNavigate } from "react-router-dom";
 
 const SellDesignInputField = () => {
     const [designFormData, setDesignFormData] = useState<DesignFormData>({
@@ -17,10 +18,9 @@ const SellDesignInputField = () => {
 
     const [activeMenu, setActiveMenu] = useState<string>("title");
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const navigate = useNavigate();
 
-    const handleInputChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-    ) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setDesignFormData((prevData) => ({
             ...prevData,
@@ -44,6 +44,7 @@ const SellDesignInputField = () => {
 
     const handleSubmit = async (designFormData: DesignFormData) => {
         const formData = new FormData();
+        const token = localStorage.getItem("accessToken");
 
         formData.append("name", designFormData.name);
         formData.append("description", designFormData.description);
@@ -52,24 +53,19 @@ const SellDesignInputField = () => {
         formData.append("maximumSize", designFormData.maximumSize);
 
         if (designFormData.file) {
-            formData.append("file", designFormData.file);
+            formData.append("modelFile", designFormData.file);
         }
 
         try {
-            const response = await newAxios.post(
-                "/api/v1/user/model/model/upload",
-                formData,
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "accessToken"
-                        )}`,
-                        "Content-Type": "multipart/form-data",
-                    },
-                }
-            );
+            const response = await newAxios.post("/api/v1/model/author/upload", formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
 
             console.log("Design data submitted successfully:", response.data);
+            navigate("/my-design");
             return response.data;
         } catch (error) {
             console.error("Error submitting design data:", error);
@@ -80,21 +76,9 @@ const SellDesignInputField = () => {
     const renderDescription = () => {
         switch (activeMenu) {
             case "title":
-                return (
-                    <InputDesignInfoContainer
-                        formData={designFormData}
-                        onInputChange={handleInputChange}
-                    />
-                );
+                return <InputDesignInfoContainer formData={designFormData} onInputChange={handleInputChange} />;
             case "fileUpload":
-                return (
-                    <FileUploadContainer
-                        formData={designFormData}
-                        onFileChange={handleFileChange}
-                        onUploadClick={handleFileUploadClick}
-                        fileInputRef={fileInputRef}
-                    />
-                );
+                return <FileUploadContainer formData={designFormData} onFileChange={handleFileChange} onUploadClick={handleFileUploadClick} fileInputRef={fileInputRef} />;
             default:
                 return null;
         }
@@ -104,22 +88,14 @@ const SellDesignInputField = () => {
         <Container>
             <MenuContainer>
                 <div>
-                    <MenuItem
-                        onClick={() => setActiveMenu("title")}
-                        active={activeMenu === "title"}
-                    >
+                    <MenuItem onClick={() => setActiveMenu("title")} active={activeMenu === "title"}>
                         제목 및 내용
                     </MenuItem>
-                    <MenuItem
-                        onClick={() => setActiveMenu("fileUpload")}
-                        active={activeMenu === "fileUpload"}
-                    >
+                    <MenuItem onClick={() => setActiveMenu("fileUpload")} active={activeMenu === "fileUpload"}>
                         파일 업로드
                     </MenuItem>
                 </div>
-                <SubmitButton onClick={() => handleSubmit(designFormData)}>
-                    제출하기
-                </SubmitButton>
+                <SubmitButton onClick={() => handleSubmit(designFormData)}>제출하기</SubmitButton>
             </MenuContainer>
             <DescriptionContainer>{renderDescription()}</DescriptionContainer>
         </Container>

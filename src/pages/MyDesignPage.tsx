@@ -1,9 +1,10 @@
 import styled from "styled-components";
 
 import DesignOutlineCard from "../components/specific/myDesign/DesignOutlineCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { designList as data } from "../testdata/dummyDesign";
+import { newAxios } from "../utils/axiosWithUrl";
 
 //TODO: State 위치 조정, 채우기
 
@@ -21,6 +22,24 @@ const MyDesignPage = () => {
 };
 
 const DesignList = () => {
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const token = localStorage.getItem("accessToken");
+                const response = await newAxios.get("/api/v1/model/user/list/my", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                let data = response.data.data;
+                console.log(data);
+                //setDesignList(data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchData();
+    }, []);
     const [isPublished, setIsPublished] = useState(false);
 
     const handleFilterClick = (filterType: boolean) => {
@@ -30,25 +49,15 @@ const DesignList = () => {
     return (
         <>
             <HeaderContainer>
-                <FilterText
-                    isActive={!isPublished}
-                    onClick={() => handleFilterClick(false)}
-                >
+                <FilterText isActive={!isPublished} onClick={() => handleFilterClick(false)}>
                     구매한 도면
                 </FilterText>
-                <FilterText
-                    isActive={isPublished}
-                    onClick={() => handleFilterClick(true)}
-                >
+                <FilterText isActive={isPublished} onClick={() => handleFilterClick(true)}>
                     판매중 도면
                 </FilterText>
             </HeaderContainer>
             {data.map((e, i) => {
-                return (
-                    <DesignOutlineCard
-                        designData={{ ...e, published: isPublished }}
-                    />
-                );
+                return <DesignOutlineCard designData={{ ...e, published: isPublished }} />;
             })}
         </>
     );

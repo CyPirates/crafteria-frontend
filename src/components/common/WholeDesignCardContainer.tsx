@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import { DesignProps } from "../../types/DesignType";
 import { Card } from "react-bootstrap";
+import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
 
 //TODO: Filter 기능 추가, SummaryCard 받아온 데이터로 변경
 
@@ -55,7 +56,7 @@ const WholeDesignCards = ({ designData }: { designData: DesignProps }) => {
     return (
         <>
             <StyledCard onClick={handleOnClick}>
-                <Card.Img variant="top" />
+                <StlRenderContainer filePath={modelFileUrl} width="230px" height="150px" clickDisabled={true} />
                 <Card.Body>
                     <Card.Title>{name}</Card.Title>
                     <Card.Text>

@@ -5,9 +5,10 @@ type StlRenderProps = {
     filePath: string;
     width: string;
     height: string;
+    clickDisabled?: boolean;
 };
 
-const StlRenderContainer = ({ filePath, width, height }: StlRenderProps) => {
+const StlRenderContainer = ({ filePath, width, height, clickDisabled }: StlRenderProps) => {
     const stlStyle = {
         width: width,
         height: height,
@@ -20,7 +21,7 @@ const StlRenderContainer = ({ filePath, width, height }: StlRenderProps) => {
             <StlViewer
                 url={filePath}
                 style={stlStyle}
-                orbitControls
+                orbitControls={!clickDisabled}
                 shadows
                 showAxes
                 // cameraProps={{
