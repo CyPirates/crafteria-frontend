@@ -17,22 +17,25 @@ const StlRenderContainer = ({ filePath, width, height, clickDisabled }: StlRende
     };
 
     return (
-        <StlContainer width={width} height={height}>
-            <StlViewer
-                url={filePath}
-                style={stlStyle}
-                orbitControls={!clickDisabled}
-                shadows
-                showAxes
-                // cameraProps={{
-                //     initialPosition: {
-                //         latitude: 0,
-                //         longitude: 0,
-                //         distance: 2,
-                //     },
-                // }}
-            />
-        </StlContainer>
+        <>
+            <StlContainer width={width} height={height}>
+                <StlViewer
+                    key={filePath}
+                    url={filePath}
+                    style={stlStyle}
+                    orbitControls={!clickDisabled}
+                    shadows
+                    showAxes
+                    // cameraProps={{
+                    //     initialPosition: {
+                    //         latitude: 0,
+                    //         longitude: 0,
+                    //         distance: 2,
+                    //     },
+                    // }}
+                />
+            </StlContainer>
+        </>
     );
 };
 

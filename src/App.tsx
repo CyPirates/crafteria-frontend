@@ -10,7 +10,7 @@ import ScrollToTop from "./components/layout/ScrollToTop";
 import MyDesignPage from "./pages/MyDesignPage";
 import DesignDetailPage from "./pages/DesignDetailPage";
 import SellDesignPage from "./pages/SellDesignPage";
-import PrintOrderPage from "./pages/PrintOrderPage";
+import MakeOrderPage from "./pages/MakeOrderPage";
 import GetTokenPage from "./pages/GetTokenPage";
 
 const App: React.FC = () => {
@@ -29,7 +29,7 @@ const App: React.FC = () => {
                             <Route path="/my-design" element={<MyDesignPage />} />
                             <Route path="/design/:id" element={<DesignDetailPage />} />
                             <Route path="/sell-design" element={<SellDesignPage />} />
-                            <Route path="/print-order" element={<PrintOrderPage />} />
+                            <Route path="/print-order" element={<MakeOrderPage />} />
                             <Route path="/auth/success" element={<GetTokenPage />} />
                         </Routes>
                     </ContentContainer>
@@ -44,5 +44,5 @@ export default App;
 const ContentContainer = styled.div`
     width: 1300px;
     margin: 50px auto 0;
-    overflow-x: hidden;
+    overflow-x: auto;
 `;

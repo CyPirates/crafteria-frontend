@@ -109,6 +109,7 @@ const StyledCard = styled(Card)`
     border-radius: 10px;
     border: solid 2px #5c5c60;
     margin-bottom: 4vw;
+    padding-top: 10px;
 
     &:hover {
         box-shadow: 5px 5px 5px black;
