@@ -1,27 +1,25 @@
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-
-import DesignOutlineCard from "../components/specific/myDesign/DesignOutlineCard";
-import { useEffect, useState } from "react";
-
-import { designList as data } from "../testdata/dummyDesign";
 import { newAxios } from "../utils/axiosWithUrl";
-
-//TODO: State 위치 조정, 채우기
+import { DesignProps } from "../types/DesignType";
+import DesignOutlineCard from "../components/specific/myDesign/DesignOutlineCard";
 
 const MyDesignPage = () => {
     return (
-        <>
-            <PageWrapper>
-                <DesignListContainer>
-                    <DesignList />
-                </DesignListContainer>
-                <CurrentStateContainer>{/*채울 내용*/}</CurrentStateContainer>
-            </PageWrapper>
-        </>
+        <PageWrapper>
+            <DesignListContainer>
+                <DesignList />
+            </DesignListContainer>
+            <CurrentStateContainer>{/* 채울 내용 */}</CurrentStateContainer>
+        </PageWrapper>
     );
 };
 
 const DesignList = () => {
+    const [purchasedDesigns, setPurchasedDesigns] = useState<DesignProps[]>([]);
+    const [uploadDesigns, setUploadDesigns] = useState<DesignProps[]>([]);
+    const [isPublished, setIsPublished] = useState(false);
+
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -31,16 +29,24 @@ const DesignList = () => {
                         Authorization: `Bearer ${token}`,
                     },
                 });
-                let data = response.data.data;
-                console.log(data);
-                //setDesignList(data);
+                setPurchasedDesigns(response.data.data);
+            } catch (error) {
+                console.log(error);
+            }
+            try {
+                const token = localStorage.getItem("accessToken");
+                const response = await newAxios.get("/api/v1/model/author/list/my", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                setUploadDesigns(response.data.data);
             } catch (error) {
                 console.log(error);
             }
         };
         fetchData();
     }, []);
-    const [isPublished, setIsPublished] = useState(false);
 
     const handleFilterClick = (filterType: boolean) => {
         setIsPublished(filterType);
@@ -56,9 +62,11 @@ const DesignList = () => {
                     판매중 도면
                 </FilterText>
             </HeaderContainer>
-            {data.map((e, i) => {
-                return <DesignOutlineCard designData={{ ...e, published: isPublished }} />;
-            })}
+            <CardContainer>
+                {isPublished
+                    ? uploadDesigns.map((design) => <DesignOutlineCard key={design.id} designData={design} published={isPublished} />)
+                    : purchasedDesigns.map((design) => <DesignOutlineCard key={design.id} designData={design} published={isPublished} />)}
+            </CardContainer>
         </>
     );
 };
@@ -68,7 +76,6 @@ export default MyDesignPage;
 const PageWrapper = styled.div`
     margin-top: 50px;
     height: auto;
-
     display: flex;
     flex-direction: row;
     gap: 40px;
@@ -94,4 +101,8 @@ const CurrentStateContainer = styled.div`
     height: 1000px;
     background-color: #5c5c60;
     border-radius: 10px;
+`;
+
+const CardContainer = styled.div`
+    width: 700px;
 `;

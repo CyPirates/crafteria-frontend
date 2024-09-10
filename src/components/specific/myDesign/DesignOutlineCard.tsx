@@ -1,66 +1,29 @@
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-type DesignData = {
-    published: boolean;
-    publishedDay: string;
-    name: string;
-    size: string;
-    price: number;
-    volume: number;
-    id: number;
-    filePath: string;
-    fileType: string;
-    profileImage: string;
-    artist: string;
-    introduction: string;
-};
+import { DesignProps } from "../../../types/DesignType";
+import StlRenderContainer from "../designDetail/StlRenderContainer";
 
 type DesignOutlineCardProps = {
-    designData: DesignData;
+    designData: DesignProps;
+    published: boolean;
 };
-const DesignOutlineCard = ({ designData }: DesignOutlineCardProps) => {
-    const {
-        published,
-        publishedDay,
-        name,
-        size,
-        price,
-        volume,
-        id,
-        filePath,
-        fileType,
-        profileImage,
-        artist,
-        introduction,
-    } = designData;
+
+const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) => {
+    const { name, minimumSize, price, downloadCount, modelFileUrl, id } = designData;
     const navigate = useNavigate();
     const handleOnclick = () => {
-        navigate(`/design/${id}`, {
-            state: {
-                publishedDay,
-                name,
-                size,
-                price,
-                volume,
-                id,
-                filePath,
-                fileType,
-                artist,
-                introduction,
-            },
-        });
+        navigate(`/design/${id}`);
     };
     return (
         <>
             <CardWrapper onClick={handleOnclick}>
-                <ImageContainer src={profileImage} alt="x" />
+                <StlRenderContainer filePath={modelFileUrl} width="150px" height="150px" clickDisabled={true} />
                 <InformationContainer>
-                    <Information>{`등록일: ${publishedDay}`}</Information>
                     <Information>{`도면명: ${name}`}</Information>
-                    <Information>{`파일용량: ${size}`}</Information>
+                    <Information>{`파일용량: ${minimumSize}`}</Information>
                     <Information>{`가격: ${price}원`}</Information>
-                    <Information>{`판매량: ${volume}`}</Information>
+                    <Information>{`판매량: ${downloadCount}`}</Information>
                 </InformationContainer>
                 <ButtonConatiner>
                     <Button>다운로드</Button>
@@ -87,19 +50,12 @@ const CardWrapper = styled.div`
     position: relative;
 `;
 
-const ImageContainer = styled.img`
-    width: 150px;
-    aspect-ratio: 1/1;
-    background-color: #e4e4e4;
-    margin-right: 20px;
-    object-fit: fill;
-`;
-
 const InformationContainer = styled.div`
     height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    margin-left: 30px;
 `;
 const Information = styled.div`
     color: #d2d2d2;

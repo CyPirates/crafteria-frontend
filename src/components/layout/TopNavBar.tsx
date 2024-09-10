@@ -25,7 +25,7 @@ const TopNavBar = () => {
     return (
         <>
             <NavContainer>
-                <LogoContainer>TEST1</LogoContainer>
+                <LogoContainer>TEST2</LogoContainer>
                 <NavMenuContainer>
                     <NavMenu to="/home">홈</NavMenu>
                     <NavMenu to="/my-design">내 도면</NavMenu>

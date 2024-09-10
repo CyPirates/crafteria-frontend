@@ -42,5 +42,4 @@ const StlContainer = styled.div<{ width: string; height: string }>`
     width: ${(props) => props.width};
     height: ${(props) => props.height};
     background-color: #e4e4e4;
-    margin-top: 20px;
 `;
