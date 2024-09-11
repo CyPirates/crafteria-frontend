@@ -47,7 +47,7 @@ const WholeDesignCardContainer = () => {
 
 const WholeDesignCards = ({ designData }: { designData: DesignProps }) => {
     const navigate = useNavigate();
-    const { id, name, description, rating, price, viewCount, downloadCount, maximumSize, minimumSize, modelFileUrl } = designData;
+    const { id, name, description, rating, price, viewCount, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl } = designData;
 
     const handleOnClick = () => {
         navigate(`/design/${id}`);
@@ -61,7 +61,9 @@ const WholeDesignCards = ({ designData }: { designData: DesignProps }) => {
                     <Card.Title>{name}</Card.Title>
                     <Card.Text>
                         <DetailText>가격: {price}원</DetailText>
-                        <DetailText>크기: {minimumSize}</DetailText>
+                        <DetailText>
+                            크기: {widthSize}mm x {lengthSize}mm x {heightSize}mm
+                        </DetailText>
                         <DetailText>판매량: {downloadCount}</DetailText>
                         <DetailText>조회수: {viewCount}</DetailText>
                     </Card.Text>

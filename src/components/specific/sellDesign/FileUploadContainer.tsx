@@ -3,40 +3,61 @@ import styled from "styled-components";
 
 import { DesignFormData } from "../../../types/DesignType";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
+import getStlModelSize from "../../../utils/getStlModelSize";
+import { useEffect, useState } from "react";
 
 type ownProps = {
     formData: DesignFormData;
     onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleSizesChange: React.Dispatch<React.SetStateAction<DesignFormData>>;
     onUploadClick: () => void;
     fileInputRef: React.RefObject<HTMLInputElement>;
 };
 
-const FileUploadContainer: React.FC<ownProps> = ({
-    formData,
-    onFileChange,
-    onUploadClick,
-    fileInputRef,
-}) => {
+type Size = {
+    width: number;
+    height: number;
+    depth: number;
+};
+
+const FileUploadContainer: React.FC<ownProps> = ({ formData, onFileChange, handleSizesChange, onUploadClick, fileInputRef }) => {
+    const [size, setSize] = useState<Size | undefined>(undefined);
+
+    useEffect(() => {
+        const fetchSize = async () => {
+            if (formData.file) {
+                try {
+                    const modelSize = await getStlModelSize(formData.file);
+                    setSize(modelSize);
+                } catch (error) {
+                    console.error("Failed to fetch model size:", error);
+                }
+            }
+        };
+
+        fetchSize();
+    }, [formData.file]);
+
+    useEffect(() => {
+        if (size) {
+            handleSizesChange((prev) => ({ ...prev, widthSize: size.width.toString(), heightSize: size.depth.toString(), lengthSize: size.height.toString() }));
+        }
+    }, [size]);
+
     return (
         <>
             <SectionTitle>파일 업로드</SectionTitle>
             <UploadBox onClick={onUploadClick}>
                 파일 선택
-                <HiddenFileInput
-                    ref={fileInputRef}
-                    type="file"
-                    onChange={onFileChange}
-                    accept=".stl"
-                />
+                <HiddenFileInput ref={fileInputRef} type="file" onChange={onFileChange} accept=".stl" />
             </UploadBox>
             {formData.file && (
                 <FileDetails>
-                    <StlRenderContainer
-                        filePath={URL.createObjectURL(formData.file)}
-                        width="200px"
-                        height="200px"
-                    />
+                    <StlRenderContainer filePath={URL.createObjectURL(formData.file)} width="200px" height="200px" />
                     <FileName>파일명: {formData.file.name}</FileName>
+                    <ModelSize>
+                        크기: {size?.width}mm x {size?.height}mm x {size?.depth}mm
+                    </ModelSize>
                 </FileDetails>
             )}
         </>
@@ -78,6 +99,13 @@ const FileDetails = styled.div`
 `;
 
 const FileName = styled.div`
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: black;
+`;
+
+const ModelSize = styled.div`
     font-size: 16px;
     margin-bottom: 10px;
     font-weight: bold;

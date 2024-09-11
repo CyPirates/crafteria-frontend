@@ -11,8 +11,9 @@ const SellDesignInputField = () => {
         name: "",
         description: "",
         price: "",
-        minimumSize: "",
-        maximumSize: "",
+        widthSize: "",
+        lengthSize: "",
+        heightSize: "",
         file: null,
     });
 
@@ -49,8 +50,9 @@ const SellDesignInputField = () => {
         formData.append("name", designFormData.name);
         formData.append("description", designFormData.description);
         formData.append("price", designFormData.price);
-        formData.append("minimumSize", designFormData.minimumSize);
-        formData.append("maximumSize", designFormData.maximumSize);
+        formData.append("widthSize", designFormData.widthSize);
+        formData.append("lengthSize", designFormData.lengthSize);
+        formData.append("heightSize", designFormData.heightSize);
 
         if (designFormData.file) {
             formData.append("modelFile", designFormData.file);
@@ -78,7 +80,15 @@ const SellDesignInputField = () => {
             case "title":
                 return <InputDesignInfoContainer formData={designFormData} onInputChange={handleInputChange} />;
             case "fileUpload":
-                return <FileUploadContainer formData={designFormData} onFileChange={handleFileChange} onUploadClick={handleFileUploadClick} fileInputRef={fileInputRef} />;
+                return (
+                    <FileUploadContainer
+                        formData={designFormData}
+                        onFileChange={handleFileChange}
+                        handleSizesChange={setDesignFormData}
+                        onUploadClick={handleFileUploadClick}
+                        fileInputRef={fileInputRef}
+                    />
+                );
             default:
                 return null;
         }
@@ -101,6 +111,9 @@ const SellDesignInputField = () => {
         </Container>
     );
 };
+
+//onClick={() => handleSubmit(designFormData)}
+//onClick={() => console.log(designFormData)}
 
 const Container = styled.div`
     width: 100%;

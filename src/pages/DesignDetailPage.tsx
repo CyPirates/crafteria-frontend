@@ -33,13 +33,14 @@ const DesignDetailPage = () => {
         return <div>Loading...</div>; // 디자인이 로드되기 전 로딩 메시지 표시
     }
 
-    const { name, description, price, downloadCount, minimumSize, modelFileUrl } = design;
+    const { name, description, price, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl } = design;
+    const size = { width: widthSize, length: lengthSize, height: heightSize };
 
     return (
         <PageWrapper>
             <DesignContainer>
                 <StlRenderContainer filePath={modelFileUrl} width="500px" height="500px" />
-                <DesignInfo name={name} artist={"asdf"} price={price} volume={downloadCount} size={minimumSize} id={id} handleOnClick={setIsPop} isPurchased={isPurchased} />
+                <DesignInfo name={name} artist={"asdf"} price={price} volume={downloadCount} size={size} id={id} handleOnClick={setIsPop} isPurchased={isPurchased} />
             </DesignContainer>
             <IntroductionTitle>소개말</IntroductionTitle>
             <IntroductionContents>{description}</IntroductionContents>

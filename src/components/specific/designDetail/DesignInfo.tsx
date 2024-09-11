@@ -6,7 +6,7 @@ type DesignInfoProps = {
     artist: string;
     price: string;
     volume: string;
-    size: string;
+    size: { width: string; length: string; height: string };
     id: string | undefined;
     isPurchased: boolean;
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,8 +28,10 @@ const DesignInfo = ({ name, artist, price, volume, size, id, isPurchased, handle
                     <DetailContent>{volume}</DetailContent>
                 </Detail>
                 <Detail>
-                    <DetailTitle>파일크기</DetailTitle>
-                    <DetailContent>{size}</DetailContent>
+                    <DetailTitle>모델 크기</DetailTitle>
+                    <DetailContent>
+                        {size.width}mm x {size.length}mm x {size.height}mm
+                    </DetailContent>
                 </Detail>
             </DetailContainer>
             <ButtonContainer>

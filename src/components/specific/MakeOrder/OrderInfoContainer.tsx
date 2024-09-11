@@ -39,8 +39,6 @@ const OrderInfoContainer = ({ setOrderData }: OrderInfoProps) => {
                 </AddressInputContainer>
                 {isOpen && <Modal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
                 <Title>결제 정보</Title>
-                <h4>asdf</h4>
-                <h4>asdf</h4>
             </UserArea>
         </>
     );

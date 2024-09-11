@@ -10,7 +10,7 @@ type DesignOutlineCardProps = {
 };
 
 const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) => {
-    const { name, minimumSize, price, downloadCount, modelFileUrl, id } = designData;
+    const { name, widthSize, lengthSize, heightSize, price, downloadCount, modelFileUrl, id } = designData;
     const navigate = useNavigate();
     const handleOnclick = () => {
         navigate(`/design/${id}`);
@@ -20,10 +20,12 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
             <CardWrapper onClick={handleOnclick}>
                 <StlRenderContainer filePath={modelFileUrl} width="150px" height="150px" clickDisabled={true} />
                 <InformationContainer>
-                    <Information>{`도면명: ${name}`}</Information>
-                    <Information>{`파일용량: ${minimumSize}`}</Information>
-                    <Information>{`가격: ${price}원`}</Information>
-                    <Information>{`판매량: ${downloadCount}`}</Information>
+                    <Information>도면명: {name}</Information>
+                    <Information>
+                        모델크기: {widthSize}mm x {lengthSize}mm x {heightSize}mm
+                    </Information>
+                    <Information>가격: {price}원</Information>
+                    <Information>판매량: {downloadCount}</Information>
                 </InformationContainer>
                 <ButtonConatiner>
                     <Button>다운로드</Button>

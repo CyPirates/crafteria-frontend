@@ -6,8 +6,9 @@ export type DesignProps = {
     price: string;
     viewCount: string;
     downloadCount: string;
-    minimumSize: string;
-    maximumSize: string;
+    widthSize: string;
+    lengthSize: string;
+    heightSize: string;
     modelFileUrl: string;
 };
 
@@ -15,7 +16,8 @@ export type DesignFormData = {
     name: string;
     description: string;
     price: string;
-    minimumSize: string;
-    maximumSize: string;
+    widthSize: string;
+    lengthSize: string;
+    heightSize: string;
     file: File | null;
 };
