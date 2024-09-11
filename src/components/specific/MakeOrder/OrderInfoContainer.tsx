@@ -2,11 +2,14 @@ import styled from "styled-components";
 import DaumPostCode from "react-daum-postcode";
 
 import { OrderData } from "../../../types/OrderType";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useInput from "../../../hooks/useInput";
+import { Company } from "../../../types/CompanyType";
 
 type OrderInfoProps = {
-    setOrderData: React.Dispatch<React.SetStateAction<OrderData>>;
+    setUserAddress: React.Dispatch<React.SetStateAction<string>>;
+    company: Company | undefined;
+    handleSubmit: () => Promise<any>;
 };
 
 type ModalProps = {
@@ -15,7 +18,7 @@ type ModalProps = {
     handleIsOpen: () => void;
 };
 
-const OrderInfoContainer = ({ setOrderData }: OrderInfoProps) => {
+const OrderInfoContainer = ({ setUserAddress, company, handleSubmit }: OrderInfoProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [zipcode, setZipcode] = useState<string>("");
     const [address, setAddress] = useState<string>("");
@@ -24,6 +27,10 @@ const OrderInfoContainer = ({ setOrderData }: OrderInfoProps) => {
     const handleIsOpen = () => {
         setIsOpen((prev) => !prev);
     };
+
+    useEffect(() => {
+        setUserAddress(address + " " + detailAddress);
+    }, [detailAddress]);
 
     return (
         <>
@@ -38,7 +45,29 @@ const OrderInfoContainer = ({ setOrderData }: OrderInfoProps) => {
                     <AddressInput placeholder="상세 주소" value={detailAddress} onChange={setDetailAddress} />
                 </AddressInputContainer>
                 {isOpen && <Modal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
+                <Title>제조사 정보</Title>
+                {company && (
+                    <>
+                        <CompanyInformation>
+                            <InfoTitle>제조사 명</InfoTitle>
+                            <InfoContent>{company.name}</InfoContent>
+                        </CompanyInformation>
+                        <CompanyInformation>
+                            <InfoTitle>주소</InfoTitle>
+                            <InfoContent>{company.address}</InfoContent>
+                        </CompanyInformation>
+                        <CompanyInformation>
+                            <InfoTitle>전화번호</InfoTitle>
+                            <InfoContent>{company.dialNumber}</InfoContent>
+                        </CompanyInformation>
+                    </>
+                )}
                 <Title>결제 정보</Title>
+                <CompanyInformation>
+                    <InfoTitle>총 가격</InfoTitle>
+                    <InfoContent>0 원</InfoContent>
+                </CompanyInformation>
+                <SubmitButton onClick={handleSubmit}>주문하기</SubmitButton>
             </UserArea>
         </>
     );
@@ -68,14 +97,17 @@ export default OrderInfoContainer;
 
 const UserArea = styled.div`
     width: 500px;
-    height: 1000px;
-    padding: 20px;
+    height: 800px;
+    padding: 0 20px;
     background-color: #5c5c60;
     border-radius: 10px;
+
+    position: relative;
 `;
 
 const Title = styled.div`
     width: 100%;
+    margin-top: 20px;
     font-size: 30px;
     font-weight: bold;
     border-bottom: 3px solid #707074;
@@ -143,4 +175,34 @@ const ModalContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+`;
+
+const CompanyInformation = styled.div`
+    display: flex;
+`;
+const InfoTitle = styled.div`
+    font-size: 20px;
+    width: 100px;
+`;
+const InfoContent = styled.div`
+    font-size: 20px;
+`;
+
+const SubmitButton = styled.div`
+    width: 460px;
+    height: 50px;
+    background-color: #008ecc;
+    border-radius: 5px;
+    font-size: 25px;
+
+    cursor: pointer;
+    &:hover {
+        background-color: #4682b4;
+    }
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    position: absolute;
+    bottom: 20px;
 `;

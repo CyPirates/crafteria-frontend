@@ -18,13 +18,13 @@ const getStlModelSize = async (input: string | File): Promise<{ width: number; h
 
     const boundingBox = new THREE.Box3().setFromObject(new THREE.Mesh(geometry));
 
-    // const width = +(boundingBox.max.x - boundingBox.min.x).toFixed(2);
-    // const height = +(boundingBox.max.y - boundingBox.min.y).toFixed(2);
-    // const depth = +(boundingBox.max.z - boundingBox.min.z).toFixed(2);
+    const width = +(boundingBox.max.x - boundingBox.min.x).toFixed(2);
+    const height = +(boundingBox.max.y - boundingBox.min.y).toFixed(2);
+    const depth = +(boundingBox.max.z - boundingBox.min.z).toFixed(2);
 
-    const width = +Math.round(boundingBox.max.x - boundingBox.min.x);
-    const height = +Math.round(boundingBox.max.y - boundingBox.min.y);
-    const depth = +Math.round(boundingBox.max.z - boundingBox.min.z);
+    // const width = +Math.round(boundingBox.max.x - boundingBox.min.x);
+    // const height = +Math.round(boundingBox.max.y - boundingBox.min.y);
+    // const depth = +Math.round(boundingBox.max.z - boundingBox.min.z);
 
     return { width, height, depth };
 };
