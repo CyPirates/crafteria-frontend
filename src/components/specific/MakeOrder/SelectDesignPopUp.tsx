@@ -6,7 +6,7 @@ import { DesignProps } from "../../../types/DesignType";
 
 type BuyDesignPopUpProps = {
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
-    setSelectedDesign: React.Dispatch<React.SetStateAction<DesignProps | undefined>>;
+    setModelFileUrl: React.Dispatch<React.SetStateAction<string | undefined>>;
 };
 
 type DesignLayoutProps = {
@@ -14,7 +14,7 @@ type DesignLayoutProps = {
     handleSelect: (data: DesignProps) => void;
 };
 
-const SelectDesignPopUp = ({ handleOnClick, setSelectedDesign }: BuyDesignPopUpProps) => {
+const SelectDesignPopUp = ({ handleOnClick, setModelFileUrl: setSelectedDesign }: BuyDesignPopUpProps) => {
     const [purchasedDesigns, setPurchasedDesigns] = useState<DesignProps[]>([]);
     useEffect(() => {
         // 팝업이 열릴 때 스크롤을 막기 위해 body에 overflow hidden 설정
@@ -44,7 +44,7 @@ const SelectDesignPopUp = ({ handleOnClick, setSelectedDesign }: BuyDesignPopUpP
     }, []);
 
     const handleSelect = (data: DesignProps) => {
-        setSelectedDesign(data);
+        setSelectedDesign(data.modelFileUrl);
         handleOnClick(false);
     };
     return (

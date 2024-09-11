@@ -11,6 +11,7 @@ import { Company } from "../types/CompanyType";
 import { newAxios } from "../utils/axiosWithUrl";
 import Star from "../assets/star.png";
 import { useNavigate } from "react-router-dom";
+
 type Size = {
     width: number;
     height: number;
@@ -24,7 +25,7 @@ type CompanyInfoProps = {
 
 const MakeOrderPage = () => {
     const navigate = useNavigate();
-    const [selectedDesign, setSelectedDesign] = useState<DesignProps>();
+    const [ModelFileUrl, setModelFileUrl] = useState<string | undefined>(undefined);
     const [isPop, setIsPop] = useState<boolean>(false);
     const [size, setSize] = useState<Size | undefined>(undefined);
     const [address, setAddress] = useState<string>("");
@@ -33,11 +34,20 @@ const MakeOrderPage = () => {
     const { value: magnification, onChange: handleMagnificationChange } = useInput("1"); // 도면 배율
     const { value: quantity, onChange: handleQuantityChange } = useInput("1"); // 출력 수량
 
+    // 파일 선택 핸들러
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const fileUrl = URL.createObjectURL(file); // 파일을 URL로 변환
+            setModelFileUrl(fileUrl); // URL을 상태에 저장
+        }
+    };
+
     useEffect(() => {
         const fetchSize = async () => {
-            if (selectedDesign && selectedDesign.modelFileUrl) {
+            if (ModelFileUrl) {
                 try {
-                    const modelSize = await getStlModelSize(selectedDesign.modelFileUrl);
+                    const modelSize = await getStlModelSize(ModelFileUrl);
                     setSize(modelSize);
                 } catch (error) {
                     console.error("Failed to fetch model size:", error);
@@ -46,7 +56,7 @@ const MakeOrderPage = () => {
         };
 
         fetchSize();
-    }, [selectedDesign]);
+    }, [ModelFileUrl]);
 
     const fetchCompanies = async () => {
         try {
@@ -70,8 +80,8 @@ const MakeOrderPage = () => {
         formData.append("deliveryAddress", address);
         formData.append("quantity", quantity);
 
-        if (selectedDesign?.modelFileUrl) {
-            const response = await fetch(selectedDesign.modelFileUrl);
+        if (ModelFileUrl) {
+            const response = await fetch(ModelFileUrl);
             const file = await response.blob();
             formData.append("modelFile", file);
         }
@@ -101,9 +111,9 @@ const MakeOrderPage = () => {
                     <Title>주문하기</Title>
                     <Step>
                         <StepName>1.도면 선택</StepName>
-                        {selectedDesign ? (
+                        {ModelFileUrl ? (
                             <>
-                                <StlRenderContainer filePath={selectedDesign.modelFileUrl} width="200px" height="200px" />
+                                <StlRenderContainer filePath={ModelFileUrl} width="200px" height="200px" />
                                 <div>
                                     크기: {size?.width}mm x {size?.height}mm x {size?.depth}mm
                                 </div>
@@ -117,8 +127,19 @@ const MakeOrderPage = () => {
                         ) : (
                             <EmptyDesign>도면을 선택해 주세요</EmptyDesign>
                         )}
-                        <Button onClick={() => setIsPop(true)}>구매한 도면에서 선택</Button>
-                        {isPop ? <SelectDesignPopUp handleOnClick={setIsPop} setSelectedDesign={setSelectedDesign} /> : null}
+                        <RowButtonContainer>
+                            <Button onClick={() => setIsPop(true)}>구매한 도면에서 선택</Button>
+                            <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
+                                <Button style={{ backgroundColor: "#FF7F00" }}>파일 직접 업로드</Button>
+                            </label>
+                            <input
+                                type="file"
+                                id="file-upload"
+                                style={{ display: "none" }}
+                                onChange={handleFileUpload} // 파일 선택시 호출
+                            />
+                        </RowButtonContainer>
+                        {isPop ? <SelectDesignPopUp handleOnClick={setIsPop} setModelFileUrl={setModelFileUrl} /> : null}
                     </Step>
                     <Step>
                         <StepName>2. 제조사 선택</StepName>
@@ -132,6 +153,8 @@ const MakeOrderPage = () => {
         </>
     );
 };
+
+export default MakeOrderPage;
 
 const CompanyInfoContainer = ({ data, setSelectedCompany }: CompanyInfoProps) => {
     const renderStars = () => {
@@ -165,8 +188,6 @@ const CompanyInfoContainer = ({ data, setSelectedCompany }: CompanyInfoProps) =>
     );
 };
 
-export default MakeOrderPage;
-
 const PageWrapper = styled.div`
     margin-top: 20px;
     display: flex;
@@ -186,11 +207,11 @@ const Title = styled.div`
 `;
 
 const Step = styled.div`
-    margin-top: 20px;
+    margin-top: 10px;
 
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    padding: 10px;
     border-bottom: 3px solid #707074;
 `;
 
@@ -199,12 +220,17 @@ const StepName = styled.div`
     font-weight: bold;
 `;
 
+const RowButtonContainer = styled.div`
+    display: flex;
+    gap: 10px;
+`;
+
 const Button = styled.div`
     width: 200px;
     height: 30px;
     background-color: #008ecc;
     border-radius: 5px;
-    margin-bottom: 10px;
+    margin-top: 10px;
 
     cursor: pointer;
 
