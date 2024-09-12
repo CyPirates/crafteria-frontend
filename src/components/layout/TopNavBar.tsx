@@ -2,10 +2,12 @@ import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { AiOutlineUser } from "react-icons/ai";
+import { useState } from "react";
 
 const TopNavBar = () => {
     const navigate = useNavigate();
     const location = useLocation(); // 현재 URL 경로 가져오기
+    const [num, setNum] = useState<number>(0);
 
     const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
@@ -17,6 +19,11 @@ const TopNavBar = () => {
     };
 
     const handleLoginClick = () => {
+        if (localStorage.getItem("accessToken")) {
+            localStorage.removeItem("accessToken");
+            setNum(num + 1);
+            return;
+        }
         window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/google";
     };
 

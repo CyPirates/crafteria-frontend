@@ -4,9 +4,11 @@ import { newAxios } from "../utils/axiosWithUrl";
 import styled from "styled-components";
 import { title } from "process";
 import OrderCard from "../components/specific/myPage/OrderCard";
+import useClassifiedOrderList from "../hooks/useClassifiedOrderList";
 
 const MyPage = () => {
     const [orderList, setOrderList] = useState<Order[]>([]);
+    const { ordered, inProducting, delivered } = useClassifiedOrderList({ orderList });
 
     useEffect(() => {
         const getOrderList = async () => {
@@ -29,7 +31,13 @@ const MyPage = () => {
         <>
             <Title>나의 주문</Title>
             <CardContainer>
-                {orderList.map((e) => {
+                {ordered.map((e) => {
+                    return <OrderCard data={e} />;
+                })}
+                {inProducting.map((e) => {
+                    return <OrderCard data={e} />;
+                })}
+                {delivered.map((e) => {
                     return <OrderCard data={e} />;
                 })}
             </CardContainer>

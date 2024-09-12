@@ -96,7 +96,7 @@ const MakeOrderPage = () => {
 
             console.log("Design data submitted successfully:", response.data);
             if (response.data.status == 200) {
-                navigate("/");
+                navigate("/my-page");
             }
 
             return response.data;
@@ -151,7 +151,6 @@ const MakeOrderPage = () => {
                     </Step>
                 </DesignArea>
                 <OrderInfoContainer setUserAddress={setAddress} company={selectedCompany} handleSubmit={handleSubmit} />
-                <button onClick={() => console.log(magnification)}>d</button>
             </PageWrapper>
         </>
     );
