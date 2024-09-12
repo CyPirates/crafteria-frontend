@@ -72,7 +72,7 @@ const MakeOrderPage = () => {
         const formData = new FormData();
         const token = localStorage.getItem("accessToken");
 
-        formData.append("manufactureId", selectedCompany!.id);
+        formData.append("manufacturerId", selectedCompany!.id);
         formData.append("widthSize", size!.width.toString());
         formData.append("lengthSize", size!.height.toString());
         formData.append("heightSize", size!.depth.toString());
@@ -95,7 +95,10 @@ const MakeOrderPage = () => {
             });
 
             console.log("Design data submitted successfully:", response.data);
-            navigate("/");
+            if (response.data.status == 200) {
+                navigate("/");
+            }
+
             return response.data;
         } catch (error) {
             console.error("Error submitting design data:", error);
@@ -148,8 +151,8 @@ const MakeOrderPage = () => {
                     </Step>
                 </DesignArea>
                 <OrderInfoContainer setUserAddress={setAddress} company={selectedCompany} handleSubmit={handleSubmit} />
+                <button onClick={() => console.log(magnification)}>d</button>
             </PageWrapper>
-            <button onClick={() => console.log(address)}>asd</button>
         </>
     );
 };

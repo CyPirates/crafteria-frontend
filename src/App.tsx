@@ -12,6 +12,7 @@ import DesignDetailPage from "./pages/DesignDetailPage";
 import SellDesignPage from "./pages/SellDesignPage";
 import MakeOrderPage from "./pages/MakeOrderPage";
 import GetTokenPage from "./pages/GetTokenPage";
+import MyPage from "./pages/MyPage";
 
 const App: React.FC = () => {
     return (
@@ -31,6 +32,7 @@ const App: React.FC = () => {
                             <Route path="/sell-design" element={<SellDesignPage />} />
                             <Route path="/print-order" element={<MakeOrderPage />} />
                             <Route path="/auth/success" element={<GetTokenPage />} />
+                            <Route path="/my-page" element={<MyPage />} />
                         </Routes>
                     </ContentContainer>
                 </div>

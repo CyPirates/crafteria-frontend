@@ -1,13 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { IoSearchSharp } from "react-icons/io5";
 import { AiOutlineUser } from "react-icons/ai";
-
-//TODO: 반응형 UI, 로고 들어오면 navigate 추가하기, params로 빨갛게 하기
 
 const TopNavBar = () => {
     const navigate = useNavigate();
+    const location = useLocation(); // 현재 URL 경로 가져오기
 
     const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
@@ -25,17 +23,28 @@ const TopNavBar = () => {
     return (
         <>
             <NavContainer>
-                <LogoContainer>TEST2</LogoContainer>
+                <LogoContainer onClick={() => navigate("/home")}>Crafteria</LogoContainer>
                 <NavMenuContainer>
-                    <NavMenu to="/home">홈</NavMenu>
-                    <NavMenu to="/my-design">내 도면</NavMenu>
-                    <NavMenu to="/design-market">도면 장터</NavMenu>
-                    <NavMenu to="/print-order">주문하기</NavMenu>
-                    <NavMenu to="/sell-design">도면 판매</NavMenu>
+                    <NavMenu to="/home" isActive={location.pathname === "/home"}>
+                        홈
+                    </NavMenu>
+                    <NavMenu to="/my-design" isActive={location.pathname === "/my-design"}>
+                        내 도면
+                    </NavMenu>
+                    <NavMenu to="/design-market" isActive={location.pathname === "/design-market"}>
+                        도면 장터
+                    </NavMenu>
+                    <NavMenu to="/print-order" isActive={location.pathname === "/print-order"}>
+                        주문하기
+                    </NavMenu>
+                    <NavMenu to="/sell-design" isActive={location.pathname === "/sell-design"}>
+                        도면 판매
+                    </NavMenu>
                 </NavMenuContainer>
-                <SearchBar onSearchSubmit={handleSearchSubmit} />
-                <LoginButton onClick={handleLoginClick}>로그인</LoginButton>
-                <MyPageButton onClick={() => navigate("/mypage")} />
+                {/* <SearchBar onSearchSubmit={handleSearchSubmit} /> */}
+                <div style={{ width: "20vw" }}></div>
+                <LoginButton onClick={handleLoginClick}>{localStorage.getItem("accessToken") ? "로그아웃" : "로그인"}</LoginButton>
+                <MyPageButton isActive={location.pathname === "/my-page"} onClick={() => navigate("/my-page")} />
             </NavContainer>
         </>
     );
@@ -80,10 +89,11 @@ const NavMenuContainer = styled.div`
     justify-content: space-between;
 `;
 
-const NavMenu = styled(Link)`
+const NavMenu = styled(Link)<{ isActive: boolean }>`
     text-decoration: none;
     font-size: 1vw;
-    color: #a5a5a7;
+    color: ${({ isActive }) => (isActive ? "#F4351D" : "#a5a5a7")};
+    font-weight: ${({ isActive }) => (isActive ? "bold" : "normal")};
 
     &:hover {
         font-weight: bold;
@@ -120,8 +130,8 @@ const LoginButton = styled.div`
     }
 `;
 
-const MyPageButton = styled(AiOutlineUser)`
-    color: #a5a5a7;
+const MyPageButton = styled(AiOutlineUser)<{ isActive: boolean }>`
+    color: ${({ isActive }) => (isActive ? "#F4351D" : "#a5a5a7")};
     width: 2vw;
     height: 2vw;
     margin-left: 60px;

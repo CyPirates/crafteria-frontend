@@ -10,7 +10,7 @@ const MyDesignPage = () => {
             <DesignListContainer>
                 <DesignList />
             </DesignListContainer>
-            <CurrentStateContainer>{/* 채울 내용 */}</CurrentStateContainer>
+            {/* <CurrentStateContainer></CurrentStateContainer> */}
         </PageWrapper>
     );
 };
@@ -63,9 +63,17 @@ const DesignList = () => {
                 </FilterText>
             </HeaderContainer>
             <CardContainer>
-                {isPublished
-                    ? uploadDesigns.map((design) => <DesignOutlineCard key={design.id} designData={design} published={isPublished} />)
-                    : purchasedDesigns.map((design) => <DesignOutlineCard key={design.id} designData={design} published={isPublished} />)}
+                {isPublished ? (
+                    uploadDesigns.length != 0 ? (
+                        uploadDesigns.map((design) => <DesignOutlineCard key={design.id} designData={design} published={isPublished} />)
+                    ) : (
+                        <div>판매 중인 도면이 없습니다</div>
+                    )
+                ) : purchasedDesigns.length != 0 ? (
+                    purchasedDesigns.map((design) => <DesignOutlineCard key={design.id} designData={design} published={isPublished} />)
+                ) : (
+                    <div>구매한 도면이 없습니다</div>
+                )}
             </CardContainer>
         </>
     );

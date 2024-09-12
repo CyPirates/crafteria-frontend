@@ -11,18 +11,34 @@ import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
 
 const WholeDesignCardContainer = () => {
     const [designList, setDesignList] = useState<DesignProps[]>([]);
+    const [isActive, setIsActive] = useState<number>(0);
+
+    const fetchData = async () => {
+        try {
+            const response = await newAxios.get("/api/v1/model/user/list/popular");
+            let data = response.data.data;
+            console.log(data);
+            setDesignList(data);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+    const sortDefault = () => {
+        setIsActive(0);
+        fetchData();
+    };
+
+    const sortDesignList = () => {
+        const temp = [...designList];
+        temp.sort((a, b) => {
+            return +b.downloadCount - +a.downloadCount;
+        });
+        setDesignList(temp);
+        setIsActive(1);
+    };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await newAxios.get("/api/v1/model/user/list/popular");
-                let data = response.data.data;
-                console.log(data);
-                setDesignList(data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
         fetchData();
     }, []);
 
@@ -31,9 +47,12 @@ const WholeDesignCardContainer = () => {
             <Container>
                 <CategoryText>도면 전체보기</CategoryText>
                 <FilterTextContainer>
-                    <FilterText>기본순</FilterText>
-                    <FilterText>인기순</FilterText>
-                    <FilterText>최신순</FilterText>
+                    <FilterText onClick={() => sortDefault()} isActive={isActive == 0}>
+                        기본순
+                    </FilterText>
+                    <FilterText onClick={() => sortDesignList()} isActive={isActive == 1}>
+                        판매량순
+                    </FilterText>
                 </FilterTextContainer>
                 <CardContainer>
                     {designList.map((e, i) => {
@@ -90,9 +109,9 @@ const FilterTextContainer = styled.div`
     flex-direction: row;
 `;
 
-const FilterText = styled.div`
+const FilterText = styled.div<{ isActive: boolean }>`
     font-size: 15px;
-    color: #b3b3b3;
+    color: ${({ isActive }) => (isActive ? "#F4351D" : "#B3B3B3")};
     margin-right: 20px;
     cursor: pointer;
 `;
