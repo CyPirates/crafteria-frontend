@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import styled, { keyframes } from "styled-components";
 import StlRenderContainer from "./StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
+import { useNavigate } from "react-router-dom";
 
 type BuyDesignPopUpProps = {
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
@@ -13,6 +14,7 @@ type BuyDesignPopUpProps = {
 };
 
 const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, setIsPurchased, name, price, filePath, id }) => {
+    const navigate = useNavigate();
     useEffect(() => {
         // 팝업이 열릴 때 스크롤을 막기 위해 body에 overflow hidden 설정
         document.body.style.overflow = "hidden";
@@ -33,9 +35,10 @@ const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, setIsPur
                 },
             });
 
-            console.log("Design data submitted successfully:", response.data);
+            console.log("data submitted successfully:", response.data);
             handleOnClick(false);
             setIsPurchased(true);
+            navigate("/my-design");
             return response.data;
         } catch (error) {
             console.error("Error submitting design data:", error);
