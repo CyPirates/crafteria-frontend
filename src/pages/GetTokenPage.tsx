@@ -1,8 +1,6 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 const GetTokenPage = () => {
-    const navigate = useNavigate();
     useEffect(() => {
         // URL에서 쿼리 파라미터를 추출하는 함수
         const getQueryParam = (param: string): string | null => {
@@ -17,11 +15,12 @@ const GetTokenPage = () => {
             // 액세스 토큰을 로컬 스토리지에 저장
             console.log(accessToken);
             localStorage.setItem("accessToken", accessToken);
-            navigate(-2);
+            const redirectPath = localStorage.getItem("redirectPath");
+            if (redirectPath) {
+                localStorage.removeItem("redirectPath"); // 리다이렉트 경로를 가져온 후 삭제
+                window.location.href = redirectPath; // 원래 페이지로 이동
+            }
         }
-
-        // 선택적으로: 인증 후 다른 페이지로 리디렉션
-        // window.location.href = '/some-other-page';
     }, []);
 
     return (

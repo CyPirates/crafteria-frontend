@@ -3,10 +3,12 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { AiOutlineUser } from "react-icons/ai";
 import { useState } from "react";
+import LoginModal from "../specific/login/LoginModal";
 
 const TopNavBar = () => {
     const navigate = useNavigate();
     const location = useLocation(); // 현재 URL 경로 가져오기
+    const [isOpen, setIsOpen] = useState(false);
     const [num, setNum] = useState<number>(0);
 
     const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -24,11 +26,13 @@ const TopNavBar = () => {
             setNum(num + 1);
             return;
         }
-        window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/google";
+        localStorage.setItem("redirectPath", window.location.href);
+        setIsOpen(!isOpen);
     };
 
     return (
         <>
+            <LoginModal isOpen={isOpen} setIsOpen={setIsOpen} />
             <NavContainer>
                 <LogoContainer onClick={() => navigate("/home")}>Crafteria</LogoContainer>
                 <NavMenuContainer>
