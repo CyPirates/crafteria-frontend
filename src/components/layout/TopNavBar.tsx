@@ -3,6 +3,10 @@ import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { AiOutlineUser } from "react-icons/ai";
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../../store/store";
+import { toggleTheme } from "../../store/themeSlice";
+
 import LoginModal from "../specific/login/LoginModal";
 
 const TopNavBar = () => {
@@ -10,6 +14,8 @@ const TopNavBar = () => {
     const location = useLocation(); // 현재 URL 경로 가져오기
     const [isOpen, setIsOpen] = useState(false);
     const [num, setNum] = useState<number>(0);
+    const isLight = useSelector((state: RootState) => state.theme.isLight);
+    const dispatch = useDispatch<AppDispatch>();
 
     const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
@@ -56,6 +62,7 @@ const TopNavBar = () => {
                 <div style={{ width: "20vw" }}></div>
                 <LoginButton onClick={handleLoginClick}>{localStorage.getItem("accessToken") ? "로그아웃" : "로그인"}</LoginButton>
                 <MyPageButton isActive={location.pathname === "/my-page"} onClick={() => navigate("/my-page")} />
+                <button onClick={() => dispatch(toggleTheme())}>{isLight ? "라이트모드" : "다크모드"}</button>
             </NavContainer>
         </>
     );

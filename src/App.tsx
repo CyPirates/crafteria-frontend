@@ -1,7 +1,10 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
+import { Provider, useSelector } from "react-redux";
+import { RootState, store } from "./store/store";
 
+import { lightTheme, darkTheme } from "./theme/theme";
 import { GlobalStyle } from "./styles/GlobalStyles";
 import TopNavBar from "./components/layout/TopNavBar";
 import HomePage from "./pages/HomePage";
@@ -15,33 +18,41 @@ import GetTokenPage from "./pages/GetTokenPage";
 import MyPage from "./pages/MyPage";
 
 const App: React.FC = () => {
+    const isLight = useSelector((state: RootState) => state.theme.isLight);
     return (
         <>
-            <GlobalStyle />
-            <BrowserRouter>
-                <div className="App">
-                    <ScrollToTop />
-                    <TopNavBar />
-                    <ContentContainer>
-                        <Routes>
-                            <Route path="/" element={<Navigate to="/home" />} />
-                            <Route path="/home" element={<HomePage />} />
-                            <Route path="/design-market" element={<DesignMarket />} />
-                            <Route path="/my-design" element={<MyDesignPage />} />
-                            <Route path="/design/:id" element={<DesignDetailPage />} />
-                            <Route path="/sell-design" element={<SellDesignPage />} />
-                            <Route path="/print-order" element={<MakeOrderPage />} />
-                            <Route path="/auth/success" element={<GetTokenPage />} />
-                            <Route path="/my-page" element={<MyPage />} />
-                        </Routes>
-                    </ContentContainer>
-                </div>
-            </BrowserRouter>
+            <ThemeProvider theme={isLight ? lightTheme : darkTheme}>
+                <GlobalStyle />
+                <BrowserRouter>
+                    <div className="App">
+                        <ScrollToTop />
+                        <TopNavBar />
+                        <ContentContainer>
+                            <Routes>
+                                <Route path="/" element={<Navigate to="/home" />} />
+                                <Route path="/home" element={<HomePage />} />
+                                <Route path="/design-market" element={<DesignMarket />} />
+                                <Route path="/my-design" element={<MyDesignPage />} />
+                                <Route path="/design/:id" element={<DesignDetailPage />} />
+                                <Route path="/sell-design" element={<SellDesignPage />} />
+                                <Route path="/print-order" element={<MakeOrderPage />} />
+                                <Route path="/auth/success" element={<GetTokenPage />} />
+                                <Route path="/my-page" element={<MyPage />} />
+                            </Routes>
+                        </ContentContainer>
+                    </div>
+                </BrowserRouter>
+            </ThemeProvider>
         </>
     );
 };
+const Root: React.FC = () => (
+    <Provider store={store}>
+        <App />
+    </Provider>
+);
 
-export default App;
+export default Root;
 
 const ContentContainer = styled.div`
     width: 1300px;
