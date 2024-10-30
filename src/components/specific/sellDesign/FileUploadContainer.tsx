@@ -47,10 +47,10 @@ const FileUploadContainer: React.FC<ownProps> = ({ formData, onFileChange, handl
     return (
         <>
             <SectionTitle>파일 업로드</SectionTitle>
-            <UploadBox onClick={onUploadClick}>
+            <UploadButton onClick={onUploadClick}>
                 파일 선택
                 <HiddenFileInput ref={fileInputRef} type="file" onChange={onFileChange} accept=".stl" />
-            </UploadBox>
+            </UploadButton>
             {formData.file && (
                 <FileDetails>
                     <StlRenderContainer filePath={URL.createObjectURL(formData.file)} width="200px" height="200px" />
@@ -67,13 +67,12 @@ const FileUploadContainer: React.FC<ownProps> = ({ formData, onFileChange, handl
 export default FileUploadContainer;
 
 const SectionTitle = styled.div`
-    color: black;
     font-weight: bold;
     font-size: 23px;
     margin-bottom: 20px;
 `;
 
-const UploadBox = styled.div`
+const UploadButton = styled.div`
     width: 180px;
     height: 50px;
     border-radius: 5px;
@@ -82,8 +81,8 @@ const UploadBox = styled.div`
     justify-content: center;
     cursor: pointer;
     font-size: 16px;
-    color: white;
     background-color: #008ecc;
+    color: white;
 
     &:hover {
         background-color: #4682b4;
@@ -102,12 +101,10 @@ const FileName = styled.div`
     font-size: 16px;
     margin-bottom: 10px;
     font-weight: bold;
-    color: black;
 `;
 
 const ModelSize = styled.div`
     font-size: 16px;
     margin-bottom: 10px;
     font-weight: bold;
-    color: black;
 `;

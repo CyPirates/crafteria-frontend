@@ -6,7 +6,7 @@ const SellDesignPage = () => {
         <>
             <PageWrapper>
                 <UploadDesignContiner>
-                    <Header>판매 도면 등록</Header>
+                    <Header>도면 판매</Header>
                     <SellDesignInputField />
                 </UploadDesignContiner>
             </PageWrapper>
@@ -18,21 +18,19 @@ export default SellDesignPage;
 
 const PageWrapper = styled.div`
     display: flex;
+    height: 850px;
     justify-content: center;
-    height: 100%;
 `;
 
 const UploadDesignContiner = styled.div`
     width: 1200px;
-    height: 100%;
-    background-color: #d9d9d9;
+    //background-color: #d9d9d9;
 `;
 
 const Header = styled.div`
-    width: 100%;
     height: 50px;
     padding: 0px 30px;
-    background-color: #5c5c60;
+    border-bottom: 0.5px solid #dddddd;
     font-size: 20px;
     font-weight: bold;
 

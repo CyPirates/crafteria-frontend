@@ -23,7 +23,6 @@ const InputDesignInfoContainer: React.FC<ownProps> = ({ formData, onInputChange 
 export default InputDesignInfoContainer;
 
 const SectionTitle = styled.div`
-    color: black;
     font-weight: bold;
     font-size: 23px;
     margin-bottom: 20px;

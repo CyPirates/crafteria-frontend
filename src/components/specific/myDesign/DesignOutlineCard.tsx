@@ -43,8 +43,8 @@ const CardWrapper = styled.div`
     width: 700px;
     padding: 15px;
     margin-bottom: 20px;
-    background-color: #5c5c60;
     border-radius: 10px;
+    border: 0.5px solid #dddddd;
 
     display: flex;
     align-items: center;
@@ -60,9 +60,9 @@ const InformationContainer = styled.div`
     margin-left: 30px;
 `;
 const Information = styled.div`
-    color: #d2d2d2;
+    //color: #d2d2d2;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 400;
 `;
 
 const ButtonConatiner = styled.div`
@@ -77,8 +77,8 @@ const ButtonConatiner = styled.div`
 const Button = styled.div`
     width: 100px;
     height: 20px;
-    background-color: #393939;
     border-radius: 15px;
+    border: 0.5px solid #dddddd;
     font-size: 11px;
 
     display: flex;

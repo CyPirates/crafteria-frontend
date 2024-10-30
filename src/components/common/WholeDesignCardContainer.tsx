@@ -45,7 +45,7 @@ const WholeDesignCardContainer = () => {
     return (
         <>
             <Container>
-                <CategoryText>도면 전체보기</CategoryText>
+                <CategoryText>모든 도면</CategoryText>
                 <FilterTextContainer>
                     <FilterText onClick={() => sortDefault()} isActive={isActive == 0}>
                         기본순
@@ -81,7 +81,7 @@ const WholeDesignCards = ({ designData }: { designData: DesignProps }) => {
                     <Card.Text>
                         <DetailText>가격: {price}원</DetailText>
                         <DetailText>
-                            크기: {widthSize}mm x {lengthSize}mm x {heightSize}mm
+                            크기: {widthSize} x {lengthSize} x {heightSize}(mm)
                         </DetailText>
                         <DetailText>판매량: {downloadCount}</DetailText>
                         <DetailText>조회수: {viewCount}</DetailText>
@@ -126,14 +126,11 @@ const StyledCard = styled(Card)`
     width: 234px;
     height: auto;
     color: black;
-    background-color: white;
-    border-radius: 10px;
-    border: solid 2px #5c5c60;
     margin-bottom: 4vw;
     padding-top: 10px;
 
     &:hover {
-        box-shadow: 5px 5px 5px black;
+        //box-shadow: 5px 5px 5px black;
         cursor: pointer;
     }
 

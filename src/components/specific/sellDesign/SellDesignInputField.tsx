@@ -116,16 +116,18 @@ const SellDesignInputField = () => {
 //onClick={() => console.log(designFormData)}
 
 const Container = styled.div`
-    width: 100%;
-    height: 800px;
+    height: 600px;
     display: flex;
     flex-direction: row;
 `;
 
 const MenuContainer = styled.div`
-    width: 300px;
+    width: 250px;
+    height: 100%;
     padding: 50px;
-    color: black;
+    background-color: #f3f2f24b;
+    border-right: 0.5px solid #dddddd;
+
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -174,10 +176,8 @@ const SubmitButton = styled.div`
 `;
 
 const DescriptionContainer = styled.div`
-    width: calc(100% - 300px);
+    width: calc(100% - 200px);
     height: 100%;
-    background-color: white;
-    box-shadow: -4px 0px 4px 0px #a1a1a7;
     padding: 20px;
 `;
 

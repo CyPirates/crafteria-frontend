@@ -8,7 +8,7 @@ const HomePage = () => {
         <>
             <PageWrapper>
                 <Carousel />
-                <CurrentVisitContainer></CurrentVisitContainer>
+                {/* <CurrentVisitContainer></CurrentVisitContainer> */}
                 <WholeDesignCardContainer />
             </PageWrapper>
         </>

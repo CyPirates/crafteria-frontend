@@ -40,29 +40,30 @@ const TopNavBar = () => {
         <>
             <LoginModal isOpen={isOpen} setIsOpen={setIsOpen} />
             <NavContainer>
-                <LogoContainer onClick={() => navigate("/home")}>Crafteria</LogoContainer>
-                <NavMenuContainer>
-                    <NavMenu to="/home" isActive={location.pathname === "/home"}>
-                        홈
-                    </NavMenu>
-                    <NavMenu to="/my-design" isActive={location.pathname === "/my-design"}>
-                        내 도면
-                    </NavMenu>
-                    <NavMenu to="/design-market" isActive={location.pathname === "/design-market"}>
-                        도면 장터
-                    </NavMenu>
-                    <NavMenu to="/print-order" isActive={location.pathname === "/print-order"}>
-                        주문하기
-                    </NavMenu>
-                    <NavMenu to="/sell-design" isActive={location.pathname === "/sell-design"}>
-                        도면 판매
-                    </NavMenu>
-                </NavMenuContainer>
-                {/* <SearchBar onSearchSubmit={handleSearchSubmit} /> */}
-                <div style={{ width: "20vw" }}></div>
-                <LoginButton onClick={handleLoginClick}>{localStorage.getItem("accessToken") ? "로그아웃" : "로그인"}</LoginButton>
-                <MyPageButton isActive={location.pathname === "/my-page"} onClick={() => navigate("/my-page")} />
-                <button onClick={() => dispatch(toggleTheme())}>{isLight ? "라이트모드" : "다크모드"}</button>
+                <ContentsContainer>
+                    <LogoContainer onClick={() => navigate("/home")}>Crafteria</LogoContainer>
+                    <NavMenuContainer>
+                        <NavMenu to="/home" isActive={location.pathname === "/home"}>
+                            홈
+                        </NavMenu>
+                        <NavMenu to="/my-design" isActive={location.pathname === "/my-design"}>
+                            내 도면
+                        </NavMenu>
+                        <NavMenu to="/design-market" isActive={location.pathname === "/design-market"}>
+                            도면 장터
+                        </NavMenu>
+                        <NavMenu to="/print-order" isActive={location.pathname === "/print-order"}>
+                            주문하기
+                        </NavMenu>
+                        <NavMenu to="/sell-design" isActive={location.pathname === "/sell-design"}>
+                            도면 판매
+                        </NavMenu>
+                    </NavMenuContainer>
+                    {/* <div style={{ width: "20vw" }}></div> */}
+                    <LoginButton onClick={handleLoginClick}>{localStorage.getItem("accessToken") ? "로그아웃" : "로그인"}</LoginButton>
+                    <MyPageButton isActive={location.pathname === "/my-page"} onClick={() => navigate("/my-page")} />
+                    <button onClick={() => dispatch(toggleTheme())}>{isLight ? "라이트모드" : "다크모드"}</button>
+                </ContentsContainer>
             </NavContainer>
         </>
     );
@@ -87,29 +88,39 @@ const NavContainer = styled.div`
     height: 50px;
     position: fixed;
     top: 0;
+    background-color: ${({ theme }) => theme.bgColor};
+
     display: flex;
-    flex-direction: row;
     align-items: center;
-    border-bottom: 5px solid #464649;
-    background-color: #39393c;
+    justify-content: center;
+
+    border-bottom: 1px solid #464649;
     z-index: 3000;
 `;
 
+const ContentsContainer = styled.div`
+    width: 1300px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+`;
+
 const LogoContainer = styled.div`
-    margin: 0px 10vw;
-    font-size: 2vw;
-    color: #9d9d9f;
+    font-size: 35px;
 `;
 
 const NavMenuContainer = styled.div`
-    width: 25vw;
+    width: 500px;
+    margin-left: 30px;
+    margin-right: 300px;
     display: flex;
     justify-content: space-between;
 `;
 
 const NavMenu = styled(Link)<{ isActive: boolean }>`
     text-decoration: none;
-    font-size: 1vw;
+    font-size: 18px;
     color: ${({ isActive }) => (isActive ? "#F4351D" : "#a5a5a7")};
     font-weight: ${({ isActive }) => (isActive ? "bold" : "normal")};
 
@@ -140,7 +151,7 @@ const SearchInput = styled.input`
 
 const LoginButton = styled.div`
     text-decoration: none;
-    font-size: 1vw;
+    font-size: 18px;
     color: #a5a5a7;
 
     &:hover {
@@ -150,12 +161,11 @@ const LoginButton = styled.div`
 
 const MyPageButton = styled(AiOutlineUser)<{ isActive: boolean }>`
     color: ${({ isActive }) => (isActive ? "#F4351D" : "#a5a5a7")};
-    width: 2vw;
-    height: 2vw;
-    margin-left: 60px;
+    width: 25px;
+    height: 25px;
+    margin-left: 30px;
 
     &:hover {
-        width: 2.2vw;
-        height: 2.2vw;
+        color: grey;
     }
 `;
