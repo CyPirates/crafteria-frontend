@@ -161,7 +161,7 @@ const MenuItem = styled.div<{ active?: boolean }>`
 const SubmitButton = styled.div`
     width: 200px;
     height: 50px;
-    background-color: #008ecc;
+    background-color: #000000;
     color: white;
     border-radius: 5px;
     cursor: pointer;

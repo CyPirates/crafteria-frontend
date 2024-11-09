@@ -3,6 +3,7 @@ import styled, { keyframes } from "styled-components";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
 import { DesignProps } from "../../../types/DesignType";
+import getStlModelSize from "../../../utils/getStlModelSize";
 
 type BuyDesignPopUpProps = {
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,6 +13,12 @@ type BuyDesignPopUpProps = {
 type DesignLayoutProps = {
     data: DesignProps;
     handleSelect: (data: DesignProps) => void;
+};
+
+type Size = {
+    width: number;
+    height: number;
+    depth: number;
 };
 
 const SelectDesignPopUp = ({ handleOnClick, setModelFileUrl: setSelectedDesign }: BuyDesignPopUpProps) => {
@@ -63,12 +70,26 @@ const SelectDesignPopUp = ({ handleOnClick, setModelFileUrl: setSelectedDesign }
 
 const DesignLayout = ({ data, handleSelect }: DesignLayoutProps) => {
     const { name, modelFileUrl } = data;
+    const [size, setSize] = useState<Size | undefined>(undefined);
+    const fetchSize = async () => {
+        if (modelFileUrl) {
+            try {
+                const modelSize = await getStlModelSize(modelFileUrl);
+                setSize(modelSize);
+            } catch (error) {
+                console.error("Failed to fetch model size:", error);
+            }
+        }
+    };
+    fetchSize();
     return (
         <DesignLayoutContainer>
             <StlRenderContainer filePath={modelFileUrl} width="100px" height="100px" clickDisabled={true} />
             <DesignInfo>
                 <InfoText>이름: {name}</InfoText>
-                <InfoText>크기: </InfoText>
+                <InfoText>
+                    크기: {size?.width} x {size?.height} x {size?.depth} (mm){" "}
+                </InfoText>
                 <SelectButton onClick={() => handleSelect(data)}>선택</SelectButton>
             </DesignInfo>
         </DesignLayoutContainer>
@@ -106,14 +127,18 @@ const PopUpContainer = styled.div`
     border-radius: 15px 15px 0 0;
     animation: ${slideUp} 0.3s ease-out forwards;
 
+    display: flex;
+    justify-content: center;
+
     overflow-y: auto;
 `;
 
 const Title = styled.div`
-    width: 100%;
+    width: 500px;
     height: 60px;
-    padding: 20px;
+    padding: 10px;
     text-align: center;
+    background-color: white;
     color: black;
     font-size: 20px;
     font-weight: bold;
@@ -127,7 +152,7 @@ const Title = styled.div`
     top: 0;
     z-index: 1200;
 
-    border-bottom: 1px solid lightgray;
+    border-bottom: 1px solid #707074;
 `;
 
 const DesignContainer = styled.div`
@@ -135,6 +160,7 @@ const DesignContainer = styled.div`
 `;
 
 const DesignLayoutContainer = styled.div`
+    width: 500px;
     margin: 20px;
     height: 120px;
     border-bottom: 1px solid gray;
@@ -162,7 +188,7 @@ const InfoText = styled.div`
 const SelectButton = styled.div`
     width: 60px;
     height: 30px;
-    background-color: #008ecc;
+    background-color: #000000;
     color: white;
     font-size: 15px;
     border-radius: 5px;

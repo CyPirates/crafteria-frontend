@@ -99,9 +99,9 @@ const UserArea = styled.div`
     width: 500px;
     height: 800px;
     padding: 0 20px;
-    background-color: #5c5c60;
-    border-radius: 10px;
-
+    //background-color: #5c5c60;
+    //border-radius: 10px;
+    border-left: 1px solid #707074;
     position: relative;
 `;
 
@@ -110,7 +110,7 @@ const Title = styled.div`
     margin-top: 20px;
     font-size: 30px;
     font-weight: bold;
-    border-bottom: 3px solid #707074;
+    border-bottom: 1px solid #707074;
 `;
 
 const AddressInputContainer = styled.div`
@@ -131,7 +131,8 @@ const ZipcodeInput = styled.input`
 const SearchAddressButton = styled.div`
     width: 100px;
     height: 40px;
-    background-color: #008ecc;
+    background-color: #000000;
+    color: white;
     border-radius: 3px;
     margin-bottom: 10px;
 
@@ -191,7 +192,8 @@ const InfoContent = styled.div`
 const SubmitButton = styled.div`
     width: 460px;
     height: 50px;
-    background-color: #008ecc;
+    background-color: #000000;
+    color: white;
     border-radius: 5px;
     font-size: 25px;
 

@@ -60,21 +60,18 @@ const DesignContainer = styled.div`
     flex-direction: row;
     gap: 20px;
     padding-bottom: 10px;
-    border-bottom: 5px solid #464649;
+    border-bottom: 1px solid #464649;
     margin-bottom: 30px;
 `;
 
-const IntroductionContainer = styled.div``;
 const IntroductionTitle = styled.div`
     width: 100%;
     font-size: 30px;
-    color: white;
     font-weight: bold;
-    border-bottom: 5px solid #464649;
+    border-bottom: 1px solid #464649;
 `;
 
 const IntroductionContents = styled.div`
     margin-top: 20px;
     font-size: 20px;
-    color: white;
 `;

@@ -62,7 +62,7 @@ const TopNavBar = () => {
                     {/* <div style={{ width: "20vw" }}></div> */}
                     <LoginButton onClick={handleLoginClick}>{localStorage.getItem("accessToken") ? "로그아웃" : "로그인"}</LoginButton>
                     <MyPageButton isActive={location.pathname === "/my-page"} onClick={() => navigate("/my-page")} />
-                    <button onClick={() => dispatch(toggleTheme())}>{isLight ? "라이트모드" : "다크모드"}</button>
+                    {/* <button onClick={() => dispatch(toggleTheme())}>{isLight ? "라이트모드" : "다크모드"}</button> */}
                 </ContentsContainer>
             </NavContainer>
         </>

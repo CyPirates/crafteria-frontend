@@ -30,7 +30,7 @@ const DesignInfo = ({ name, artist, price, volume, size, id, isPurchased, handle
                 <Detail>
                     <DetailTitle>모델 크기</DetailTitle>
                     <DetailContent>
-                        {size.width}mm x {size.length}mm x {size.height}mm
+                        {size.width} x {size.length} x {size.height} mm
                     </DetailContent>
                 </Detail>
             </DetailContainer>
@@ -64,7 +64,7 @@ const Title = styled.div`
 const ArtistName = styled.div`
     color: #9d9d9f;
     font-size: 15px;
-    border-bottom: 5px solid #464649;
+    border-bottom: 1px solid #464649;
     margin-bottom: 10px;
 `;
 
@@ -74,7 +74,6 @@ const DetailContainer = styled.div`
 
 const Detail = styled.div`
     font-size: 20px;
-    color: #c0c0c0;
     display: flex;
     margin-bottom: 5px;
 `;

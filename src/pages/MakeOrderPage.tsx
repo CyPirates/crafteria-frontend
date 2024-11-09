@@ -114,26 +114,10 @@ const MakeOrderPage = () => {
                     <Title>주문하기</Title>
                     <Step>
                         <StepName>1.도면 선택</StepName>
-                        {ModelFileUrl ? (
-                            <>
-                                <StlRenderContainer filePath={ModelFileUrl} width="200px" height="200px" />
-                                <div>
-                                    크기: {size?.width}mm x {size?.height}mm x {size?.depth}mm
-                                </div>
-                                <div>
-                                    배율: <Input value={magnification} onChange={handleMagnificationChange} />배
-                                </div>
-                                <div>
-                                    수량: <Input value={quantity} onChange={handleQuantityChange} />개
-                                </div>
-                            </>
-                        ) : (
-                            <EmptyDesign>도면을 선택해 주세요</EmptyDesign>
-                        )}
-                        <RowButtonContainer>
+                        <RowContainer>
                             <Button onClick={() => setIsPop(true)}>구매한 도면에서 선택</Button>
                             <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-                                <Button style={{ backgroundColor: "#FF7F00" }}>파일 직접 업로드</Button>
+                                <Button>파일 직접 업로드</Button>
                             </label>
                             <input
                                 type="file"
@@ -141,7 +125,26 @@ const MakeOrderPage = () => {
                                 style={{ display: "none" }}
                                 onChange={handleFileUpload} // 파일 선택시 호출
                             />
-                        </RowButtonContainer>
+                        </RowContainer>
+                        {ModelFileUrl ? (
+                            <>
+                                <StlRenderContainer filePath={ModelFileUrl} width="150px" height="150px" />
+                                <div>
+                                    크기: {size?.width} x {size?.height} x {size?.depth} (mm)
+                                </div>
+                                <RowContainer>
+                                    <div>
+                                        배율: <Input value={magnification} onChange={handleMagnificationChange} />배
+                                    </div>
+                                    <div>
+                                        수량: <Input value={quantity} onChange={handleQuantityChange} />개
+                                    </div>
+                                </RowContainer>
+                            </>
+                        ) : (
+                            <EmptyDesign>도면을 선택해 주세요</EmptyDesign>
+                        )}
+
                         {isPop ? <SelectDesignPopUp handleOnClick={setIsPop} setModelFileUrl={setModelFileUrl} /> : null}
                     </Step>
                     <Step>
@@ -205,7 +208,7 @@ const Title = styled.div`
     width: 100%;
     font-size: 30px;
     font-weight: bold;
-    border-bottom: 3px solid #707074;
+    border-bottom: 1px solid #707074;
 `;
 
 const Step = styled.div`
@@ -214,7 +217,7 @@ const Step = styled.div`
     display: flex;
     flex-direction: column;
     padding: 10px;
-    border-bottom: 3px solid #707074;
+    border-bottom: 1px solid #707074;
 `;
 
 const StepName = styled.div`
@@ -222,15 +225,17 @@ const StepName = styled.div`
     font-weight: bold;
 `;
 
-const RowButtonContainer = styled.div`
+const RowContainer = styled.div`
     display: flex;
     gap: 10px;
+    margin-bottom: 20px;
 `;
 
 const Button = styled.div`
     width: 200px;
     height: 30px;
-    background-color: #008ecc;
+    background-color: #000000;
+    color: white;
     border-radius: 5px;
     margin-top: 10px;
 
