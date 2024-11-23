@@ -95,13 +95,14 @@ const ButtonContainer = styled.div`
 `;
 
 const Button = styled.button`
-    width: 250px;
+    width: 248px;
     height: 40px;
     color: white;
-    background-color: #818181;
+    font-weight: 600;
+    background-color: #000000;
     box-shadow: none;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
 
     cursor: pointer;
 `;

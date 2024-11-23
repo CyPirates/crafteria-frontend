@@ -12,7 +12,7 @@ export type Order = {
     orderId: string;
     userId: string;
     purchasePrice: string;
-    manufactureId: string;
+    manufacturerId: string;
     widthSize: string;
     lengthSize: string;
     heightSize: string;
@@ -20,5 +20,5 @@ export type Order = {
     quantity: string;
     deliveryAddress: string;
     status: string;
-    modelFileUrl: string;
+    modelFileUrls: string[];
 };

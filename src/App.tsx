@@ -16,6 +16,7 @@ import SellDesignPage from "./pages/SellDesignPage";
 import MakeOrderPage from "./pages/MakeOrderPage";
 import GetTokenPage from "./pages/GetTokenPage";
 import MyPage from "./pages/MyPage";
+import CreateReviewPage from "./pages/CreateReviewPage";
 
 const App: React.FC = () => {
     const isLight = useSelector((state: RootState) => state.theme.isLight);
@@ -38,6 +39,7 @@ const App: React.FC = () => {
                                 <Route path="/print-order" element={<MakeOrderPage />} />
                                 <Route path="/auth/success" element={<GetTokenPage />} />
                                 <Route path="/my-page" element={<MyPage />} />
+                                <Route path="/createReview/:id" element={<CreateReviewPage />} />
                             </Routes>
                         </ContentContainer>
                     </div>

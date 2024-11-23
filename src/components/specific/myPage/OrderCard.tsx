@@ -1,14 +1,15 @@
 import styled from "styled-components";
 import { Order } from "../../../types/OrderType";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
+import { useNavigate } from "react-router-dom";
 
 type OrderCardProps = {
     data: Order;
 };
 
 const OrderCard = ({ data }: OrderCardProps) => {
-    const { modelFileUrl, widthSize, lengthSize, heightSize, magnification, quantity, purchasePrice, manufactureId, status } = data;
-
+    const navigate = useNavigate();
+    const { modelFileUrls, widthSize, lengthSize, heightSize, magnification, quantity, purchasePrice, manufacturerId, status } = data;
     const convertStatusToString = (status: string) => {
         switch (status) {
             case "ORDERED":
@@ -25,15 +26,16 @@ const OrderCard = ({ data }: OrderCardProps) => {
             <CardWrapper>
                 <Status>{convertedStatus}</Status>
                 <InfoContainer>
-                    <StlRenderContainer filePath={modelFileUrl} width="100px" height="100px" clickDisabled={true} />
+                    <StlRenderContainer filePath={modelFileUrls[0]} width="100px" height="100px" clickDisabled={true} />
                     <TextContainer>
                         <Text style={{ whiteSpace: "pre-line" }}>
-                            크기: {widthSize}mm x {widthSize}mm x {lengthSize}mm{"\n"}
+                            크기: {widthSize}mm x {lengthSize}mm x {heightSize}mm{"\n"}
                             {magnification}배 x {quantity}개
                         </Text>
                         <Text>총 {purchasePrice}원</Text>
                     </TextContainer>
                 </InfoContainer>
+                {status === "DELIVERED" ? <button onClick={() => navigate(`/createReview/${manufacturerId}`)}>리뷰쓰기</button> : null}
             </CardWrapper>
         </>
     );
@@ -46,7 +48,7 @@ const CardWrapper = styled.div`
     height: 170px;
     padding: 15px;
     margin-bottom: 20px;
-    background-color: #5c5c60;
+    border: 1px solid #e6e6e6;
     border-radius: 10px;
 
     display: flex;

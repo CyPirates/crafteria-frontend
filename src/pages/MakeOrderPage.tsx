@@ -7,7 +7,7 @@ import getStlModelSize from "../utils/getStlModelSize";
 import useInput from "../hooks/useInput";
 import OrderInfoContainer from "../components/specific/MakeOrder/OrderInfoContainer";
 import { OrderData } from "../types/OrderType";
-import { Company } from "../types/CompanyType";
+import { Company, Equipment } from "../types/CompanyType";
 import { newAxios } from "../utils/axiosWithUrl";
 import Star from "../assets/star.png";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +22,21 @@ type CompanyInfoProps = {
     data: Company;
     setSelectedCompany: React.Dispatch<React.SetStateAction<Company | undefined>>;
 };
+
+// type SubmittedOrder = {
+//     manufacturerId: string;
+//     widthSize: number;
+//     lengthSize: number;
+//     heightSize: number;
+//     magnification: string;
+//     deliveryAddress: string;
+//     quantity: string;
+//     modelFiles?: Blob; // 선택적으로 STL 파일 추가
+//     recipientName: string;
+//     recipientPhone: string;
+//     recipientEmail: string;
+//     specialRequest?: string;
+// };
 
 const MakeOrderPage = () => {
     const navigate = useNavigate();
@@ -80,10 +95,15 @@ const MakeOrderPage = () => {
         formData.append("deliveryAddress", address);
         formData.append("quantity", quantity);
 
+        formData.append("recipientName", "test");
+        formData.append("recipientPhone", "010-0000-0000");
+        formData.append("recipientEmail", "2@naver.com");
+        formData.append("specialRequest", "testing..");
+
         if (ModelFileUrl) {
             const response = await fetch(ModelFileUrl);
             const file = await response.blob();
-            formData.append("modelFile", file);
+            formData.append("modelFiles", file);
         }
 
         try {
@@ -162,6 +182,15 @@ const MakeOrderPage = () => {
 export default MakeOrderPage;
 
 const CompanyInfoContainer = ({ data, setSelectedCompany }: CompanyInfoProps) => {
+    const checkPrintNow = () => {
+        const equipments: Equipment[] = data.equipmentList;
+        for (let i = 0; i < equipments.length; i++) {
+            if (equipments[i].status === "Available") return true;
+        }
+        return false;
+    };
+    const isAvailable = checkPrintNow();
+
     const renderStars = () => {
         return Array.from({ length: +data.rating }, (_, index) => <img key={index} src={Star} alt="star" />);
     };
@@ -180,6 +209,10 @@ const CompanyInfoContainer = ({ data, setSelectedCompany }: CompanyInfoProps) =>
                 <Contents>대표 장비: {data.representativeEquipment}</Contents>
                 <Contents>누적 주문 수: {data.productionCount}</Contents>
             </CompanyInfo>
+            <StatusContainer>
+                <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: isAvailable ? "#4CAF50" : "#FF9800" }} />
+                <div>{isAvailable ? "제작 가능" : "제작 대기"}</div>
+            </StatusContainer>
             <SelectCompanyButtonConatiner>
                 <SelectCompanyButton
                     onClick={() => {
@@ -266,11 +299,11 @@ const Input = styled.input`
 `;
 
 const CompanyContainer = styled.div`
-    width: 650px;
-    height: 100px;
-    margin-bottom: 20px;
-    background-color: #5c5c60;
-    border-radius: 10px;
+    width: 648px;
+    height: 148px;
+    margin-top: 20px;
+    border: 1px solid #ececec;
+    border-radius: 8px;
     padding-left: 10px;
 
     display: flex;
@@ -280,10 +313,10 @@ const CompanyContainer = styled.div`
 `;
 
 const CompanyImage = styled.img`
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     object-fit: cover;
-    border-radius: 5px;
+    border-radius: 4px;
     margin-right: 20px;
 `;
 
@@ -297,7 +330,7 @@ const NameAndRating = styled.div`
     display: flex;
 `;
 const CompanyName = styled.div`
-    font-size: 15px;
+    font-size: 20px;
     font-weight: 600;
 `;
 const Contents = styled.div`
@@ -307,12 +340,23 @@ const Contents = styled.div`
 const Rating = styled.div`
     margin-left: 20px;
     color: #e54444;
-    font-size: 15px;
+    font-size: 20px;
     img {
-        width: 13px;
-        height: 13px;
+        width: 16px;
+        height: 16px;
         object-fit: cover;
     }
+`;
+
+const StatusContainer = styled.div`
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+
+    position: absolute;
+    top: 10px;
+    right: 10px;
 `;
 
 const SelectCompanyButtonConatiner = styled.div`
@@ -325,15 +369,16 @@ const SelectCompanyButtonConatiner = styled.div`
     right: 10px;
 `;
 const SelectCompanyButton = styled.div`
-    width: 50px;
-    height: 20px;
-    background-color: #008ecc;
-    border-radius: 5px;
-    font-size: 11px;
+    width: 80px;
+    height: 28px;
+    background-color: #000000;
+    color: #ffffff;
+    border-radius: 4px;
+    font-size: 16px;
 
     cursor: pointer;
     &:hover {
-        background-color: #4682b4;
+        background-color: #c0c0c0;
     }
     display: flex;
     justify-content: center;

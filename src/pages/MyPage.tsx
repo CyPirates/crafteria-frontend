@@ -18,7 +18,7 @@ const MyPage = () => {
                         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
                     },
                 });
-                console.log(response.data.data);
+                //console.log(response.data.data);
                 setOrderList(response.data.data);
             } catch (e) {
                 console.log(e);
@@ -26,6 +26,11 @@ const MyPage = () => {
         };
         getOrderList();
     }, []);
+
+    useEffect(() => {
+        console.log("check");
+        console.log(delivered);
+    }, [delivered]);
 
     return (
         <>
@@ -37,7 +42,8 @@ const MyPage = () => {
                 {inProducting.map((e) => {
                     return <OrderCard data={e} />;
                 })}
-                {delivered.map((e) => {
+                {delivered.map((e, i) => {
+                    //if (i == 3) return;
                     return <OrderCard data={e} />;
                 })}
             </CardContainer>

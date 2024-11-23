@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 import { DesignProps } from "../../../types/DesignType";
@@ -17,7 +17,7 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
     };
     return (
         <>
-            <CardWrapper onClick={handleOnclick}>
+            <CardWrapper>
                 <StlRenderContainer filePath={modelFileUrl} width="150px" height="150px" clickDisabled={true} />
                 <InformationContainer>
                     <Information>도면명: {name}</Information>
@@ -28,9 +28,13 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
                     <Information>판매량: {downloadCount}</Information>
                 </InformationContainer>
                 <ButtonConatiner>
-                    <Button>다운로드</Button>
+                    <Button>
+                        <Link to={modelFileUrl} style={{ textDecoration: "none", color: "black" }}>
+                            다운로드
+                        </Link>
+                    </Button>
                     {published && <Button>수정</Button>}
-                    <Button>삭제</Button>
+                    <Button onClick={handleOnclick}>상세보기</Button>
                 </ButtonConatiner>
             </CardWrapper>
         </>
@@ -84,4 +88,9 @@ const Button = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
+
+    &:hover {
+        background-color: #dddddd;
+        cursor: pointer;
+    }
 `;

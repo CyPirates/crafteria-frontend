@@ -135,11 +135,11 @@ const PriceContainer = styled.div`
 
 const PurchaseButton = styled.div`
     width: 200px;
-    height: 50px;
+    height: 44px;
     margin-top: 20px;
-    background-color: #008ecc;
+    background-color: #000000;
     color: white;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
 
     display: flex;
@@ -147,6 +147,6 @@ const PurchaseButton = styled.div`
     justify-content: center;
 
     &:hover {
-        background-color: #4682b4;
+        background-color: #2e2e2e;
     }
 `;
