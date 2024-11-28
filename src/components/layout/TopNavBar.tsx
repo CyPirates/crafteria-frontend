@@ -8,6 +8,7 @@ import { RootState, AppDispatch } from "../../store/store";
 import { toggleTheme } from "../../store/themeSlice";
 
 import LoginModal from "../specific/login/LoginModal";
+import Logo from "../../assets/logo.png";
 
 const TopNavBar = () => {
     const navigate = useNavigate();
@@ -41,7 +42,9 @@ const TopNavBar = () => {
             <LoginModal isOpen={isOpen} setIsOpen={setIsOpen} />
             <NavContainer>
                 <ContentsContainer>
-                    <LogoContainer onClick={() => navigate("/home")}>Crafteria</LogoContainer>
+                    <LogoContainer onClick={() => navigate("/home")}>
+                        <LogoImage src={Logo} alt="x" />
+                    </LogoContainer>
                     <NavMenuContainer>
                         <NavMenu to="/home" isActive={location.pathname === "/home"}>
                             홈
@@ -107,7 +110,19 @@ const ContentsContainer = styled.div`
 `;
 
 const LogoContainer = styled.div`
-    font-size: 35px;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+
+    &:hover {
+        cursor: pointer;
+    }
+`;
+
+const LogoImage = styled.img`
+    //height: 48px;
+    width: 240px;
+    object-fit: contain;
 `;
 
 const NavMenuContainer = styled.div`
