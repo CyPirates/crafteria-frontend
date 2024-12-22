@@ -48,6 +48,7 @@ const App: React.FC = () => {
         </>
     );
 };
+
 const Root: React.FC = () => (
     <Provider store={store}>
         <App />

@@ -4,10 +4,11 @@ import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
 import { DesignProps } from "../../../types/DesignType";
 import getStlModelSize from "../../../utils/getStlModelSize";
+import { ModelFile } from "../../../types/FileType";
 
 type BuyDesignPopUpProps = {
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
-    setModelFileUrl: React.Dispatch<React.SetStateAction<string | undefined>>;
+    setModelFiles: React.Dispatch<React.SetStateAction<ModelFile[]>>;
 };
 
 type DesignLayoutProps = {
@@ -21,7 +22,7 @@ type Size = {
     depth: number;
 };
 
-const SelectDesignPopUp = ({ handleOnClick, setModelFileUrl: setSelectedDesign }: BuyDesignPopUpProps) => {
+const SelectDesignPopUp = ({ handleOnClick, setModelFiles }: BuyDesignPopUpProps) => {
     const [purchasedDesigns, setPurchasedDesigns] = useState<DesignProps[]>([]);
     useEffect(() => {
         // 팝업이 열릴 때 스크롤을 막기 위해 body에 overflow hidden 설정
@@ -51,7 +52,15 @@ const SelectDesignPopUp = ({ handleOnClick, setModelFileUrl: setSelectedDesign }
     }, []);
 
     const handleSelect = (data: DesignProps) => {
-        setSelectedDesign(data.modelFileUrl);
+        const designData: ModelFile = {
+            fileUrl: data.modelFileUrl,
+            widthSize: data.widthSize,
+            lengthSize: data.lengthSize,
+            heightSize: data.heightSize,
+            magnification: "1",
+            quantity: "1",
+        };
+        setModelFiles((prev) => [...prev, designData]);
         handleOnClick(false);
     };
     return (
@@ -69,26 +78,13 @@ const SelectDesignPopUp = ({ handleOnClick, setModelFileUrl: setSelectedDesign }
 };
 
 const DesignLayout = ({ data, handleSelect }: DesignLayoutProps) => {
-    const { name, modelFileUrl } = data;
-    const [size, setSize] = useState<Size | undefined>(undefined);
-    const fetchSize = async () => {
-        if (modelFileUrl) {
-            try {
-                const modelSize = await getStlModelSize(modelFileUrl);
-                setSize(modelSize);
-            } catch (error) {
-                console.error("Failed to fetch model size:", error);
-            }
-        }
-    };
-    fetchSize();
     return (
         <DesignLayoutContainer>
-            <StlRenderContainer filePath={modelFileUrl} width="100px" height="100px" clickDisabled={true} />
+            <StlRenderContainer filePath={data.modelFileUrl} width="100px" height="100px" clickDisabled={true} />
             <DesignInfo>
-                <InfoText>이름: {name}</InfoText>
+                <InfoText>이름: {data.name}</InfoText>
                 <InfoText>
-                    크기: {size?.width} x {size?.height} x {size?.depth} (mm){" "}
+                    크기: {data.widthSize} x {data.lengthSize} x {data.heightSize} (mm){" "}
                 </InfoText>
                 <SelectButton onClick={() => handleSelect(data)}>선택</SelectButton>
             </DesignInfo>

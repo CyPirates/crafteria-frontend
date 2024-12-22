@@ -1,6 +1,8 @@
 import Modal from "react-modal";
 
 import GoogleLoginImage from "../../../assets/googleLogin.png";
+import NaverLoginImage from "../../../assets/naverLogin.png";
+import KakaoLoginImage from "../../../assets/kakaoLogin.png";
 import styled from "styled-components";
 
 Modal.setAppElement("#root");
@@ -15,9 +17,9 @@ const LoginModal = ({ isOpen, setIsOpen }: ModalProps) => {
             <Container>간편로그인/회원가입</Container>
             <Line />
             <ImagesContainer>
-                <img src={GoogleLoginImage} onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/google")} />
-                <img src={GoogleLoginImage} onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/google")} />
-                <img src={GoogleLoginImage} onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/google")} />
+                <Logo src={GoogleLoginImage} onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/google")} />
+                <Logo src={KakaoLoginImage} alt="x" onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/kakao")} />
+                <Logo src={NaverLoginImage} onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/naver")} />
             </ImagesContainer>
         </Modal>
     );
@@ -58,6 +60,11 @@ const Container = styled.div`
     align-items: center;
 `;
 
+const Logo = styled.img`
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+`;
 const Line = styled.div`
     border: 1px solid #464649;
     width: 100%;

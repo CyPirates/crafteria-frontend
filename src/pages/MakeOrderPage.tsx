@@ -11,6 +11,7 @@ import { Company, Equipment } from "../types/CompanyType";
 import { newAxios } from "../utils/axiosWithUrl";
 import Star from "../assets/star.png";
 import { useNavigate } from "react-router-dom";
+import { ModelFile } from "../types/FileType";
 
 type Size = {
     width: number;
@@ -23,26 +24,10 @@ type CompanyInfoProps = {
     setSelectedCompany: React.Dispatch<React.SetStateAction<Company | undefined>>;
 };
 
-// type SubmittedOrder = {
-//     manufacturerId: string;
-//     widthSize: number;
-//     lengthSize: number;
-//     heightSize: number;
-//     magnification: string;
-//     deliveryAddress: string;
-//     quantity: string;
-//     modelFiles?: Blob; // 선택적으로 STL 파일 추가
-//     recipientName: string;
-//     recipientPhone: string;
-//     recipientEmail: string;
-//     specialRequest?: string;
-// };
-
 const MakeOrderPage = () => {
     const navigate = useNavigate();
-    const [ModelFileUrl, setModelFileUrl] = useState<string | undefined>(undefined);
+    const [modelFiles, setModelFiles] = useState<ModelFile[]>([]);
     const [isPop, setIsPop] = useState<boolean>(false);
-    const [size, setSize] = useState<Size | undefined>(undefined);
     const [address, setAddress] = useState<string>("");
     const [selectedCompany, setSelectedCompany] = useState<Company>();
     const [companies, setCompanies] = useState<Company[] | undefined>(undefined);
@@ -50,28 +35,26 @@ const MakeOrderPage = () => {
     const { value: quantity, onChange: handleQuantityChange } = useInput("1"); // 출력 수량
 
     // 파일 선택 핸들러
-    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             const fileUrl = URL.createObjectURL(file); // 파일을 URL로 변환
-            setModelFileUrl(fileUrl); // URL을 상태에 저장
+            try {
+                const modelSize = await getStlModelSize(fileUrl);
+                const fileData: ModelFile = {
+                    fileUrl: fileUrl,
+                    widthSize: modelSize.width.toString(),
+                    lengthSize: modelSize.height.toString(),
+                    heightSize: modelSize.depth.toString(),
+                    magnification: "1",
+                    quantity: "1",
+                };
+                setModelFiles((prev) => [...prev, fileData]);
+            } catch (e) {
+                console.log(e);
+            }
         }
     };
-
-    useEffect(() => {
-        const fetchSize = async () => {
-            if (ModelFileUrl) {
-                try {
-                    const modelSize = await getStlModelSize(ModelFileUrl);
-                    setSize(modelSize);
-                } catch (error) {
-                    console.error("Failed to fetch model size:", error);
-                }
-            }
-        };
-
-        fetchSize();
-    }, [ModelFileUrl]);
 
     const fetchCompanies = async () => {
         try {
@@ -88,23 +71,24 @@ const MakeOrderPage = () => {
         const token = localStorage.getItem("accessToken");
 
         formData.append("manufacturerId", selectedCompany!.id);
-        formData.append("widthSize", size!.width.toString());
-        formData.append("lengthSize", size!.height.toString());
-        formData.append("heightSize", size!.depth.toString());
-        formData.append("magnification", magnification);
         formData.append("deliveryAddress", address);
-        formData.append("quantity", quantity);
-
         formData.append("recipientName", "test");
         formData.append("recipientPhone", "010-0000-0000");
         formData.append("recipientEmail", "2@naver.com");
         formData.append("specialRequest", "testing..");
 
-        if (ModelFileUrl) {
-            const response = await fetch(ModelFileUrl);
-            const file = await response.blob();
-            formData.append("modelFiles", file);
-        }
+        modelFiles.map(async (files) => {
+            const { fileUrl, ...fileData } = files;
+            const file = (await fetch(fileUrl)).blob();
+            const dataWithFile = { ...fileData, modelFile: file };
+            //formData.append('orderItems', dataWithFile);
+        });
+
+        // if (ModelFileUrl) {
+        //     const response = await fetch(ModelFileUrl);
+        //     const file = await response.blob();
+        //     formData.append("modelFiles", file);
+        // }
 
         try {
             const response = await newAxios.post("/api/v1/order/create", formData, {
@@ -124,7 +108,6 @@ const MakeOrderPage = () => {
             console.error("Error submitting design data:", error);
             throw error;
         }
-        return;
     };
 
     return (
@@ -146,26 +129,47 @@ const MakeOrderPage = () => {
                                 onChange={handleFileUpload} // 파일 선택시 호출
                             />
                         </RowContainer>
-                        {ModelFileUrl ? (
-                            <>
-                                <StlRenderContainer filePath={ModelFileUrl} width="150px" height="150px" />
-                                <div>
-                                    크기: {size?.width} x {size?.height} x {size?.depth} (mm)
+
+                        {modelFiles.length > 0 ? (
+                            modelFiles.map((file, index) => (
+                                <div key={index}>
+                                    <StlRenderContainer filePath={file.fileUrl} width="150px" height="150px" />
+                                    <div>
+                                        크기: {file.widthSize} x {file.lengthSize} x {file.heightSize} (mm)
+                                    </div>
+                                    <RowContainer>
+                                        <div>
+                                            배율:
+                                            <Input
+                                                value={file.magnification}
+                                                onChange={(e) => {
+                                                    const newModelFiles = [...modelFiles];
+                                                    newModelFiles[index].magnification = e.target.value;
+                                                    setModelFiles(newModelFiles);
+                                                }}
+                                            />
+                                            배
+                                        </div>
+                                        <div>
+                                            수량:
+                                            <Input
+                                                value={file.quantity}
+                                                onChange={(e) => {
+                                                    const newModelFiles = [...modelFiles];
+                                                    newModelFiles[index].quantity = e.target.value;
+                                                    setModelFiles(newModelFiles);
+                                                }}
+                                            />
+                                            개
+                                        </div>
+                                    </RowContainer>
                                 </div>
-                                <RowContainer>
-                                    <div>
-                                        배율: <Input value={magnification} onChange={handleMagnificationChange} />배
-                                    </div>
-                                    <div>
-                                        수량: <Input value={quantity} onChange={handleQuantityChange} />개
-                                    </div>
-                                </RowContainer>
-                            </>
+                            ))
                         ) : (
                             <EmptyDesign>도면을 선택해 주세요</EmptyDesign>
                         )}
 
-                        {isPop ? <SelectDesignPopUp handleOnClick={setIsPop} setModelFileUrl={setModelFileUrl} /> : null}
+                        {isPop ? <SelectDesignPopUp handleOnClick={setIsPop} setModelFiles={setModelFiles} /> : null}
                     </Step>
                     <Step>
                         <StepName>2. 제조사 선택</StepName>
