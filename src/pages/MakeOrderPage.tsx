@@ -118,9 +118,9 @@ const MakeOrderPage = () => {
                     <Step>
                         <StepName>1.도면 선택</StepName>
                         <RowContainer>
-                            <Button onClick={() => setIsPop(true)}>구매한 도면에서 선택</Button>
+                            <SelectFileButton onClick={() => setIsPop(true)}>구매한 도면에서 선택</SelectFileButton>
                             <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
-                                <Button>파일 직접 업로드</Button>
+                                <SelectFileButton>파일 직접 업로드</SelectFileButton>
                             </label>
                             <input
                                 type="file"
@@ -173,7 +173,7 @@ const MakeOrderPage = () => {
                     </Step>
                     <Step>
                         <StepName>2. 제조사 선택</StepName>
-                        <Button onClick={fetchCompanies}>제조사 검색</Button>
+                        <SelectFileButton onClick={fetchCompanies}>제조사 검색</SelectFileButton>
                         {companies && companies.map((e) => <CompanyInfoContainer data={e} setSelectedCompany={setSelectedCompany} />)}
                     </Step>
                 </DesignArea>
@@ -186,6 +186,7 @@ const MakeOrderPage = () => {
 export default MakeOrderPage;
 
 const CompanyInfoContainer = ({ data, setSelectedCompany }: CompanyInfoProps) => {
+    const navigate = useNavigate();
     const checkPrintNow = () => {
         const equipments: Equipment[] = data.equipmentList;
         for (let i = 0; i < equipments.length; i++) {
@@ -199,6 +200,9 @@ const CompanyInfoContainer = ({ data, setSelectedCompany }: CompanyInfoProps) =>
         return Array.from({ length: +data.rating }, (_, index) => <img key={index} src={Star} alt="star" />);
     };
 
+    const moveToAboutPage = () => {
+        window.open(`/company-detail/${data.id}`);
+    };
     return (
         <CompanyContainer>
             <CompanyImage src={data.imageFileUrl} />
@@ -217,15 +221,22 @@ const CompanyInfoContainer = ({ data, setSelectedCompany }: CompanyInfoProps) =>
                 <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: isAvailable ? "#4CAF50" : "#FF9800" }} />
                 <div>{isAvailable ? "제작 가능" : "제작 대기"}</div>
             </StatusContainer>
-            <SelectCompanyButtonConatiner>
-                <SelectCompanyButton
+            <RowGridButtonContainer>
+                <ButtonInBox
+                    onClick={() => {
+                        moveToAboutPage();
+                    }}
+                >
+                    자세히
+                </ButtonInBox>
+                <ButtonInBox
                     onClick={() => {
                         setSelectedCompany(data);
                     }}
                 >
                     선택
-                </SelectCompanyButton>
-            </SelectCompanyButtonConatiner>
+                </ButtonInBox>
+            </RowGridButtonContainer>
         </CompanyContainer>
     );
 };
@@ -268,7 +279,7 @@ const RowContainer = styled.div`
     margin-bottom: 20px;
 `;
 
-const Button = styled.div`
+const SelectFileButton = styled.div`
     width: 200px;
     height: 30px;
     background-color: #000000;
@@ -363,7 +374,7 @@ const StatusContainer = styled.div`
     right: 10px;
 `;
 
-const SelectCompanyButtonConatiner = styled.div`
+const RowGridButtonContainer = styled.div`
     display: flex;
     flex-direction: row;
     gap: 10px;
@@ -372,7 +383,7 @@ const SelectCompanyButtonConatiner = styled.div`
     bottom: 10px;
     right: 10px;
 `;
-const SelectCompanyButton = styled.div`
+const ButtonInBox = styled.div`
     width: 80px;
     height: 28px;
     background-color: #000000;
@@ -382,7 +393,7 @@ const SelectCompanyButton = styled.div`
 
     cursor: pointer;
     &:hover {
-        background-color: #c0c0c0;
+        background-color: #4682b4;
     }
     display: flex;
     justify-content: center;

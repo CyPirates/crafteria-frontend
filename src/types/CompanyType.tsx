@@ -9,6 +9,7 @@ export type Company = {
     representativeEquipment: string;
     imageFileUrl: string;
     equipmentList: Equipment[];
+    unitPrice: string;
 };
 
 export type Equipment = {
