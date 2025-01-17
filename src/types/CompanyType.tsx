@@ -9,7 +9,18 @@ export type Company = {
     representativeEquipment: string;
     imageFileUrl: string;
     equipmentList: Equipment[];
+    technologies: Technology[];
     unitPrice: string;
+};
+
+export type Technology = {
+    technologyId: string;
+    colorValue: string;
+    description: string;
+    imageUrl: string;
+    manufacturerId: string;
+    material: string;
+    pricePerHour: string;
 };
 
 export type Equipment = {

@@ -1,28 +1,14 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { DesignProps } from "../types/DesignType";
 import SelectDesignPopUp from "../components/specific/MakeOrder/SelectDesignPopUp";
 import StlRenderContainer from "../components/specific/designDetail/StlRenderContainer";
 import getStlModelSize from "../utils/getStlModelSize";
 import useInput from "../hooks/useInput";
-import OrderInfoContainer from "../components/specific/MakeOrder/OrderInfoContainer";
-import { OrderData } from "../types/OrderType";
 import { Company, Equipment } from "../types/CompanyType";
 import { newAxios } from "../utils/axiosWithUrl";
-import Star from "../assets/star.png";
 import { useNavigate } from "react-router-dom";
 import { ModelFile } from "../types/FileType";
-
-type Size = {
-    width: number;
-    height: number;
-    depth: number;
-};
-
-type CompanyInfoProps = {
-    data: Company;
-    setSelectedCompany: React.Dispatch<React.SetStateAction<Company | undefined>>;
-};
+import SelectCompany from "../components/specific/MakeOrder/SelectCompany";
 
 const MakeOrderPage = () => {
     const navigate = useNavigate();
@@ -30,11 +16,9 @@ const MakeOrderPage = () => {
     const [isPop, setIsPop] = useState<boolean>(false);
     const [address, setAddress] = useState<string>("");
     const [selectedCompany, setSelectedCompany] = useState<Company>();
-    const [companies, setCompanies] = useState<Company[] | undefined>(undefined);
     const { value: magnification, onChange: handleMagnificationChange } = useInput("1"); // 도면 배율
     const { value: quantity, onChange: handleQuantityChange } = useInput("1"); // 출력 수량
 
-    // 파일 선택 핸들러
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
@@ -53,16 +37,6 @@ const MakeOrderPage = () => {
             } catch (e) {
                 console.log(e);
             }
-        }
-    };
-
-    const fetchCompanies = async () => {
-        try {
-            const response = await newAxios.get("/api/v1/manufacturers");
-            console.log(response.data.data);
-            setCompanies(response.data.data);
-        } catch (e) {
-            console.log(e);
         }
     };
 
@@ -115,6 +89,7 @@ const MakeOrderPage = () => {
             <PageWrapper>
                 <DesignArea>
                     <Title>주문하기</Title>
+                    <SelectCompany setSelectedCompany={setSelectedCompany} />
                     <Step>
                         <StepName>1.도면 선택</StepName>
                         <RowContainer>
@@ -171,75 +146,14 @@ const MakeOrderPage = () => {
 
                         {isPop ? <SelectDesignPopUp handleOnClick={setIsPop} setModelFiles={setModelFiles} /> : null}
                     </Step>
-                    <Step>
-                        <StepName>2. 제조사 선택</StepName>
-                        <SelectFileButton onClick={fetchCompanies}>제조사 검색</SelectFileButton>
-                        {companies && companies.map((e) => <CompanyInfoContainer data={e} setSelectedCompany={setSelectedCompany} />)}
-                    </Step>
                 </DesignArea>
-                <OrderInfoContainer setUserAddress={setAddress} company={selectedCompany} handleSubmit={handleSubmit} />
+                {/* <OrderInfoContainer setUserAddress={setAddress} company={selectedCompany} handleSubmit={handleSubmit} /> */}
             </PageWrapper>
         </>
     );
 };
 
 export default MakeOrderPage;
-
-const CompanyInfoContainer = ({ data, setSelectedCompany }: CompanyInfoProps) => {
-    const navigate = useNavigate();
-    const checkPrintNow = () => {
-        const equipments: Equipment[] = data.equipmentList;
-        for (let i = 0; i < equipments.length; i++) {
-            if (equipments[i].status === "Available") return true;
-        }
-        return false;
-    };
-    const isAvailable = checkPrintNow();
-
-    const renderStars = () => {
-        return Array.from({ length: +data.rating }, (_, index) => <img key={index} src={Star} alt="star" />);
-    };
-
-    const moveToAboutPage = () => {
-        window.open(`/company-detail/${data.id}`);
-    };
-    return (
-        <CompanyContainer>
-            <CompanyImage src={data.imageFileUrl} />
-            <CompanyInfo>
-                <NameAndRating>
-                    <CompanyName>{data.name}</CompanyName>
-                    <Rating>
-                        {renderStars()} ({data.rating})
-                    </Rating>
-                </NameAndRating>
-                <Contents>{data.introduction}</Contents>
-                <Contents>대표 장비: {data.representativeEquipment}</Contents>
-                <Contents>누적 주문 수: {data.productionCount}</Contents>
-            </CompanyInfo>
-            <StatusContainer>
-                <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: isAvailable ? "#4CAF50" : "#FF9800" }} />
-                <div>{isAvailable ? "제작 가능" : "제작 대기"}</div>
-            </StatusContainer>
-            <RowGridButtonContainer>
-                <ButtonInBox
-                    onClick={() => {
-                        moveToAboutPage();
-                    }}
-                >
-                    자세히
-                </ButtonInBox>
-                <ButtonInBox
-                    onClick={() => {
-                        setSelectedCompany(data);
-                    }}
-                >
-                    선택
-                </ButtonInBox>
-            </RowGridButtonContainer>
-        </CompanyContainer>
-    );
-};
 
 const PageWrapper = styled.div`
     margin-top: 20px;
@@ -311,91 +225,4 @@ const EmptyDesign = styled.div`
 
 const Input = styled.input`
     width: 40px;
-`;
-
-const CompanyContainer = styled.div`
-    width: 648px;
-    height: 148px;
-    margin-top: 20px;
-    border: 1px solid #ececec;
-    border-radius: 8px;
-    padding-left: 10px;
-
-    display: flex;
-    align-items: center;
-
-    position: relative;
-`;
-
-const CompanyImage = styled.img`
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-right: 20px;
-`;
-
-const CompanyInfo = styled.div`
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-`;
-
-const NameAndRating = styled.div`
-    display: flex;
-`;
-const CompanyName = styled.div`
-    font-size: 20px;
-    font-weight: 600;
-`;
-const Contents = styled.div`
-    font-size: 12px;
-    font-weight: 600;
-`;
-const Rating = styled.div`
-    margin-left: 20px;
-    color: #e54444;
-    font-size: 20px;
-    img {
-        width: 16px;
-        height: 16px;
-        object-fit: cover;
-    }
-`;
-
-const StatusContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-
-    position: absolute;
-    top: 10px;
-    right: 10px;
-`;
-
-const RowGridButtonContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-`;
-const ButtonInBox = styled.div`
-    width: 80px;
-    height: 28px;
-    background-color: #000000;
-    color: #ffffff;
-    border-radius: 4px;
-    font-size: 16px;
-
-    cursor: pointer;
-    &:hover {
-        background-color: #4682b4;
-    }
-    display: flex;
-    justify-content: center;
-    align-items: center;
 `;
