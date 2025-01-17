@@ -1,6 +1,7 @@
 import { Company, Equipment } from "../../../types/CompanyType";
 import styled from "styled-components";
 import Star from "../../../assets/star.png";
+import MaterialPopover from "./MaterialPopover";
 
 type CompanyInfoProps = {
     data: Company;
@@ -36,7 +37,9 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
                 <Contents>누적 주문 수: {data.productionCount}</Contents>
             </CompanyInfo>
             <Divider />
-            <MaterialContainer></MaterialContainer>
+            <MaterialContainer>
+                <MaterialPopover color="#ffffff" imgUrl={data.imageFileUrl} />
+            </MaterialContainer>
             <StatusContainer>
                 <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: isAvailable ? "#4CAF50" : "#FF9800" }} />
                 <div>{isAvailable ? "제작 가능" : "제작 대기"}</div>
