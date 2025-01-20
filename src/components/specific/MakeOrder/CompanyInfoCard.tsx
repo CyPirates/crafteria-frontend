@@ -2,6 +2,9 @@ import { Company, Equipment } from "../../../types/CompanyType";
 import styled from "styled-components";
 import Star from "../../../assets/star.png";
 import MaterialPopover from "./MaterialPopover";
+import classifyMaterial from "../../../utils/classifyMaterial";
+import convertMaterialName from "../../../utils/convertMaterialName";
+import React from "react";
 
 type CompanyInfoProps = {
     data: Company;
@@ -9,6 +12,9 @@ type CompanyInfoProps = {
 };
 
 const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
+    const materials = classifyMaterial(data.technologies);
+    const avgPrice = (materials["FILAMENT"].totalPrice + materials["POWDER"].totalPrice + materials["LIQUID"].totalPrice) / data.technologies.length;
+
     const checkPrintNow = () => {
         const equipments: Equipment[] = data.equipmentList;
         for (let i = 0; i < equipments.length; i++) {
@@ -17,7 +23,6 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
         return false;
     };
     const isAvailable = checkPrintNow();
-
     const moveToAboutPage = () => {
         window.open(`/company-detail/${data.id}`);
     };
@@ -35,10 +40,26 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
                 <Contents>{data.introduction}</Contents>
                 <Contents>대표 장비: {data.representativeEquipment}</Contents>
                 <Contents>누적 주문 수: {data.productionCount}</Contents>
+                <Contents>평균 가격: {avgPrice}원/시간</Contents>
             </CompanyInfo>
             <Divider />
             <MaterialContainer>
-                <MaterialPopover color="#ffffff" imgUrl={data.imageFileUrl} />
+                <h5>보유 재료</h5>
+                {Object.entries(materials).map(([key, value]) => {
+                    if (value.materials.length === 0) return null;
+
+                    return (
+                        <MaterialAndPopover>
+                            <MaterialText>
+                                {convertMaterialName(key)} <br />
+                                평균 {value.totalPrice / value.materials.length}원/시간
+                            </MaterialText>
+                            {value.materials.map((e) => (
+                                <MaterialPopover color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                            ))}
+                        </MaterialAndPopover>
+                    );
+                })}
             </MaterialContainer>
             <StatusContainer>
                 <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: isAvailable ? "#4CAF50" : "#FF9800" }} />
@@ -68,7 +89,7 @@ export default CompanyInfoCard;
 
 const CompanyContainer = styled.div`
     width: 960px;
-    height: 148px;
+    height: 180px;
     margin-top: 20px;
     border: 1px solid #ececec;
     border-radius: 8px;
@@ -81,8 +102,8 @@ const CompanyContainer = styled.div`
 `;
 
 const CompanyImage = styled.img`
-    width: 120px;
-    height: 120px;
+    width: 160px;
+    height: 160px;
     object-fit: cover;
     border-radius: 4px;
     margin-right: 20px;
@@ -164,4 +185,19 @@ const Divider = styled.div`
 const MaterialContainer = styled.div`
     flex: 1;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+`;
+
+const MaterialAndPopover = styled.div`
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 8px;
+`;
+const MaterialText = styled.div`
+    font-size: 11px;
+    font-weight: bold;
 `;

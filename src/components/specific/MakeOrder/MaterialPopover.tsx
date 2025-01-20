@@ -6,17 +6,19 @@ import styled from "styled-components";
 type OwnProps = {
     color: string;
     imgUrl: string;
+    price: string;
 };
-const MaterialPopover = ({ color, imgUrl }: OwnProps) => {
+const MaterialPopover = ({ color, imgUrl, price }: OwnProps) => {
     return (
         <>
             <OverlayTrigger
-                trigger="click"
+                //trigger="hover"
                 placement="bottom"
                 overlay={
                     <Popover id={`popover-positioned-`}>
                         <Popover.Body>
                             <MaterialImg src={imgUrl} alt="x" />
+                            <div>{price}원/시간</div>
                         </Popover.Body>
                     </Popover>
                 }
@@ -36,8 +38,9 @@ const MaterialImg = styled.img`
 `;
 
 const ColorButton = styled.div`
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     background-color: ${(props) => props.color};
     border: 1px solid #919191;
+    border-radius: 50%;
 `;

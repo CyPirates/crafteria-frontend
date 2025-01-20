@@ -9,7 +9,7 @@ import { Company } from "../../../types/CompanyType";
 type OrderInfoProps = {
     setUserAddress: React.Dispatch<React.SetStateAction<string>>;
     company: Company | undefined;
-    handleSubmit: () => Promise<any>;
+    //handleSubmit: () => Promise<any>;
 };
 
 type ModalProps = {
@@ -18,7 +18,7 @@ type ModalProps = {
     handleIsOpen: () => void;
 };
 
-const OrderInfoContainer = ({ setUserAddress, company, handleSubmit }: OrderInfoProps) => {
+const OrderInfoContainer = ({ setUserAddress, company }: OrderInfoProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [zipcode, setZipcode] = useState<string>("");
     const [address, setAddress] = useState<string>("");
@@ -67,7 +67,7 @@ const OrderInfoContainer = ({ setUserAddress, company, handleSubmit }: OrderInfo
                     <InfoTitle>총 가격</InfoTitle>
                     <InfoContent>0 원</InfoContent>
                 </CompanyInformation>
-                <SubmitButton onClick={handleSubmit}>주문하기</SubmitButton>
+                <SubmitButton>주문하기</SubmitButton>
             </UserArea>
         </>
     );

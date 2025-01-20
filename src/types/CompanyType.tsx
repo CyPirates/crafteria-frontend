@@ -9,11 +9,11 @@ export type Company = {
     representativeEquipment: string;
     imageFileUrl: string;
     equipmentList: Equipment[];
-    technologies: Technology[];
+    technologies: Material[];
     unitPrice: string;
 };
 
-export type Technology = {
+export type Material = {
     technologyId: string;
     colorValue: string;
     description: string;
