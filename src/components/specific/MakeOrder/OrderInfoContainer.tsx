@@ -1,15 +1,15 @@
 import styled from "styled-components";
 import DaumPostCode from "react-daum-postcode";
 
-import { OrderData } from "../../../types/OrderType";
-import { useEffect, useState } from "react";
+import { OrderItems, PrintOrderData, SubmittedOrder } from "../../../types/OrderType";
+import { ChangeEvent, useEffect, useState } from "react";
 import useInput from "../../../hooks/useInput";
 import { Company } from "../../../types/CompanyType";
+import { newAxios } from "../../../utils/axiosWithUrl";
 
 type OrderInfoProps = {
-    setUserAddress: React.Dispatch<React.SetStateAction<string>>;
-    company: Company | undefined;
-    //handleSubmit: () => Promise<any>;
+    printOrders: PrintOrderData[];
+    company: Company;
 };
 
 type ModalProps = {
@@ -18,19 +18,115 @@ type ModalProps = {
     handleIsOpen: () => void;
 };
 
-const OrderInfoContainer = ({ setUserAddress, company }: OrderInfoProps) => {
+const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [zipcode, setZipcode] = useState<string>("");
     const [address, setAddress] = useState<string>("");
     const { value: detailAddress, onChange: setDetailAddress } = useInput("");
+    const [submittedData, setSubmittedData] = useState<SubmittedOrder>({
+        manufactureId: company.id,
+        purchasedPrice: "0",
+        status: "ORDERED",
+        deliveryAddress: "",
+        orderItems: [],
+        recipientName: "",
+        recipentPhone: "",
+        recipientEmail: "",
+        specialRequest: "",
+        files: [],
+    });
+
+    useEffect(() => {
+        const orderData: OrderItems[] = [];
+        const fileUrls: string[] = [];
+
+        printOrders.map((item) => {
+            orderData.push({
+                widthSize: item.widthSize,
+                lengthSize: item.lengthSize,
+                heightSize: item.heightSize,
+                magnification: item.magnification,
+                quantity: item.quantity,
+            });
+            fileUrls.push(item.fileUrl);
+        });
+
+        setSubmittedData((prevData) => ({
+            ...prevData,
+            orderItems: orderData,
+            files: fileUrls,
+        }));
+    }, [printOrders]);
+
+    useEffect(() => {
+        setSubmittedData((prev) => ({ ...prev, deliveryAddress: address + " " + detailAddress }));
+    }, [detailAddress, address]);
 
     const handleIsOpen = () => {
         setIsOpen((prev) => !prev);
     };
 
-    useEffect(() => {
-        setUserAddress(address + " " + detailAddress);
-    }, [detailAddress]);
+    const handleOnchange = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        const tag = e.target.id;
+        setSubmittedData((prev) => ({ ...prev, [tag]: value }));
+    };
+
+    const handleSubmit = async () => {
+        const formData = new FormData();
+
+        formData.append(
+            "request",
+            JSON.stringify({
+                manufacturerId: submittedData.manufactureId,
+                purchasePrice: 0,
+                status: "ORDERED",
+                deliveryAddress: submittedData.deliveryAddress,
+                orderItems: submittedData.orderItems,
+                recipientName: submittedData.recipientName,
+                recipientPhone: submittedData.recipentPhone,
+                recipientEmail: "example@naver.com",
+                specialRequest: submittedData.specialRequest,
+            })
+        );
+
+        // 파일 URL을 변환하여 FormData에 추가
+        const convertToFile = async (url: string) => {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const filename = url.split("/").pop() || "uploaded-file.stl";
+                return new File([blob], filename, { type: blob.type });
+            } catch (error) {
+                console.error("파일 변환 실패:", error);
+                return null;
+            }
+        };
+
+        const filePromises = submittedData.files.map(async (fileUrl) => {
+            const file = await convertToFile(fileUrl);
+            if (file) formData.append("files", file);
+        });
+
+        await Promise.all(filePromises);
+
+        for (const entry of formData.entries()) {
+            console.log(entry);
+        }
+
+        try {
+            const token = localStorage.getItem("accessToken");
+            const response = await newAxios.post("/api/v1/order/create", formData, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            console.log(response.data);
+        } catch (e) {
+            console.log(e);
+        }
+    };
 
     return (
         <>
@@ -45,29 +141,29 @@ const OrderInfoContainer = ({ setUserAddress, company }: OrderInfoProps) => {
                     <AddressInput placeholder="상세 주소" value={detailAddress} onChange={setDetailAddress} />
                 </AddressInputContainer>
                 {isOpen && <Modal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
-                <Title>제조사 정보</Title>
-                {company && (
-                    <>
-                        <CompanyInformation>
-                            <InfoTitle>제조사 명</InfoTitle>
-                            <InfoContent>{company.name}</InfoContent>
-                        </CompanyInformation>
-                        <CompanyInformation>
-                            <InfoTitle>주소</InfoTitle>
-                            <InfoContent>{company.address}</InfoContent>
-                        </CompanyInformation>
-                        <CompanyInformation>
-                            <InfoTitle>전화번호</InfoTitle>
-                            <InfoContent>{company.dialNumber}</InfoContent>
-                        </CompanyInformation>
-                    </>
-                )}
+                <Title>구매자 정보</Title>
+                <InformationContainer>
+                    <RowGrid>
+                        <InfoTitle>이름</InfoTitle>
+                        <InformationInput id="recipientName" onChange={handleOnchange} />
+                    </RowGrid>
+                    <RowGrid>
+                        <InfoTitle>전화번호</InfoTitle>
+                        <InformationInput id="recipentPhone" onChange={handleOnchange} />
+                    </RowGrid>
+                    <RowGrid>
+                        <InfoTitle>요청사항</InfoTitle>
+                        <InformationInput id="specialRequest" onChange={handleOnchange} />
+                    </RowGrid>
+                </InformationContainer>
                 <Title>결제 정보</Title>
-                <CompanyInformation>
-                    <InfoTitle>총 가격</InfoTitle>
-                    <InfoContent>0 원</InfoContent>
-                </CompanyInformation>
-                <SubmitButton>주문하기</SubmitButton>
+                <InformationContainer>
+                    <RowGrid>
+                        <InfoTitle>총 가격</InfoTitle>
+                        <InfoContent>0 원</InfoContent>
+                    </RowGrid>
+                </InformationContainer>
+                <SubmitButton onClick={() => handleSubmit()}>주문하기</SubmitButton>
             </UserArea>
         </>
     );
@@ -97,7 +193,8 @@ export default OrderInfoContainer;
 
 const UserArea = styled.div`
     width: 500px;
-    height: 800px;
+    min-height: 800px;
+    height: 100%;
     padding: 0 20px;
     //background-color: #5c5c60;
     //border-radius: 10px;
@@ -107,15 +204,13 @@ const UserArea = styled.div`
 
 const Title = styled.div`
     width: 100%;
-    margin-top: 20px;
+    margin: 20px 0px;
     font-size: 30px;
     font-weight: bold;
     border-bottom: 1px solid #707074;
 `;
 
-const AddressInputContainer = styled.div`
-    margin-top: 20px;
-`;
+const AddressInputContainer = styled.div``;
 
 const ZipcodeAndButton = styled.div`
     display: flex;
@@ -178,8 +273,15 @@ const ModalContainer = styled.div`
     align-items: center;
 `;
 
-const CompanyInformation = styled.div`
+const InformationContainer = styled.div``;
+const RowGrid = styled.div`
     display: flex;
+`;
+const InformationInput = styled.input`
+    width: 400px;
+    height: 40px;
+    font-size: 15px;
+    margin-bottom: 10px;
 `;
 const InfoTitle = styled.div`
     font-size: 20px;

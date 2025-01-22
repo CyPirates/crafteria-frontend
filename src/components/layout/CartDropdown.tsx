@@ -21,6 +21,7 @@ function CartDropdown() {
 
     const fetchCartData = async () => {
         const token = localStorage.getItem("accessToken");
+        if (!token) return;
 
         try {
             const response = await newAxios.get("/api/v1/carts", {

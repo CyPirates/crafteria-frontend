@@ -1,10 +1,10 @@
 import styled from "styled-components";
-import { Order } from "../../../types/OrderType";
+import { FetchedOrder } from "../../../types/OrderType";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { useNavigate } from "react-router-dom";
 
 type OrderCardProps = {
-    data: Order;
+    data: FetchedOrder;
 };
 
 const OrderCard = ({ data }: OrderCardProps) => {

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import { Order } from "../types/OrderType";
+import { FetchedOrder } from "../types/OrderType";
 
 type OwnProps = {
-    orderList: Order[];
+    orderList: FetchedOrder[];
 };
 
 const useClassifiedOrderList = ({ orderList }: OwnProps) => {
-    const [ordered, setOrdered] = useState<Order[]>([]);
-    const [inProducting, setInProducting] = useState<Order[]>([]);
-    const [delivered, setDelivered] = useState<Order[]>([]);
-    const [canceled, setCanceled] = useState<Order[]>([]);
+    const [ordered, setOrdered] = useState<FetchedOrder[]>([]);
+    const [inProducting, setInProducting] = useState<FetchedOrder[]>([]);
+    const [delivered, setDelivered] = useState<FetchedOrder[]>([]);
+    const [canceled, setCanceled] = useState<FetchedOrder[]>([]);
 
     useEffect(() => {
         const classifiedOrdered = orderList.filter((order) => order.status === "ORDERED");

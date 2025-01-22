@@ -8,12 +8,11 @@ import React from "react";
 
 type CompanyInfoProps = {
     data: Company;
-    setSelectedCompany: React.Dispatch<React.SetStateAction<Company | undefined>>;
+    setSelectedCompany?: React.Dispatch<React.SetStateAction<Company | undefined>>;
 };
 
 const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
     const materials = classifyMaterial(data.technologies);
-    const avgPrice = (materials["FILAMENT"].totalPrice + materials["POWDER"].totalPrice + materials["LIQUID"].totalPrice) / data.technologies.length;
 
     const checkPrintNow = () => {
         const equipments: Equipment[] = data.equipmentList;
@@ -40,7 +39,6 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
                 <Contents>{data.introduction}</Contents>
                 <Contents>대표 장비: {data.representativeEquipment}</Contents>
                 <Contents>누적 주문 수: {data.productionCount}</Contents>
-                <Contents>평균 가격: {avgPrice}원/시간</Contents>
             </CompanyInfo>
             <Divider />
             <MaterialContainer>
@@ -73,13 +71,15 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
                 >
                     자세히
                 </Button>
-                <Button
-                    onClick={() => {
-                        setSelectedCompany(data);
-                    }}
-                >
-                    선택
-                </Button>
+                {setSelectedCompany ? (
+                    <Button
+                        onClick={() => {
+                            setSelectedCompany(data);
+                        }}
+                    >
+                        선택
+                    </Button>
+                ) : null}
             </RowGridButtonContainer>
         </CompanyContainer>
     );
@@ -88,8 +88,8 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
 export default CompanyInfoCard;
 
 const CompanyContainer = styled.div`
-    width: 960px;
-    height: 180px;
+    width: 800px;
+    height: 160px;
     margin-top: 20px;
     border: 1px solid #ececec;
     border-radius: 8px;
@@ -102,15 +102,15 @@ const CompanyContainer = styled.div`
 `;
 
 const CompanyImage = styled.img`
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     object-fit: cover;
     border-radius: 4px;
     margin-right: 20px;
 `;
 
 const CompanyInfo = styled.div`
-    width: 280px;
+    width: 200px;
     display: flex;
     flex-direction: column;
     gap: 5px;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Order } from "../types/OrderType";
+import { FetchedOrder } from "../types/OrderType";
 import { newAxios } from "../utils/axiosWithUrl";
 import styled from "styled-components";
 import { title } from "process";
@@ -7,7 +7,7 @@ import OrderCard from "../components/specific/myPage/OrderCard";
 import useClassifiedOrderList from "../hooks/useClassifiedOrderList";
 
 const MyPage = () => {
-    const [orderList, setOrderList] = useState<Order[]>([]);
+    const [orderList, setOrderList] = useState<FetchedOrder[]>([]);
     const { ordered, inProducting, delivered } = useClassifiedOrderList({ orderList });
 
     useEffect(() => {

@@ -5,10 +5,13 @@ import { newAxios } from "../../../utils/axiosWithUrl";
 import { DesignProps } from "../../../types/DesignType";
 import getStlModelSize from "../../../utils/getStlModelSize";
 import { ModelFile } from "../../../types/FileType";
+import { PrintOrderData } from "../../../types/OrderType";
 
 type BuyDesignPopUpProps = {
+    defaultType: string;
+    defaultColor: string;
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
-    setModelFiles: React.Dispatch<React.SetStateAction<ModelFile[]>>;
+    setOrderRows: React.Dispatch<React.SetStateAction<PrintOrderData[]>>;
 };
 
 type DesignLayoutProps = {
@@ -22,7 +25,7 @@ type Size = {
     depth: number;
 };
 
-const SelectDesignPopUp = ({ handleOnClick, setModelFiles }: BuyDesignPopUpProps) => {
+const SelectDesignPopUp = ({ defaultType, defaultColor, handleOnClick, setOrderRows }: BuyDesignPopUpProps) => {
     const [purchasedDesigns, setPurchasedDesigns] = useState<DesignProps[]>([]);
     useEffect(() => {
         // 팝업이 열릴 때 스크롤을 막기 위해 body에 overflow hidden 설정
@@ -52,15 +55,17 @@ const SelectDesignPopUp = ({ handleOnClick, setModelFiles }: BuyDesignPopUpProps
     }, []);
 
     const handleSelect = (data: DesignProps) => {
-        const designData: ModelFile = {
+        const designData: PrintOrderData = {
             fileUrl: data.modelFileUrl,
             widthSize: data.widthSize,
             lengthSize: data.lengthSize,
             heightSize: data.heightSize,
-            magnification: "1",
-            quantity: "1",
+            magnification: 1,
+            quantity: 1,
+            materialType: defaultType,
+            color: defaultColor,
         };
-        setModelFiles((prev) => [...prev, designData]);
+        setOrderRows((prev) => [...prev, designData]);
         handleOnClick(false);
     };
     return (
