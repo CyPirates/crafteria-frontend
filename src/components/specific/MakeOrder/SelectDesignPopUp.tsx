@@ -10,6 +10,7 @@ import { PrintOrderData } from "../../../types/OrderType";
 type BuyDesignPopUpProps = {
     defaultType: string;
     defaultColor: string;
+    defaultId: string;
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
     setOrderRows: React.Dispatch<React.SetStateAction<PrintOrderData[]>>;
 };
@@ -25,7 +26,7 @@ type Size = {
     depth: number;
 };
 
-const SelectDesignPopUp = ({ defaultType, defaultColor, handleOnClick, setOrderRows }: BuyDesignPopUpProps) => {
+const SelectDesignPopUp = ({ defaultType, defaultColor, defaultId, handleOnClick, setOrderRows }: BuyDesignPopUpProps) => {
     const [purchasedDesigns, setPurchasedDesigns] = useState<DesignProps[]>([]);
     useEffect(() => {
         // 팝업이 열릴 때 스크롤을 막기 위해 body에 overflow hidden 설정
@@ -64,6 +65,7 @@ const SelectDesignPopUp = ({ defaultType, defaultColor, handleOnClick, setOrderR
             quantity: 1,
             materialType: defaultType,
             color: defaultColor,
+            technologyId: defaultId,
         };
         setOrderRows((prev) => [...prev, designData]);
         handleOnClick(false);

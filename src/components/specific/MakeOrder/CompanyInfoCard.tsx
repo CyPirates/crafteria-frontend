@@ -198,6 +198,7 @@ const MaterialAndPopover = styled.div`
     margin-bottom: 8px;
 `;
 const MaterialText = styled.div`
+    width: 100px;
     font-size: 11px;
     font-weight: bold;
 `;

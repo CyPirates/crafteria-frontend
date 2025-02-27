@@ -50,6 +50,7 @@ type OwnProps = {
 const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) => {
     const defaultMaterialType = Object.keys(materials)[0];
     const defaultColor = materials[defaultMaterialType].materials[0].colorValue;
+    const defaultId = materials[defaultMaterialType].materials[0].technologyId;
 
     const [isPop, setIsPop] = useState<boolean>(false);
 
@@ -68,6 +69,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                     quantity: 1,
                     materialType: defaultMaterialType,
                     color: defaultColor,
+                    technologyId: defaultId,
                 };
                 setOrderRows((prev) => [...prev, newRow]);
             } catch (e) {
@@ -141,7 +143,18 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                                         if (column.id === "color") {
                                             return (
                                                 <TableCell key={column.id} align={column.align}>
-                                                    <Select<string> value={String(value) || ""} onChange={(e) => handleChange(i, "color", e.target.value)}>
+                                                    <Select<string>
+                                                        value={String(value) || ""}
+                                                        onChange={(e) => {
+                                                            const selectedColor = e.target.value;
+                                                            const selectedMaterial = materials[row.materialType].materials.find((material) => material.colorValue === selectedColor);
+
+                                                            handleChange(i, "color", selectedColor);
+                                                            if (selectedMaterial) {
+                                                                handleChange(i, "technologyId", selectedMaterial.technologyId);
+                                                            }
+                                                        }}
+                                                    >
                                                         {materials[row.materialType].materials.map((material) => {
                                                             let color = material.colorValue;
                                                             return (
@@ -170,7 +183,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                     </Table>
                 </TableContainer>
             </Paper>
-            {isPop ? <SelectDesignPopUp defaultType={defaultMaterialType} defaultColor={defaultColor} handleOnClick={setIsPop} setOrderRows={setOrderRows} /> : null}
+            {isPop ? <SelectDesignPopUp defaultType={defaultMaterialType} defaultColor={defaultColor} defaultId={defaultId} handleOnClick={setIsPop} setOrderRows={setOrderRows} /> : null}
         </>
     );
 };

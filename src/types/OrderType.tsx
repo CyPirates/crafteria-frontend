@@ -17,6 +17,7 @@ export type OrderItems = {
     heightSize: string;
     magnification: number;
     quantity: number;
+    technologyId: number | string;
 };
 
 export type FetchedOrder = {
@@ -43,4 +44,5 @@ export type PrintOrderData = {
     quantity: number;
     materialType: string;
     color: string;
+    technologyId: string;
 };

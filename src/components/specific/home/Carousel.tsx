@@ -2,40 +2,37 @@ import styled from "styled-components";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
 import { useCarousel } from "../../../hooks/useCarousel";
+import { newAxios } from "../../../utils/axiosWithUrl";
+import { useEffect, useState } from "react";
 
 const Carousel = () => {
-    const images = [
-        "https://via.placeholder.com/600x300/FF0000/FFFFFF?text=Slide+1",
-        "https://via.placeholder.com/600x300/00FF00/FFFFFF?text=Slide+2",
-        "https://via.placeholder.com/600x300/0000FF/FFFFFF?text=Slide+3",
-    ];
+    const [images, setImages] = useState<string[]>([]);
+
+    const fetchImages = async () => {
+        const response = await newAxios.get("/api/v1/advertisement-images");
+        const data = response.data.data;
+        data.map((e: any) => {
+            images.push(e.imageUrl);
+        });
+        console.log(images);
+    };
+
+    useEffect(() => {
+        fetchImages();
+    }, []);
 
     const totalImages = images.length;
     const extendedImages = [images[totalImages - 1], ...images, images[0]];
     const transitionTime = 0.5; //애니메이션 동작 시간. 초
     const intervalTime = 4000; //자동으로 슬라이드 넘어가는 시간. 밀리초
 
-    const { currentIndex, isTransitioning, nextSlide, prevSlide } = useCarousel(
-        totalImages,
-        transitionTime,
-        intervalTime
-    );
+    const { currentIndex, isTransitioning, nextSlide, prevSlide } = useCarousel(totalImages, transitionTime, intervalTime);
 
     return (
         <CarouselContainer>
-            <CarouselWrapper
-                translateX={currentIndex * 100}
-                transition={
-                    isTransitioning
-                        ? `transform ${transitionTime}s ease-in-out`
-                        : "none"
-                }
-            >
+            <CarouselWrapper translateX={currentIndex * 100} transition={isTransitioning ? `transform ${transitionTime}s ease-in-out` : "none"}>
                 {extendedImages.map((image, index) => (
-                    <CarouselSlide
-                        key={index}
-                        style={{ backgroundImage: `url(${image})` }}
-                    />
+                    <CarouselSlide key={index} style={{ backgroundImage: `url(${image})` }} />
                 ))}
             </CarouselWrapper>
             <PrevButton onClick={prevSlide}>

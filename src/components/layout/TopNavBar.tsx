@@ -24,15 +24,6 @@ const TopNavBar = () => {
     const isLight = useSelector((state: RootState) => state.theme.isLight);
     const dispatch = useDispatch<AppDispatch>();
 
-    const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === "Enter") {
-            const searchKeyword = e.currentTarget.value.trim();
-            if (searchKeyword) {
-                navigate(`/search/${searchKeyword}`);
-            }
-        }
-    };
-
     const handleLoginClick = () => {
         if (localStorage.getItem("accessToken")) {
             localStorage.removeItem("accessToken");
@@ -100,18 +91,6 @@ const TopNavBar = () => {
     );
 };
 
-const SearchBar: React.FC<{
-    onSearchSubmit: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-}> = ({ onSearchSubmit }) => {
-    return (
-        <SearchContainer>
-            <SearchInput
-                onKeyUp={onSearchSubmit} // Enter 키 입력 시 검색 처리
-            />
-        </SearchContainer>
-    );
-};
-
 export default TopNavBar;
 
 const NavContainer = styled.div`
@@ -140,17 +119,19 @@ const ContentsContainer = styled.div`
 const LogoContainer = styled.div`
     display: flex;
     justify-content: center;
-    align-items: start;
-
+    align-items: center;
+    height: 50px; // TopNavBar의 높이에 맞추기
+    width: auto;
+    overflow: hidden; // 튀어나오는 외곽을 숨김
     &:hover {
         cursor: pointer;
     }
 `;
 
 const LogoImage = styled.img`
-    //height: 48px;
-    width: 240px;
-    object-fit: contain;
+    height: 80px; // 원하는 이미지 크기
+    width: auto; // 원본 비율 유지
+    object-fit: contain; // 이미지 비율 유지하면서 영역에 맞춤
 `;
 
 const NavMenuContainer = styled.div`
@@ -170,26 +151,6 @@ const NavMenu = styled(Link)<{ isActive: boolean }>`
     &:hover {
         font-weight: bold;
     }
-`;
-
-const SearchContainer = styled.div`
-    width: 15vw;
-    height: 34px;
-    margin: 0px 10vw;
-    padding-left: 20px;
-    border-radius: 30px;
-    background-color: white;
-    display: flex;
-    justify-content: start;
-    align-items: center;
-`;
-
-const SearchInput = styled.input`
-    width: 12vw;
-    margin-left: 10px;
-    border: none;
-    outline: none;
-    font-size: 1vw;
 `;
 
 const LoginButton = styled.div`

@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import StlRenderContainer from "./StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
 import { useNavigate } from "react-router-dom";
+import PortOne from "@portone/browser-sdk/v2";
 
 type BuyDesignPopUpProps = {
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
@@ -15,6 +16,9 @@ type BuyDesignPopUpProps = {
 
 const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, setIsPurchased, name, price, filePath, id }) => {
     const navigate = useNavigate();
+    const [paymentStatus, setPaymentStatus] = useState<any>({
+        status: "IDLE",
+    });
     useEffect(() => {
         // 팝업이 열릴 때 스크롤을 막기 위해 body에 overflow hidden 설정
         document.body.style.overflow = "hidden";
@@ -24,25 +28,79 @@ const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, setIsPur
         };
     }, []);
 
-    const handlePurchase = async () => {
-        const token = localStorage.getItem("accessToken");
-        console.log(token);
-        console.log(id);
-        try {
-            const response = await newAxios.post(`/api/v1/model/user/purchase/${id}`, null, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+    // const handlePurchase = async () => {
+    //     const token = localStorage.getItem("accessToken");
+    //     console.log(token);
+    //     console.log(id);
+    //     try {
+    //         const response = await newAxios.post(`/api/v1/model/user/purchase/${id}`, null, {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         });
 
-            console.log("data submitted successfully:", response.data);
-            handleOnClick(false);
-            setIsPurchased(true);
-            navigate("/my-design");
-            return response.data;
-        } catch (error) {
-            console.error("Error submitting design data:", error);
-            throw error;
+    //         console.log("data submitted successfully:", response.data);
+    //         handleOnClick(false);
+    //         setIsPurchased(true);
+    //         navigate("/my-design");
+    //         return response.data;
+    //     } catch (error) {
+    //         console.error("Error submitting design data:", error);
+    //         throw error;
+    //     }
+    // };
+
+    function randomId() {
+        return [...crypto.getRandomValues(new Uint32Array(2))].map((word) => word.toString(16).padStart(8, "0")).join("");
+    }
+
+    const handleSubmit = async (e: any) => {
+        e.preventDefault();
+        setPaymentStatus({ status: "PENDING" });
+        const paymentId = randomId();
+        const payment = await PortOne.requestPayment({
+            storeId: "store-fac07677-97a5-457e-a490-fa243d2d40d1",
+            channelKey: "channel-key-cc38c030-f0b0-46b0-8c0d-78695dac8786",
+            paymentId,
+            orderName: name,
+            totalAmount: +price * 1000,
+            currency: "CURRENCY_KRW",
+            payMethod: "CARD",
+            customData: {
+                item: id,
+            },
+            customer: {
+                fullName: "이찬호",
+                email: "qboooodp@naver.com",
+                phoneNumber: "010-8152-1000",
+            },
+        });
+        if (payment!.code !== undefined) {
+            setPaymentStatus({
+                status: "FAILED",
+                message: payment!.message,
+            });
+            return;
+        }
+        const completeResponse = await fetch("/api/payment/complete", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                paymentId: payment!.paymentId,
+            }),
+        });
+        if (completeResponse.ok) {
+            const paymentComplete = await completeResponse.json();
+            setPaymentStatus({
+                status: paymentComplete.status,
+            });
+        } else {
+            setPaymentStatus({
+                status: "FAILED",
+                message: await completeResponse.text(),
+            });
         }
     };
 
@@ -61,7 +119,7 @@ const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, setIsPur
                 </Content>
                 <PriceContainer>
                     <BoldText>총 가격: {price}원</BoldText>
-                    <PurchaseButton onClick={handlePurchase}>결제하기</PurchaseButton>
+                    <PurchaseButton onClick={handleSubmit}>결제하기</PurchaseButton>
                 </PriceContainer>
             </PopUpContainer>
         </Overlay>

@@ -6,6 +6,7 @@ import { ChangeEvent, useEffect, useState } from "react";
 import useInput from "../../../hooks/useInput";
 import { Company } from "../../../types/CompanyType";
 import { newAxios } from "../../../utils/axiosWithUrl";
+import { useNavigate } from "react-router-dom";
 
 type OrderInfoProps = {
     printOrders: PrintOrderData[];
@@ -19,6 +20,7 @@ type ModalProps = {
 };
 
 const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
+    const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [zipcode, setZipcode] = useState<string>("");
     const [address, setAddress] = useState<string>("");
@@ -47,6 +49,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                 heightSize: item.heightSize,
                 magnification: item.magnification,
                 quantity: item.quantity,
+                technologyId: item.technologyId,
             });
             fileUrls.push(item.fileUrl);
         });
@@ -74,7 +77,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
 
     const handleSubmit = async () => {
         const formData = new FormData();
-
+        console.log(submittedData.orderItems);
         formData.append(
             "request",
             JSON.stringify({
@@ -123,6 +126,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                 },
             });
             console.log(response.data);
+            navigate("/my-page");
         } catch (e) {
             console.log(e);
         }

@@ -4,13 +4,23 @@ import { Company } from "../../../types/CompanyType";
 import styled from "styled-components";
 import CompanyInfoCard from "./CompanyInfoCard";
 import useCompanyFilter from "../../../hooks/useCompanyFilter";
+import { IoIosSearch } from "react-icons/io";
 
 type OwnProps = {
     setSelectedCompany: React.Dispatch<React.SetStateAction<Company | undefined>>;
 };
 
+type SearchResult = {
+    type: string;
+    id: string;
+    title: string;
+    description: string;
+    additionalInfo: string | null;
+};
+
 const SelectCompany = (props: OwnProps) => {
     const [companies, setCompanies] = useState<Company[]>([]);
+    const [searchResult, setSearchResult] = useState<SearchResult[]>([]);
     const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
     const [filterText, setFilterText] = useState<string[]>([]);
     const filterTextArray = ["상관없음", "필라멘트", "분말", "액상"];
@@ -48,10 +58,47 @@ const SelectCompany = (props: OwnProps) => {
         }
     };
 
+    const searchCompanies = async (keyword: string) => {
+        try {
+            const response = await newAxios.get(`/api/v1/search/manufacturers/by-name-description?keyword=${encodeURIComponent(keyword)}`);
+            const searchResult: SearchResult[] = response.data.data;
+
+            const searchedCompanies = await Promise.all(
+                searchResult.map(async (e) => {
+                    try {
+                        const companyResponse = await newAxios.get(`/api/v1/manufacturers/${e.id}`);
+                        return companyResponse.data.data;
+                    } catch (e) {
+                        console.log(e);
+                        return null;
+                    }
+                })
+            );
+
+            setCompanies(searchedCompanies.filter(Boolean));
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const handleSearchSubmit = async (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            const searchKeyword = e.currentTarget.value.trim();
+            if (!searchKeyword) {
+                fetchCompanies();
+                return;
+            }
+            searchCompanies(searchKeyword);
+        }
+    };
+
     return (
         <>
             <Step>
-                <StepName>제조사 선택</StepName>
+                <StepName>
+                    제조사 선택
+                    <SearchBar onSearchSubmit={handleSearchSubmit} />
+                </StepName>
                 <FilterContainer>
                     <FilterCategory>보유 재료</FilterCategory>
 
@@ -78,6 +125,19 @@ const SelectCompany = (props: OwnProps) => {
     );
 };
 
+const SearchBar: React.FC<{
+    onSearchSubmit: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+}> = ({ onSearchSubmit }) => {
+    return (
+        <SearchContainer>
+            <SearchInput
+                onKeyUp={onSearchSubmit} // Enter 키 입력 시 검색 처리
+            />
+            <IoIosSearch />
+        </SearchContainer>
+    );
+};
+
 export default SelectCompany;
 
 const Step = styled.div`
@@ -92,6 +152,8 @@ const StepName = styled.div`
     margin-bottom: 4px;
     font-size: 20px;
     font-weight: bold;
+
+    display: flex;
 `;
 
 const FilterCategory = styled.div`
@@ -110,4 +172,25 @@ const FilterLabel = styled.label`
     align-items: center;
     gap: 8px;
     font-size: 16px;
+`;
+
+const SearchContainer = styled.div`
+    width: 300px;
+    height: 34px;
+    margin: 0px 16px;
+    padding-left: 10px;
+    border-radius: 30px;
+    border: 1px solid #919191;
+
+    display: flex;
+    justify-content: start;
+    align-items: center;
+`;
+
+const SearchInput = styled.input`
+    width: 240px;
+    margin-left: 10px;
+    border: none;
+    outline: none;
+    font-size: 12px;
 `;

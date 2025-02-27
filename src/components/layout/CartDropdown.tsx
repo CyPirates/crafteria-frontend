@@ -1,24 +1,28 @@
 import { useEffect, useState } from "react";
 import Dropdown from "react-bootstrap/Dropdown";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import { MdDelete } from "react-icons/md";
 import { Cart } from "../../types/CartType";
-import { Badge, Typography, Box } from "@mui/material";
+import { Badge, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { newAxios } from "../../utils/axiosWithUrl";
 import styled from "styled-components";
 import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
 
 type DesignOutline = {
-    id: string;
+    cartId: string;
+    modelId: string;
     modelFileUrl: string;
     name: string;
     price: string;
 };
+
 function CartDropdown() {
     const navigate = useNavigate();
     const [cartData, setCartData] = useState<Cart[] | undefined>(undefined);
     const [items, setItems] = useState<DesignOutline[]>([]);
 
+    // 장바구니 데이터 가져오기
     const fetchCartData = async () => {
         const token = localStorage.getItem("accessToken");
         if (!token) return;
@@ -28,31 +32,30 @@ function CartDropdown() {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setCartData(response.data.data);
-        } catch (e: any) {
+        } catch (e) {
             console.error("Failed to fetch cart data:", e);
         }
     };
 
-    const fetchItemData = async (id: string) => {
+    // 디자인 정보 가져오기
+    const fetchItemData = async (modelId: string, cartId: string) => {
         try {
-            const response = await newAxios.get(`/api/v1/model/user/view/${id}`);
+            const response = await newAxios.get(`/api/v1/model/user/view/${modelId}`);
             const data = response.data.data;
 
-            setItems((prev) => [...prev, { id: data.id, modelFileUrl: data.modelFileUrl, name: data.name, price: data.price }]);
-        } catch (e: any) {
-            console.error(`Failed to fetch design data for id: ${id}`, e);
+            setItems((prev) => [...prev, { cartId: cartId, modelId: modelId, modelFileUrl: data.modelFileUrl, name: data.name, price: data.price }]);
+        } catch (e) {
+            console.error(`Failed to fetch design data for id: ${cartId}`, e);
         }
     };
+
     useEffect(() => {
         fetchCartData();
     }, []);
 
     useEffect(() => {
-        setItems([]);
-        console.log(cartData);
-        cartData?.map((e) => {
-            fetchItemData(e.modelId);
-        });
+        setItems([]); // 기존 데이터 초기화
+        cartData?.forEach((e) => fetchItemData(e.modelId, e.cartId));
     }, [cartData]);
 
     return (
@@ -64,7 +67,7 @@ function CartDropdown() {
                     sx={{
                         "& .MuiBadge-badge": {
                             backgroundColor: "#F20000",
-                            color: "white", // 배지 텍스트 색상
+                            color: "white",
                         },
                     }}
                 >
@@ -74,14 +77,14 @@ function CartDropdown() {
 
             {/* 드롭다운 메뉴 */}
             <Dropdown.Menu style={{ minWidth: "100px" }}>
-                {items && items.length > 0 ? (
+                {items.length > 0 ? (
                     items.map((item, index) => (
-                        <>
-                            <Dropdown.Item key={index} onClick={() => navigate(`/design/${item.id}`)}>
-                                <ItemLayout modelFileUrl={item.modelFileUrl} name={item.name} price={item.price} />
+                        <div key={index}>
+                            <Dropdown.Item onClick={() => navigate(`/design/${item.modelId}`)}>
+                                <ItemLayout modelFileUrl={item.modelFileUrl} name={item.name} id={item.cartId} setItems={setItems} setCartData={setCartData} />
                             </Dropdown.Item>
-                            {index + 1 == items.length ? null : <Dropdown.Divider />}
-                        </>
+                            {index + 1 !== items.length && <Dropdown.Divider />}
+                        </div>
                     ))
                 ) : (
                     <Dropdown.Item disabled>
@@ -95,23 +98,48 @@ function CartDropdown() {
     );
 }
 
-const ItemLayout = ({ modelFileUrl, name, price }: { modelFileUrl: string; name: string; price: string }) => {
+const ItemLayout = ({
+    modelFileUrl,
+    name,
+    id,
+    setItems,
+    setCartData,
+}: {
+    modelFileUrl: string;
+    name: string;
+    id: string;
+    setItems: React.Dispatch<React.SetStateAction<DesignOutline[]>>;
+    setCartData: React.Dispatch<React.SetStateAction<Cart[] | undefined>>;
+}) => {
+    const handleDelete = async () => {
+        try {
+            const token = localStorage.getItem("accessToken");
+            const response = await newAxios.delete(`/api/v1/carts/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            setCartData((prev) => prev?.filter((cart) => cart.cartId !== id));
+        } catch (e) {
+            console.error("삭제 실패:", e);
+        }
+    };
+
     return (
-        <>
-            <ItemWrapper>
-                <StlRenderContainer filePath={modelFileUrl} width="50px" height="50px" clickDisabled={true} />
-                <NameContainer>{name}</NameContainer>
-            </ItemWrapper>
-        </>
+        <ItemWrapper>
+            <StlRenderContainer filePath={modelFileUrl} width="80px" height="80px" clickDisabled={true} />
+            <NameContainer>
+                {name} {id}
+            </NameContainer>
+            <MdDelete size={"1.5em"} onClick={handleDelete} style={{ cursor: "pointer" }} />
+        </ItemWrapper>
     );
 };
+
 export default CartDropdown;
 
 const ItemWrapper = styled.div`
     display: flex;
     flex-direction: row;
-    width: 200px;
-
+    width: 300px;
     align-items: center;
 `;
 
