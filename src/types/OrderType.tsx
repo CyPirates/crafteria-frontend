@@ -23,16 +23,15 @@ export type OrderItems = {
 export type FetchedOrder = {
     orderId: string;
     userId: string;
-    purchasePrice: string;
     manufacturerId: string;
-    widthSize: string;
-    lengthSize: string;
-    heightSize: string;
-    magnification: string;
-    quantity: string;
-    deliveryAddress: string;
+    purchasePrice: string;
     status: string;
     modelFileUrls: string[];
+    deliveryAddress: string;
+    recipientName: string;
+    recipientEmail: string;
+    specialRequest: string;
+    orderItems: OrderItems[];
 };
 
 export type PrintOrderData = {

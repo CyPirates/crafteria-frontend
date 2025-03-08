@@ -111,16 +111,13 @@ const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, setIsPur
                     <h2>상품 정보</h2>
                     <DesignInfoContainer>
                         <StlRenderContainer filePath={filePath} width="200px" height="200px" />
-                        <ColumnTextContainer>
-                            <BoldText>도면명: {name}</BoldText>
-                            <BoldText>가격: {price}원</BoldText>
-                        </ColumnTextContainer>
+                        <ColumnContainer>
+                            <BoldText>{name}</BoldText>
+                            <BoldText>{price}원</BoldText>
+                            <PurchaseButton onClick={handleSubmit}>결제하기</PurchaseButton>
+                        </ColumnContainer>
                     </DesignInfoContainer>
                 </Content>
-                <PriceContainer>
-                    <BoldText>총 가격: {price}원</BoldText>
-                    <PurchaseButton onClick={handleSubmit}>결제하기</PurchaseButton>
-                </PriceContainer>
             </PopUpContainer>
         </Overlay>
     );
@@ -153,7 +150,7 @@ const Overlay = styled.div`
 
 const PopUpContainer = styled.div`
     width: 1300px;
-    height: 700px;
+    height: 400px;
     background-color: white;
     border-radius: 15px 15px 0 0;
     animation: ${slideUp} 0.3s ease-out forwards;
@@ -175,7 +172,7 @@ const DesignInfoContainer = styled.div`
     display: flex;
     gap: 30px;
 `;
-const ColumnTextContainer = styled.div`
+const ColumnContainer = styled.div`
     margin-top: 20px;
 
     display: flex;
@@ -187,14 +184,10 @@ const BoldText = styled.div`
     font-weight: bold;
 `;
 
-const PriceContainer = styled.div`
-    margin: 30px 45px;
-`;
-
 const PurchaseButton = styled.div`
     width: 200px;
     height: 44px;
-    margin-top: 20px;
+    margin-top: 40px;
     background-color: #000000;
     color: white;
     border-radius: 8px;

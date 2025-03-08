@@ -18,7 +18,6 @@ const MyPage = () => {
                         Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
                     },
                 });
-                //console.log(response.data.data);
                 setOrderList(response.data.data);
             } catch (e) {
                 console.log(e);
@@ -26,17 +25,12 @@ const MyPage = () => {
         };
         getOrderList();
     }, []);
-
-    useEffect(() => {
-        console.log("check");
-        console.log(delivered);
-    }, [delivered]);
-
     return (
         <>
             <Title>나의 주문</Title>
             <CardContainer>
                 {ordered.map((e) => {
+                    console.log(ordered);
                     return <OrderCard data={e} />;
                 })}
                 {inProducting.map((e) => {
