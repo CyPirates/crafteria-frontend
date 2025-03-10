@@ -19,35 +19,38 @@ import GetTokenPage from "./pages/GetTokenPage";
 import MyPage from "./pages/MyPage";
 import CreateReviewPage from "./pages/CreateReviewPage";
 import AboutPage from "./pages/AboutPage";
+import { CartProvider } from "./hooks/useCart";
 
 const App: React.FC = () => {
     const isLight = useSelector((state: RootState) => state.theme.isLight);
     return (
         <>
-            <ThemeProvider theme={isLight ? lightTheme : darkTheme}>
-                <GlobalStyle />
-                <BrowserRouter>
-                    <div className="App">
-                        <ScrollToTop />
-                        <TopNavBar />
-                        <ContentContainer>
-                            <Routes>
-                                <Route path="/" element={<Navigate to="/home" />} />
-                                <Route path="/home" element={<HomePage />} />
-                                <Route path="/design-market" element={<DesignMarket />} />
-                                <Route path="/my-design" element={<MyDesignPage />} />
-                                <Route path="/design/:id" element={<DesignDetailPage />} />
-                                <Route path="/sell-design" element={<SellDesignPage />} />
-                                <Route path="/print-order" element={<MakeOrderPage />} />
-                                <Route path="/auth/success" element={<GetTokenPage />} />
-                                <Route path="/my-page" element={<MyPage />} />
-                                <Route path="/createReview/:id" element={<CreateReviewPage />} />
-                                <Route path="/company-detail/:id" element={<AboutPage />} />
-                            </Routes>
-                        </ContentContainer>
-                    </div>
-                </BrowserRouter>
-            </ThemeProvider>
+            <CartProvider>
+                <ThemeProvider theme={isLight ? lightTheme : darkTheme}>
+                    <GlobalStyle />
+                    <BrowserRouter>
+                        <div className="App">
+                            <ScrollToTop />
+                            <TopNavBar />
+                            <ContentContainer>
+                                <Routes>
+                                    <Route path="/" element={<Navigate to="/home" />} />
+                                    <Route path="/home" element={<HomePage />} />
+                                    <Route path="/design-market" element={<DesignMarket />} />
+                                    <Route path="/my-design" element={<MyDesignPage />} />
+                                    <Route path="/design/:id" element={<DesignDetailPage />} />
+                                    <Route path="/sell-design" element={<SellDesignPage />} />
+                                    <Route path="/print-order" element={<MakeOrderPage />} />
+                                    <Route path="/auth/success" element={<GetTokenPage />} />
+                                    <Route path="/my-page" element={<MyPage />} />
+                                    <Route path="/createReview/:id" element={<CreateReviewPage />} />
+                                    <Route path="/company-detail/:id" element={<AboutPage />} />
+                                </Routes>
+                            </ContentContainer>
+                        </div>
+                    </BrowserRouter>
+                </ThemeProvider>
+            </CartProvider>
         </>
     );
 };

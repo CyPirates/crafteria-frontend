@@ -1,6 +1,5 @@
-import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
-import { newAxios } from "../../../utils/axiosWithUrl";
+import { useCart } from "../../../hooks/useCart";
 
 type DesignInfoProps = {
     name: string;
@@ -14,20 +13,8 @@ type DesignInfoProps = {
 };
 
 const DesignInfo = ({ name, artist, price, volume, size, id, isPurchased, handleOnClick }: DesignInfoProps) => {
-    const navigate = useNavigate();
-    const handleAddCart = async (id: any) => {
-        const data = {
-            manufacturerId: 0,
-            modelId: id,
-        };
+    const { addToCart } = useCart();
 
-        try {
-            const response = await newAxios.post("/api/v1/carts/addModel", data, { headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } });
-            console.log(response.data);
-        } catch (e) {
-            console.log(e);
-        }
-    };
     return (
         <InfoContainer>
             <Title>{name}</Title>
@@ -57,7 +44,7 @@ const DesignInfo = ({ name, artist, price, volume, size, id, isPurchased, handle
                 >
                     {isPurchased ? "구매완료" : "구매하기"}
                 </Button>
-                <Button onClick={() => handleAddCart(id)}>장바구니 담기</Button>
+                <Button onClick={() => addToCart(id!)}>장바구니 담기</Button>
             </ButtonContainer>
         </InfoContainer>
     );
