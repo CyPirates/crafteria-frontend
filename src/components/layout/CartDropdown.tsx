@@ -51,11 +51,16 @@ function CartDropdown() {
 }
 
 const ItemLayout = ({ modelFileUrl, name, cartId, removeFromCart }: { modelFileUrl: string; name: string; cartId: string; removeFromCart: (cartId: string) => void }) => {
+    const handleDelete = (event: React.MouseEvent) => {
+        event.stopPropagation(); // ⛔ 이벤트 전파 방지
+        removeFromCart(cartId);
+    };
+
     return (
         <ItemWrapper>
             <StlRenderContainer filePath={modelFileUrl} width="80px" height="80px" clickDisabled={true} />
             <NameContainer>{name}</NameContainer>
-            <MdDelete size={"1.5em"} onClick={() => removeFromCart(cartId)} style={{ cursor: "pointer" }} />
+            <MdDelete size={"1.5em"} onClick={handleDelete} style={{ cursor: "pointer" }} />
         </ItemWrapper>
     );
 };
