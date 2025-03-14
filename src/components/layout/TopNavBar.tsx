@@ -5,15 +5,14 @@ import { AiOutlineUser } from "react-icons/ai";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
-import Badge from "@mui/material/Badge";
 import { toggleTheme } from "../../store/themeSlice";
 
 import LoginModal from "../specific/login/LoginModal";
 import Logo from "../../assets/logo.png";
 import { newAxios } from "../../utils/axiosWithUrl";
 import { User } from "../../types/UserType";
-import { Cart } from "../../types/CartType";
 import CartDropdown from "./CartDropdown";
+import SearchBar from "./SearchBar";
 
 const TopNavBar = () => {
     const navigate = useNavigate();
@@ -80,6 +79,7 @@ const TopNavBar = () => {
                         </NavMenu>
                     </NavMenuContainer>
                     {/* <div style={{ width: "20vw" }}></div> */}
+                    <SearchBar />
                     {userData ? <div>{userData.realname}님</div> : null}
                     <LoginButton onClick={handleLoginClick}>{localStorage.getItem("accessToken") ? null : "로그인"}</LoginButton>
                     <CartDropdown />
@@ -136,8 +136,7 @@ const LogoImage = styled.img`
 
 const NavMenuContainer = styled.div`
     width: 500px;
-    margin-left: 30px;
-    margin-right: 300px;
+    margin-right: 20px;
     display: flex;
     justify-content: space-between;
 `;
@@ -167,7 +166,6 @@ const MyPageButton = styled(AiOutlineUser)<{ isActive: boolean }>`
     color: ${({ isActive }) => (isActive ? "#F4351D" : "#a5a5a7")};
     width: 25px;
     height: 25px;
-    margin-left: 30px;
 
     &:hover {
         color: grey;

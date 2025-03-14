@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { DesignProps } from "../../../types/DesignType";
+import { Design } from "../../../types/DesignType";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
 
 type DesignOutlineCardProps = {
-    designData: DesignProps;
+    designData: Design;
     published: boolean;
 };
 
@@ -33,7 +33,7 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
                             다운로드
                         </Link>
                     </Button>
-                    {published && <Button>수정</Button>}
+                    {/* {published && <Button>수정</Button>} */}
                     <Button onClick={handleOnclick}>상세보기</Button>
                 </ButtonConatiner>
             </CardWrapper>

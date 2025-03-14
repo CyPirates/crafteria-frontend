@@ -13,7 +13,10 @@ type CompanyInfoProps = {
 
 const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
     const materials = classifyMaterial(data.technologies);
+    const isMaterialsEmpty = Object.keys(materials).length === 0;
+    if (isMaterialsEmpty) return null;
 
+    console.log(materials);
     const checkPrintNow = () => {
         const equipments: Equipment[] = data.equipmentList;
         for (let i = 0; i < equipments.length; i++) {

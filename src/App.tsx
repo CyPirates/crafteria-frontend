@@ -20,6 +20,7 @@ import MyPage from "./pages/MyPage";
 import CreateReviewPage from "./pages/CreateReviewPage";
 import AboutPage from "./pages/AboutPage";
 import { CartProvider } from "./hooks/useCart";
+import SearchResultPage from "./pages/SearchResultPage";
 
 const App: React.FC = () => {
     const isLight = useSelector((state: RootState) => state.theme.isLight);
@@ -45,6 +46,7 @@ const App: React.FC = () => {
                                     <Route path="/my-page" element={<MyPage />} />
                                     <Route path="/createReview/:id" element={<CreateReviewPage />} />
                                     <Route path="/company-detail/:id" element={<AboutPage />} />
+                                    <Route path="/search" element={<SearchResultPage />} />
                                 </Routes>
                             </ContentContainer>
                         </div>

@@ -1,4 +1,4 @@
-export type DesignProps = {
+export type Design = {
     id: string;
     author: AuthorInfo;
     name: string;

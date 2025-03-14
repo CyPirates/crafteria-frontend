@@ -45,7 +45,7 @@ const OrderCard = ({ data }: OrderCardProps) => {
                                     <TextContainer>
                                         <Text style={{ whiteSpace: "pre-line" }}></Text>
                                         <Text>
-                                            재료타입, 색상, {orderItems[i].magnification}배, {orderItems[i].quantity}개
+                                            재료타입, 색상, {orderItems[i].magnification}배, {orderItems[i].quantity}개, {data.orderId}
                                         </Text>
                                     </TextContainer>
                                 </ItemContainer>

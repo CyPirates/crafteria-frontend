@@ -3,14 +3,14 @@ import { newAxios } from "../../utils/axiosWithUrl";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 
-import { DesignProps } from "../../types/DesignType";
+import { Design } from "../../types/DesignType";
 import { Card } from "react-bootstrap";
 import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
 
 //TODO: Filter 기능 추가, SummaryCard 받아온 데이터로 변경
 
 const WholeDesignCardContainer = () => {
-    const [designList, setDesignList] = useState<DesignProps[]>([]);
+    const [designList, setDesignList] = useState<Design[]>([]);
     const [isActive, setIsActive] = useState<number>(0);
 
     const fetchData = async () => {
@@ -64,7 +64,7 @@ const WholeDesignCardContainer = () => {
     );
 };
 
-const WholeDesignCards = ({ designData }: { designData: DesignProps }) => {
+const WholeDesignCards = ({ designData }: { designData: Design }) => {
     const navigate = useNavigate();
     const { id, name, description, rating, price, viewCount, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl } = designData;
 
@@ -123,7 +123,7 @@ const CardContainer = styled.div`
 `;
 
 const StyledCard = styled(Card)`
-    width: 234px;
+    width: 248px;
     height: auto;
     color: black;
     margin-bottom: 4vw;

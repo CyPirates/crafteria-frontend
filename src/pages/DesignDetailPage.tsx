@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import "react-quill/dist/quill.snow.css";
 
-import { DesignProps } from "../types/DesignType";
+import { Design } from "../types/DesignType";
 import StlRenderContainer from "../components/specific/designDetail/StlRenderContainer";
 import DesignInfo from "../components/specific/designDetail/DesignInfo";
 import { useEffect, useState } from "react";
@@ -10,7 +10,7 @@ import BuyDesignPopUp from "../components/specific/designDetail/BuyDesignPopUp";
 import { newAxios } from "../utils/axiosWithUrl";
 
 const DesignDetailPage = () => {
-    const [design, setDesign] = useState<DesignProps | undefined>(undefined);
+    const [design, setDesign] = useState<Design | undefined>(undefined);
     const [isPop, setIsPop] = useState<boolean>(false);
     const [isPurchased, setIsPurchased] = useState<boolean>(false);
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { newAxios } from "../utils/axiosWithUrl";
-import { DesignProps } from "../types/DesignType";
+import { Design } from "../types/DesignType";
 import DesignOutlineCard from "../components/specific/myDesign/DesignOutlineCard";
 
 const MyDesignPage = () => {
@@ -16,8 +16,8 @@ const MyDesignPage = () => {
 };
 
 const DesignList = () => {
-    const [purchasedDesigns, setPurchasedDesigns] = useState<DesignProps[]>([]);
-    const [uploadDesigns, setUploadDesigns] = useState<DesignProps[]>([]);
+    const [purchasedDesigns, setPurchasedDesigns] = useState<Design[]>([]);
+    const [uploadDesigns, setUploadDesigns] = useState<Design[]>([]);
     const [isPublished, setIsPublished] = useState(false);
 
     useEffect(() => {

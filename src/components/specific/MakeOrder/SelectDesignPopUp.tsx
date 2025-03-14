@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
-import { DesignProps } from "../../../types/DesignType";
+import { Design } from "../../../types/DesignType";
 import getStlModelSize from "../../../utils/getStlModelSize";
 import { ModelFile } from "../../../types/FileType";
 import { PrintOrderData } from "../../../types/OrderType";
@@ -16,8 +16,8 @@ type BuyDesignPopUpProps = {
 };
 
 type DesignLayoutProps = {
-    data: DesignProps;
-    handleSelect: (data: DesignProps) => void;
+    data: Design;
+    handleSelect: (data: Design) => void;
 };
 
 type Size = {
@@ -27,7 +27,7 @@ type Size = {
 };
 
 const SelectDesignPopUp = ({ defaultType, defaultColor, defaultId, handleOnClick, setOrderRows }: BuyDesignPopUpProps) => {
-    const [purchasedDesigns, setPurchasedDesigns] = useState<DesignProps[]>([]);
+    const [purchasedDesigns, setPurchasedDesigns] = useState<Design[]>([]);
     useEffect(() => {
         // 팝업이 열릴 때 스크롤을 막기 위해 body에 overflow hidden 설정
         document.body.style.overflow = "hidden";
@@ -55,7 +55,7 @@ const SelectDesignPopUp = ({ defaultType, defaultColor, defaultId, handleOnClick
         fetchData();
     }, []);
 
-    const handleSelect = (data: DesignProps) => {
+    const handleSelect = (data: Design) => {
         const designData: PrintOrderData = {
             fileUrl: data.modelFileUrl,
             widthSize: data.widthSize,
