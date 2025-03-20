@@ -3,8 +3,6 @@ import styled, { keyframes } from "styled-components";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
 import { Design } from "../../../types/DesignType";
-import getStlModelSize from "../../../utils/getStlModelSize";
-import { ModelFile } from "../../../types/FileType";
 import { PrintOrderData } from "../../../types/OrderType";
 
 type BuyDesignPopUpProps = {
@@ -18,12 +16,6 @@ type BuyDesignPopUpProps = {
 type DesignLayoutProps = {
     data: Design;
     handleSelect: (data: Design) => void;
-};
-
-type Size = {
-    width: number;
-    height: number;
-    depth: number;
 };
 
 const SelectDesignPopUp = ({ defaultType, defaultColor, defaultId, handleOnClick, setOrderRows }: BuyDesignPopUpProps) => {

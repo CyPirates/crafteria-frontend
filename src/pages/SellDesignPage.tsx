@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import FileDrop from "../components/common/FileDrop";
 import { DesignFormData } from "../types/DesignType";
@@ -6,6 +6,7 @@ import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { newAxios } from "../utils/axiosWithUrl";
 import { useNavigate } from "react-router-dom";
+import useLoginNavigation from "../hooks/useLoginNavigation";
 
 const modules = {
     toolbar: [
@@ -22,6 +23,7 @@ const formats = ["size", "bold", "italic", "underline", "strike", "color", "back
 
 const SellDesignPage = () => {
     const navigate = useNavigate();
+    const { moveToLogin } = useLoginNavigation();
     const [data, setData] = useState<DesignFormData>({
         name: "",
         file: null,
@@ -33,6 +35,12 @@ const SellDesignPage = () => {
     });
     const [value, setValue] = useState("");
 
+    useEffect(() => {
+        if (!localStorage.getItem("accessToken")) {
+            console.log("asdf");
+            moveToLogin();
+        }
+    }, []);
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         setData((prev) => ({ ...prev, [id]: value }));

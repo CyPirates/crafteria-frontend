@@ -25,7 +25,6 @@ const SelectDesign = ({ selectedCompany }: OwnProps) => {
                 </Step>
                 <OrderInfoContainer printOrders={orderRows} company={selectedCompany} />
             </Container>
-            <button onClick={() => console.log(orderRows)}>test</button>
         </>
     );
 };

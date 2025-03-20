@@ -15,6 +15,20 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
     const handleOnclick = () => {
         navigate(`/design/${id}`);
     };
+    // 파일 이름을 생성하는 함수 (수정됨)
+    const handleDownload = async (url: string, filename: string) => {
+        const file = await fetch(url);
+        const blob = await file.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const newName = filename + ".stl";
+        const link = document.createElement("a");
+        link.download = newName;
+        link.href = objectUrl;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    };
+
     return (
         <>
             <CardWrapper>
@@ -28,11 +42,8 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
                     <Information>판매량: {downloadCount}</Information>
                 </InformationContainer>
                 <ButtonConatiner>
-                    <Button>
-                        <Link to={modelFileUrl} style={{ textDecoration: "none", color: "black" }}>
-                            다운로드
-                        </Link>
-                    </Button>
+                    <Button onClick={() => handleDownload(modelFileUrl, name)}>다운로드</Button>
+
                     {/* {published && <Button>수정</Button>} */}
                     <Button onClick={handleOnclick}>상세보기</Button>
                 </ButtonConatiner>

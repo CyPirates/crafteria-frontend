@@ -1,6 +1,5 @@
 import styled from "styled-components";
 import DaumPostCode from "react-daum-postcode";
-
 import { OrderItems, PrintOrderData, SubmittedOrder } from "../../../types/OrderType";
 import { ChangeEvent, useEffect, useState } from "react";
 import useInput from "../../../hooks/useInput";
@@ -75,9 +74,13 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
         setSubmittedData((prev) => ({ ...prev, [tag]: value }));
     };
 
+    const handleCheck = () => {
+        console.log(submittedData);
+    };
+
     const handleSubmit = async () => {
         const formData = new FormData();
-        console.log(submittedData.orderItems);
+        // orderItems 먼저 추가
         formData.append(
             "request",
             JSON.stringify({
@@ -93,25 +96,22 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             })
         );
 
-        // 파일 URL을 변환하여 FormData에 추가
-        const convertToFile = async (url: string) => {
+        // 파일 변환 및 추가를 순차적으로 처리
+        const convertToFile = async (url: string, index: number) => {
             try {
                 const response = await fetch(url);
                 const blob = await response.blob();
-                const filename = url.split("/").pop() || "uploaded-file.stl";
+                const filename = `file_${index}.stl`;
                 return new File([blob], filename, { type: blob.type });
             } catch (error) {
                 console.error("파일 변환 실패:", error);
                 return null;
             }
         };
-
-        const filePromises = submittedData.files.map(async (fileUrl) => {
-            const file = await convertToFile(fileUrl);
+        for (let i = 0; i < submittedData.files.length; i++) {
+            const file = await convertToFile(submittedData.files[i], i);
             if (file) formData.append("files", file);
-        });
-
-        await Promise.all(filePromises);
+        }
 
         for (const entry of formData.entries()) {
             console.log(entry);
@@ -126,7 +126,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                 },
             });
             console.log(response.data);
-            navigate("/my-page");
+            navigate("/my-order");
         } catch (e) {
             console.log(e);
         }
@@ -167,7 +167,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                         <InfoContent>0 원</InfoContent>
                     </RowGrid>
                 </InformationContainer>
-                <SubmitButton onClick={() => handleSubmit()}>주문하기</SubmitButton>
+                <SubmitButton onClick={handleSubmit}>주문하기</SubmitButton>
             </UserArea>
         </>
     );

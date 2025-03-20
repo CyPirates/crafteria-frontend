@@ -1,0 +1,36 @@
+import styled from "styled-components";
+
+const BottomBar = () => {
+    return (
+        <BottomBarContainer>
+            <TextContainer>
+                <Text>
+                    대표: 장성수 | 장성수 컴퍼니 사업자 등록번호 189-58-00930 정보통신업 전자우편:sungsujang99@gmail.com | 사업문의: 010-6444-6887 | 주소: 인천광역시 부평구 안남로 123번길 46
+                    우성아파트 403-602
+                </Text>
+            </TextContainer>
+        </BottomBarContainer>
+    );
+};
+
+export default BottomBar;
+
+const BottomBarContainer = styled.div`
+    width: 100%;
+    height: 60px;
+    background-color: #77777c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+`;
+
+const TextContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+`;
+
+const Text = styled.div`
+    color: white;
+    font-size: 12px;
+`;

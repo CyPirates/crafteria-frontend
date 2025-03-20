@@ -10,17 +10,17 @@ import TextField from "@mui/material/TextField";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import getStlModelSize from "../../../utils/getStlModelSize";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import SelectDesignPopUp from "./SelectDesignPopUp";
 import { Material } from "../../../types/CompanyType";
-import classifyMaterial from "../../../utils/classifyMaterial";
-import { SelectChangeEvent } from "@mui/material";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { PrintOrderData } from "../../../types/OrderType";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
 
 type Column = {
-    id: "fileUrl" | "magnification" | "quantity" | "materialType" | "color";
+    id: "fileUrl" | "magnification" | "quantity" | "materialType" | "color" | "delete";
     label: string;
     width?: number | string;
     flex?: any;
@@ -33,6 +33,7 @@ const columns: Column[] = [
     { id: "quantity", label: "수량", width: 140 },
     { id: "materialType", label: "재료타입", width: 180 },
     { id: "color", label: "색상" },
+    { id: "delete", label: "", align: "right" }, //삭제버튼을 위한 새로운 column
 ];
 
 type OwnProps = {
@@ -56,6 +57,9 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
 
     const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
+        if (file && !file.name.toLowerCase().endsWith(".stl")) {
+            alert("stl 파일만 업로드 가능합니다.");
+        }
         if (file) {
             const fileUrl = URL.createObjectURL(file);
             try {
@@ -63,8 +67,8 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                 const newRow: PrintOrderData = {
                     fileUrl: fileUrl,
                     widthSize: modelSize.width.toString(),
-                    lengthSize: modelSize.height.toString(),
-                    heightSize: modelSize.depth.toString(),
+                    lengthSize: modelSize.length.toString(),
+                    heightSize: modelSize.height.toString(),
                     magnification: 1,
                     quantity: 1,
                     materialType: defaultMaterialType,
@@ -82,6 +86,10 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
         setOrderRows((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
     };
 
+    const handleDeleteRow = (index: number) => {
+        setOrderRows((prev) => prev.filter((_, i) => i !== index));
+    };
+
     return (
         <>
             <ButtonContainer>
@@ -89,7 +97,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                 <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
                     <SelectFileButton>파일 직접 업로드</SelectFileButton>
                 </label>
-                <input type="file" id="file-upload" style={{ display: "none" }} onChange={handleFileUpload} />
+                <input type="file" accept=".stl" id="file-upload" style={{ display: "none" }} onChange={handleFileUpload} />
             </ButtonContainer>
             <Paper sx={{ width: "800px", overflow: "hidden" }}>
                 <TableContainer>
@@ -107,6 +115,15 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                             {orderRows.map((row, i) => (
                                 <TableRow hover key={i} style={{ height: "140px" }}>
                                     {columns.map((column) => {
+                                        if (column.id === "delete") {
+                                            return (
+                                                <TableCell key={column.id} align={column.align}>
+                                                    <IconButton onClick={() => handleDeleteRow(i)}>
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </TableCell>
+                                            );
+                                        }
                                         const value = row[column.id];
 
                                         if (column.id === "fileUrl") {
@@ -170,6 +187,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                                                 </TableCell>
                                             );
                                         }
+                                        //새로추가된 삭제버튼
 
                                         return (
                                             <TableCell key={column.id} align={column.align}>

@@ -16,8 +16,8 @@ type ownProps = {
 
 type Size = {
     width: number;
+    length: number;
     height: number;
-    depth: number;
 };
 
 const FileUploadContainer: React.FC<ownProps> = ({ formData, onFileChange, handleSizesChange, onUploadClick, fileInputRef }) => {
@@ -40,7 +40,7 @@ const FileUploadContainer: React.FC<ownProps> = ({ formData, onFileChange, handl
 
     useEffect(() => {
         if (size) {
-            handleSizesChange((prev) => ({ ...prev, widthSize: size.width.toString(), heightSize: size.depth.toString(), lengthSize: size.height.toString() }));
+            handleSizesChange((prev) => ({ ...prev, widthSize: size.width.toString(), heightSize: size.height.toString(), lengthSize: size.length.toString() }));
         }
     }, [size]);
 
@@ -56,7 +56,7 @@ const FileUploadContainer: React.FC<ownProps> = ({ formData, onFileChange, handl
                     <StlRenderContainer filePath={URL.createObjectURL(formData.file)} width="200px" height="200px" />
                     <FileName>파일명: {formData.file.name}</FileName>
                     <ModelSize>
-                        크기: {size?.width}mm x {size?.height}mm x {size?.depth}mm
+                        크기: {size?.width}mm x {size?.length}mm x {size?.height}mm
                     </ModelSize>
                 </FileDetails>
             )}

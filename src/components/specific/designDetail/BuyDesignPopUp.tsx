@@ -28,28 +28,6 @@ const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, setIsPur
         };
     }, []);
 
-    // const handlePurchase = async () => {
-    //     const token = localStorage.getItem("accessToken");
-    //     console.log(token);
-    //     console.log(id);
-    //     try {
-    //         const response = await newAxios.post(`/api/v1/model/user/purchase/${id}`, null, {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //         });
-
-    //         console.log("data submitted successfully:", response.data);
-    //         handleOnClick(false);
-    //         setIsPurchased(true);
-    //         navigate("/my-design");
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error("Error submitting design data:", error);
-    //         throw error;
-    //     }
-    // };
-
     function randomId() {
         return [...crypto.getRandomValues(new Uint32Array(2))].map((word) => word.toString(16).padStart(8, "0")).join("");
     }

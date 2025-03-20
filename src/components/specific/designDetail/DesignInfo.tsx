@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import { useCart } from "../../../hooks/useCart";
+import useLoginNavigation from "../../../hooks/useLoginNavigation";
 
 type DesignInfoProps = {
     name: string;
@@ -14,7 +15,12 @@ type DesignInfoProps = {
 
 const DesignInfo = ({ name, artist, price, volume, size, id, isPurchased, handleOnClick }: DesignInfoProps) => {
     const { addToCart } = useCart();
-
+    const { moveToLogin } = useLoginNavigation();
+    const handlePurchaseButtonClick = () => {
+        if (!localStorage.getItem("accessToken")) moveToLogin();
+        if (isPurchased) return;
+        handleOnClick(true);
+    };
     return (
         <InfoContainer>
             <Title>{name}</Title>
@@ -36,14 +42,7 @@ const DesignInfo = ({ name, artist, price, volume, size, id, isPurchased, handle
                 </Detail>
             </DetailContainer>
             <ButtonContainer>
-                <Button
-                    onClick={() => {
-                        if (isPurchased) return;
-                        handleOnClick(true);
-                    }}
-                >
-                    {isPurchased ? "구매완료" : "구매하기"}
-                </Button>
+                <Button onClick={handlePurchaseButtonClick}>{isPurchased ? "구매완료" : "구매하기"}</Button>
                 <Button onClick={() => addToCart(id!)}>장바구니 담기</Button>
             </ButtonContainer>
         </InfoContainer>

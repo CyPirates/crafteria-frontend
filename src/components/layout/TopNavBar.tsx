@@ -13,12 +13,11 @@ import { newAxios } from "../../utils/axiosWithUrl";
 import { User } from "../../types/UserType";
 import CartDropdown from "./CartDropdown";
 import SearchBar from "./SearchBar";
+import UserMenuDropdown from "./UserMenuDropdown";
 
 const TopNavBar = () => {
     const navigate = useNavigate();
     const location = useLocation(); // 현재 URL 경로 가져오기
-    const [isOpen, setIsOpen] = useState(false);
-    const [num, setNum] = useState<number>(0);
     const [userData, setUserData] = useState<User | undefined>(undefined);
     const isLight = useSelector((state: RootState) => state.theme.isLight);
     const dispatch = useDispatch<AppDispatch>();
@@ -26,11 +25,9 @@ const TopNavBar = () => {
     const handleLoginClick = () => {
         if (localStorage.getItem("accessToken")) {
             localStorage.removeItem("accessToken");
-            setNum(num + 1);
-            return;
         }
         localStorage.setItem("redirectPath", window.location.href);
-        setIsOpen(!isOpen);
+        navigate("/login");
     };
 
     useEffect(() => {
@@ -55,7 +52,6 @@ const TopNavBar = () => {
 
     return (
         <>
-            <LoginModal isOpen={isOpen} setIsOpen={setIsOpen} />
             <NavContainer>
                 <ContentsContainer>
                     <LogoContainer onClick={() => navigate("/home")}>
@@ -68,7 +64,7 @@ const TopNavBar = () => {
                         <NavMenu to="/my-design" isActive={location.pathname === "/my-design"}>
                             내 도면
                         </NavMenu>
-                        <NavMenu to="/design-market" isActive={location.pathname === "/design-market"}>
+                        <NavMenu to="/design-market" isActive={location.pathname === "/design-market" || location.pathname.startsWith("/design")}>
                             도면 장터
                         </NavMenu>
                         <NavMenu to="/print-order" isActive={location.pathname === "/print-order"}>
@@ -78,12 +74,11 @@ const TopNavBar = () => {
                             도면 판매
                         </NavMenu>
                     </NavMenuContainer>
-                    {/* <div style={{ width: "20vw" }}></div> */}
                     <SearchBar />
                     {userData ? <div>{userData.realname}님</div> : null}
                     <LoginButton onClick={handleLoginClick}>{localStorage.getItem("accessToken") ? null : "로그인"}</LoginButton>
                     <CartDropdown />
-                    <MyPageButton isActive={location.pathname === "/my-page"} onClick={() => navigate("/my-page")} />
+                    <UserMenuDropdown />
                     {/* <button onClick={() => dispatch(toggleTheme())}>{isLight ? "라이트모드" : "다크모드"}</button> */}
                 </ContentsContainer>
             </NavContainer>
@@ -159,15 +154,5 @@ const LoginButton = styled.div`
 
     &:hover {
         font-weight: bold;
-    }
-`;
-
-const MyPageButton = styled(AiOutlineUser)<{ isActive: boolean }>`
-    color: ${({ isActive }) => (isActive ? "#F4351D" : "#a5a5a7")};
-    width: 25px;
-    height: 25px;
-
-    &:hover {
-        color: grey;
     }
 `;

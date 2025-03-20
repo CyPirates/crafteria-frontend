@@ -58,7 +58,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
         try {
             const response = await newAxios.post("/api/v1/carts/addModel", { manufacturerId: 0, modelId: modelId }, { headers: { Authorization: `Bearer ${token}` } });
-
+            if (response.data.status === 409) {
+                alert("이미 담긴 도면입니다");
+            }
             console.log(response.data);
             fetchCartData(); // 상태 업데이트
         } catch (e) {

@@ -26,28 +26,38 @@ const FileDrop = ({ setData }: OwnProps) => {
         event.preventDefault();
     };
 
+    const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file && file.name.toLowerCase().endsWith(".stl")) {
+            setSelectedFile(file);
+            const { width, length, height } = await getStlModelSize(file);
+            setData((prev) => ({
+                ...prev,
+                file,
+                widthSize: width.toString(),
+                lengthSize: length.toString(),
+                heightSize: height.toString(),
+            }));
+        } else {
+            alert("STL 파일만 업로드 가능합니다.");
+        }
+    };
+
     const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
         event.preventDefault();
         setIsActive(false);
 
         const file = event.dataTransfer.files[0];
-        if (file) {
+        if (file && file.name.toLowerCase().endsWith(".stl")) {
             setSelectedFile(file);
-        }
-    };
-
-    const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) {
-            setSelectedFile(file);
-            const { width, height, depth } = await getStlModelSize(file);
-            setData((prev) => ({ ...prev, file: file, widthSize: width.toString(), lengthSize: height.toString(), heightSize: depth.toString() }));
+        } else {
+            alert("STL 파일만 업로드 가능합니다.");
         }
     };
 
     return (
         <Label isActive={isActive} onDragEnter={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragEnd} onDrop={handleDrop}>
-            <input type="file" onChange={handleOnChange} style={{ display: "none" }} />
+            <input type="file" accept=".stl" onChange={handleOnChange} style={{ display: "none" }} />
             {selectedFile ? <StlRenderContainer filePath={URL.createObjectURL(selectedFile)} width="250px" height="250px" clickDisabled={true} /> : <p>파일을 드롭하거나 클릭하여 업로드</p>}
         </Label>
     );

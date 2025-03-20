@@ -3,6 +3,9 @@ import styled from "styled-components";
 import { newAxios } from "../utils/axiosWithUrl";
 import { Design } from "../types/DesignType";
 import DesignOutlineCard from "../components/specific/myDesign/DesignOutlineCard";
+import { ErrorType } from "../types/ErrorType";
+import useLoginNavigation from "../hooks/useLoginNavigation";
+import useAuthErrorHandler from "../hooks/useAuthErrorHandler";
 
 const MyDesignPage = () => {
     return (
@@ -16,6 +19,8 @@ const MyDesignPage = () => {
 };
 
 const DesignList = () => {
+    const { handleAuthError } = useAuthErrorHandler();
+
     const [purchasedDesigns, setPurchasedDesigns] = useState<Design[]>([]);
     const [uploadDesigns, setUploadDesigns] = useState<Design[]>([]);
     const [isPublished, setIsPublished] = useState(false);
@@ -31,7 +36,7 @@ const DesignList = () => {
                 });
                 setPurchasedDesigns(response.data.data);
             } catch (error) {
-                console.log(error);
+                handleAuthError(error);
             }
             try {
                 const token = localStorage.getItem("accessToken");

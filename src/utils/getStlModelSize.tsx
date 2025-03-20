@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
 import axios from "axios";
 
-const getStlModelSize = async (input: string | File): Promise<{ width: number; height: number; depth: number }> => {
+const getStlModelSize = async (input: string | File): Promise<{ width: number; length: number; height: number }> => {
     const loader = new STLLoader();
     let geometry: THREE.BufferGeometry;
 
@@ -19,14 +19,14 @@ const getStlModelSize = async (input: string | File): Promise<{ width: number; h
     const boundingBox = new THREE.Box3().setFromObject(new THREE.Mesh(geometry));
 
     const width = +(boundingBox.max.x - boundingBox.min.x).toFixed(2);
-    const height = +(boundingBox.max.y - boundingBox.min.y).toFixed(2);
-    const depth = +(boundingBox.max.z - boundingBox.min.z).toFixed(2);
+    const length = +(boundingBox.max.y - boundingBox.min.y).toFixed(2);
+    const height = +(boundingBox.max.z - boundingBox.min.z).toFixed(2);
 
     // const width = +Math.round(boundingBox.max.x - boundingBox.min.x);
     // const height = +Math.round(boundingBox.max.y - boundingBox.min.y);
     // const depth = +Math.round(boundingBox.max.z - boundingBox.min.z);
 
-    return { width, height, depth };
+    return { width, length, height };
 };
 
 export default getStlModelSize;

@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import useInput from "../hooks/useInput";
 import { Company } from "../types/CompanyType";
 import SelectCompany from "../components/specific/MakeOrder/SelectCompany";
 import SelectDesign from "../components/specific/MakeOrder/SelectDesign";
+import useLoginNavigation from "../hooks/useLoginNavigation";
 
 const MakeOrderPage = () => {
+    const { moveToLogin } = useLoginNavigation();
     const [selectedCompany, setSelectedCompany] = useState<Company | undefined>(undefined);
+
+    useEffect(() => {
+        if (!localStorage.getItem("accessToken")) {
+            console.log("asdf");
+            moveToLogin();
+        }
+    }, []);
     return (
         <>
             <PageWrapper>
