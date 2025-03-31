@@ -6,6 +6,8 @@ import useInput from "../../../hooks/useInput";
 import { Company } from "../../../types/CompanyType";
 import { newAxios } from "../../../utils/axiosWithUrl";
 import { useNavigate } from "react-router-dom";
+import convertURLToFile from "../../../utils/convertUrlToFile";
+import PortOne from "@portone/browser-sdk/v2";
 
 type OrderInfoProps = {
     printOrders: PrintOrderData[];
@@ -23,6 +25,9 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [zipcode, setZipcode] = useState<string>("");
     const [address, setAddress] = useState<string>("");
+    const [paymentStatus, setPaymentStatus] = useState<any>({
+        status: "IDLE",
+    });
     const { value: detailAddress, onChange: setDetailAddress } = useInput("");
     const [submittedData, setSubmittedData] = useState<SubmittedOrder>({
         manufactureId: company.id,
@@ -74,18 +79,13 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
         setSubmittedData((prev) => ({ ...prev, [tag]: value }));
     };
 
-    const handleCheck = () => {
-        console.log(submittedData);
-    };
-
     const handleSubmit = async () => {
         const formData = new FormData();
-        // orderItems 먼저 추가
         formData.append(
             "request",
             JSON.stringify({
                 manufacturerId: submittedData.manufactureId,
-                purchasePrice: 0,
+                purchasePrice: 1000,
                 status: "ORDERED",
                 deliveryAddress: submittedData.deliveryAddress,
                 orderItems: submittedData.orderItems,
@@ -96,25 +96,9 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             })
         );
 
-        // 파일 변환 및 추가를 순차적으로 처리
-        const convertToFile = async (url: string, index: number) => {
-            try {
-                const response = await fetch(url);
-                const blob = await response.blob();
-                const filename = `file_${index}.stl`;
-                return new File([blob], filename, { type: blob.type });
-            } catch (error) {
-                console.error("파일 변환 실패:", error);
-                return null;
-            }
-        };
         for (let i = 0; i < submittedData.files.length; i++) {
-            const file = await convertToFile(submittedData.files[i], i);
+            const file = await convertURLToFile(submittedData.files[i], i);
             if (file) formData.append("files", file);
-        }
-
-        for (const entry of formData.entries()) {
-            console.log(entry);
         }
 
         try {
@@ -126,7 +110,52 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                 },
             });
             console.log(response.data);
-            navigate("/my-order");
+            const { paymentId, orderId } = response.data.data;
+            console.log(paymentId, orderId);
+            if (paymentId && orderId) {
+                requestPayment(paymentId, orderId, "1000");
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    };
+
+    const requestPayment = async (paymentId: string, orderId: string, price: string) => {
+        setPaymentStatus({ status: "PENDING" });
+        const response = await PortOne.requestPayment({
+            storeId: "store-fac07677-97a5-457e-a490-fa243d2d40d1",
+            channelKey: "channel-key-cc38c030-f0b0-46b0-8c0d-78695dac8786",
+            paymentId,
+            orderName: "주문하기",
+            totalAmount: +price,
+            currency: "CURRENCY_KRW",
+            payMethod: "CARD",
+            customData: {},
+            customer: {
+                fullName: "이찬호",
+                email: "qboooodp@naver.com",
+                phoneNumber: "010-8152-1000",
+            },
+        });
+        if (response?.code) {
+            console.log(response.message);
+        }
+        try {
+            const notified: any = await newAxios.post(
+                "/api/v1/payment/complete",
+                { paymentId: paymentId, order: orderId },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    },
+                }
+            );
+            if (notified.status === 200) {
+                setPaymentStatus({ status: "SUCCESS" });
+                navigate("/my-order");
+            } else {
+                alert(notified.message);
+            }
         } catch (e) {
             console.log(e);
         }

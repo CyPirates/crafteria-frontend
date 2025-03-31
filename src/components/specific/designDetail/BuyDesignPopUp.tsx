@@ -7,14 +7,13 @@ import PortOne from "@portone/browser-sdk/v2";
 
 type BuyDesignPopUpProps = {
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
-    setIsPurchased: React.Dispatch<React.SetStateAction<boolean>>;
     name: string;
     price: string;
     filePath: string;
     id: any;
 };
 
-const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, setIsPurchased, name, price, filePath, id }) => {
+const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, name, price, filePath, id }) => {
     const navigate = useNavigate();
     const [paymentStatus, setPaymentStatus] = useState<any>({
         status: "IDLE",
@@ -33,52 +32,44 @@ const BuyDesignPopUp: React.FC<BuyDesignPopUpProps> = ({ handleOnClick, setIsPur
     }
 
     const handleSubmit = async (e: any) => {
-        e.preventDefault();
-        setPaymentStatus({ status: "PENDING" });
-        const paymentId = randomId();
-        const payment = await PortOne.requestPayment({
-            storeId: "store-fac07677-97a5-457e-a490-fa243d2d40d1",
-            channelKey: "channel-key-cc38c030-f0b0-46b0-8c0d-78695dac8786",
-            paymentId,
-            orderName: name,
-            totalAmount: +price * 1000,
-            currency: "CURRENCY_KRW",
-            payMethod: "CARD",
-            customData: {
-                item: id,
-            },
-            customer: {
-                fullName: "이찬호",
-                email: "qboooodp@naver.com",
-                phoneNumber: "010-8152-1000",
-            },
-        });
-        if (payment!.code !== undefined) {
-            setPaymentStatus({
-                status: "FAILED",
-                message: payment!.message,
-            });
-            return;
-        }
-        const completeResponse = await fetch("/api/payment/complete", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                paymentId: payment!.paymentId,
-            }),
-        });
-        if (completeResponse.ok) {
-            const paymentComplete = await completeResponse.json();
-            setPaymentStatus({
-                status: paymentComplete.status,
-            });
-        } else {
-            setPaymentStatus({
-                status: "FAILED",
-                message: await completeResponse.text(),
-            });
+        // e.preventDefault();
+        // setPaymentStatus({ status: "PENDING" });
+        // const paymentId = randomId();
+        // const payment = await PortOne.requestPayment({
+        //     storeId: "store-fac07677-97a5-457e-a490-fa243d2d40d1",
+        //     channelKey: "channel-key-cc38c030-f0b0-46b0-8c0d-78695dac8786",
+        //     paymentId,
+        //     orderName: name,
+        //     totalAmount: +price * 1000,
+        //     currency: "CURRENCY_KRW",
+        //     payMethod: "CARD",
+        //     customData: {
+        //         item: id,
+        //     },
+        //     customer: {
+        //         fullName: "이찬호",
+        //         email: "qboooodp@naver.com",
+        //         phoneNumber: "010-8152-1000",
+        //     },
+        // });
+        try {
+            try {
+                const response = await newAxios.post(`/api/v1/model/user/purchase/${id}`, null, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    },
+                });
+                if (response.data.status === 200) {
+                    navigate("/my-design");
+                }
+                if (response.data.status === 400) {
+                    alert(response.data.message);
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        } catch (error) {
+            console.log(error);
         }
     };
 
