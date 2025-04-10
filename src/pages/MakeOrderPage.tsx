@@ -33,7 +33,7 @@ export default MakeOrderPage;
 const PageWrapper = styled.div`
     margin-top: 20px;
     display: flex;
-    justify-content: space-between;
+    //justify-content: space-between;
 `;
 
 const DesignArea = styled.div`

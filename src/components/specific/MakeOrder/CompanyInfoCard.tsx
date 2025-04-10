@@ -12,10 +12,10 @@ type CompanyInfoProps = {
 };
 
 const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
-    const materials = classifyMaterial(data.technologies);
+    const materials = classifyMaterial(data);
     const isMaterialsEmpty = Object.keys(materials).length === 0;
     if (isMaterialsEmpty) return null;
-
+    console.log(data);
     console.log(materials);
     const checkPrintNow = () => {
         const equipments: Equipment[] = data.equipmentList;
@@ -54,6 +54,8 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
                             <MaterialText>
                                 {convertMaterialName(key)} <br />
                                 평균 {value.totalPrice / value.materials.length}원/시간
+                                <br />
+                                {value.printSpeed}mm³/시간
                             </MaterialText>
                             {value.materials.map((e) => (
                                 <MaterialPopover color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
@@ -91,8 +93,8 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
 export default CompanyInfoCard;
 
 const CompanyContainer = styled.div`
-    width: 800px;
-    height: 160px;
+    width: 1260px;
+    height: 200px;
     margin-top: 20px;
     border: 1px solid #ececec;
     border-radius: 8px;
@@ -105,8 +107,8 @@ const CompanyContainer = styled.div`
 `;
 
 const CompanyImage = styled.img`
-    width: 140px;
-    height: 140px;
+    width: 180px;
+    height: 180px;
     object-fit: cover;
     border-radius: 4px;
     margin-right: 20px;

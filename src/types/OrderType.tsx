@@ -44,4 +44,10 @@ export type PrintOrderData = {
     materialType: string;
     color: string;
     technologyId: string;
+
+    //for datagrid
+    volume?: number;
+    time?: number;
+    price?: number;
+    materialPrice?: number;
 };

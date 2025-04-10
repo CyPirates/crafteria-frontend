@@ -10,7 +10,10 @@ export type Company = {
     imageFileUrl: string;
     equipmentList: Equipment[];
     technologies: Material[];
-    unitPrice: string;
+    printSpeedFilament: number;
+    printSpeedPowder: number;
+    printSpeedLiquid: number;
+    [key: string]: any; // Add this line
 };
 
 export type Material = {

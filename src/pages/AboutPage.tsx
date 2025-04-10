@@ -102,7 +102,7 @@ const ProfileImage = styled.img`
     width: 280px;
     height: 280px;
     margin-right: 30px;
-    object-fit: contain;
+    object-fit: cover;
     border-radius: 5px;
 `;
 

@@ -76,6 +76,7 @@ export default Root;
 
 const ContentContainer = styled.div`
     width: 1300px;
-    margin: 50px auto 0;
+    max-width: 1300px;
+    margin: 80px auto 0;
     min-height: calc(100vh - 50px);
 `;

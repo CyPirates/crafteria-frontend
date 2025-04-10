@@ -25,6 +25,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [zipcode, setZipcode] = useState<string>("");
     const [address, setAddress] = useState<string>("");
+    const [price, setPrice] = useState<number>(0);
     const [paymentStatus, setPaymentStatus] = useState<any>({
         status: "IDLE",
     });
@@ -43,10 +44,12 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     });
 
     useEffect(() => {
+        console.log(printOrders);
         const orderData: OrderItems[] = [];
         const fileUrls: string[] = [];
-
+        let price = 0;
         printOrders.map((item) => {
+            if (item.price) price += item.price;
             orderData.push({
                 widthSize: item.widthSize,
                 lengthSize: item.lengthSize,
@@ -57,7 +60,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             });
             fileUrls.push(item.fileUrl);
         });
-
+        setPrice(price);
         setSubmittedData((prevData) => ({
             ...prevData,
             orderItems: orderData,
@@ -85,7 +88,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             "request",
             JSON.stringify({
                 manufacturerId: submittedData.manufactureId,
-                purchasePrice: 1000,
+                purchasePrice: price,
                 status: "ORDERED",
                 deliveryAddress: submittedData.deliveryAddress,
                 orderItems: submittedData.orderItems,
@@ -113,7 +116,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             const { paymentId, orderId } = response.data.data;
             console.log(paymentId, orderId);
             if (paymentId && orderId) {
-                requestPayment(paymentId, orderId, "1000");
+                requestPayment(paymentId, orderId, price.toString());
             }
         } catch (e) {
             console.log(e);
@@ -193,7 +196,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                 <InformationContainer>
                     <RowGrid>
                         <InfoTitle>총 가격</InfoTitle>
-                        <InfoContent>0 원</InfoContent>
+                        <InfoContent>{price} 원</InfoContent>
                     </RowGrid>
                 </InformationContainer>
                 <SubmitButton onClick={handleSubmit}>주문하기</SubmitButton>
@@ -225,7 +228,7 @@ const Modal = ({ setZipcode, setAddress, handleIsOpen }: ModalProps) => {
 export default OrderInfoContainer;
 
 const UserArea = styled.div`
-    width: 500px;
+    width: 400px;
     min-height: 800px;
     height: 100%;
     padding: 0 20px;
@@ -238,7 +241,7 @@ const UserArea = styled.div`
 const Title = styled.div`
     width: 100%;
     margin: 20px 0px;
-    font-size: 30px;
+    font-size: 20px;
     font-weight: bold;
     border-bottom: 1px solid #707074;
 `;
@@ -251,7 +254,7 @@ const ZipcodeAndButton = styled.div`
 `;
 
 const ZipcodeInput = styled.input`
-    width: 150px;
+    width: 120px;
     height: 40px;
     font-size: 15px;
 `;
@@ -276,7 +279,7 @@ const SearchAddressButton = styled.div`
 `;
 
 const AddressInput = styled.input`
-    width: 400px;
+    width: 360px;
     height: 40px;
     font-size: 15px;
     margin-bottom: 10px;
@@ -317,7 +320,7 @@ const InformationInput = styled.input`
     margin-bottom: 10px;
 `;
 const InfoTitle = styled.div`
-    font-size: 20px;
+    font-size: 16px;
     width: 100px;
 `;
 const InfoContent = styled.div`
@@ -325,7 +328,7 @@ const InfoContent = styled.div`
 `;
 
 const SubmitButton = styled.div`
-    width: 460px;
+    width: 360px;
     height: 50px;
     background-color: #000000;
     color: white;

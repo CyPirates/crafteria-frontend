@@ -49,7 +49,8 @@ export default Carousel;
 
 const CarouselContainer = styled.div`
     position: relative;
-    width: 1000px;
+    width: 1200px;
+    height: 628px;
     margin: auto;
     overflow: hidden;
     border-radius: 15px;
@@ -63,7 +64,7 @@ const CarouselWrapper = styled.div<{ translateX: number; transition: string }>`
 
 const CarouselSlide = styled.div`
     min-width: 100%;
-    height: 500px;
+    height: 628px;
     background-position: center;
 `;
 

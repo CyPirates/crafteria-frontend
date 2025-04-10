@@ -19,7 +19,11 @@ const DesignDetailPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await newAxios.get(`/api/v1/model/user/view/${id}`);
+                const response = await newAxios.get(`/api/v1/model/user/view/${id}`, {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    },
+                });
                 let data = response.data.data;
                 console.log(data);
                 setDesign(data);
