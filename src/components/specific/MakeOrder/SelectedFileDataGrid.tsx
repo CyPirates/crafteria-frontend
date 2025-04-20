@@ -87,47 +87,59 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
     const defaultId = defaultMaterialInfo?.technologyId || "";
     const defaultMaterialPrice = defaultMaterialInfo?.pricePerHour;
     const defaultPrintSpeed = materials[defaultMaterialType]?.printSpeed;
+    console.log("십" + defaultMaterialPrice + "ㅁㄴㅇㄹ" + defaultPrintSpeed);
 
     const [isPop, setIsPop] = useState<boolean>(false);
 
-    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file && !file.name.toLowerCase().endsWith(".stl")) {
-            alert("stl 파일만 업로드 가능합니다.");
-            event.target.value = "";
-            return;
+    const handleFileUpload = async (event?: React.ChangeEvent<HTMLInputElement>, url?: string) => {
+        let fileUrl = "";
+        if (event) {
+            const file = event.target.files?.[0];
+            if (file) {
+                if (!file.name.toLowerCase().endsWith(".stl")) {
+                    alert("stl 파일만 업로드 가능합니다.");
+                    event.target.value = "";
+                    return;
+                }
+                fileUrl = URL.createObjectURL(file);
+            }
         }
-        if (file) {
-            const fileUrl = URL.createObjectURL(file);
-            try {
-                const modelSize = await getStlModelSize(fileUrl);
-                const modelVolume = await getStlModelVolume(fileUrl);
+        if (url) {
+            fileUrl = url;
+        }
 
-                // 초기 time 및 price 계산
-                const initialTime = calculateAndRoundPrintTime(1, modelVolume, defaultPrintSpeed);
-                const initialPrice = calculatePrice(defaultMaterialPrice ? +defaultMaterialPrice : undefined, initialTime, 1);
+        try {
+            const modelSize = await getStlModelSize(fileUrl);
+            const modelVolume = await getStlModelVolume(fileUrl);
 
-                const newRow: PrintOrderData = {
-                    fileUrl: fileUrl,
-                    widthSize: modelSize.width.toString(),
-                    lengthSize: modelSize.length.toString(),
-                    heightSize: modelSize.height.toString(),
-                    magnification: 1,
-                    quantity: 1,
-                    materialType: defaultMaterialType,
-                    color: defaultColor,
-                    technologyId: defaultId,
-                    volume: modelVolume,
-                    materialPrice: defaultMaterialPrice ? +defaultMaterialPrice : undefined,
-                    time: typeof initialTime === "number" ? initialTime : undefined, // 계산 불가 시 undefined 저장
-                    price: typeof initialPrice === "number" ? initialPrice : undefined, // 계산 불가 시 undefined 저장
-                };
-                setOrderRows((prev) => [...prev, newRow]);
-            } catch (e) {
-                console.error("파일 처리 중 오류:", e);
-                alert("파일 처리 중 오류가 발생했습니다.");
-            } finally {
-                event.target.value = "";
+            // 초기 time 및 price 계산
+            const initialTime = calculateAndRoundPrintTime(1, modelVolume, defaultPrintSpeed);
+            const initialPrice = calculatePrice(defaultMaterialPrice ? +defaultMaterialPrice : undefined, initialTime, 1);
+
+            const newRow: PrintOrderData = {
+                fileUrl: fileUrl,
+                widthSize: modelSize.width.toString(),
+                lengthSize: modelSize.length.toString(),
+                heightSize: modelSize.height.toString(),
+                magnification: 1,
+                quantity: 1,
+                materialType: defaultMaterialType,
+                color: defaultColor,
+                technologyId: defaultId,
+                volume: modelVolume,
+                materialPrice: defaultMaterialPrice ? +defaultMaterialPrice : undefined,
+                time: typeof initialTime === "number" ? initialTime : undefined, // 계산 불가 시 undefined 저장
+                price: typeof initialPrice === "number" ? initialPrice : undefined, // 계산 불가 시 undefined 저장
+            };
+            console.log("ㅁㄴㅇㄹ");
+            console.log(newRow);
+            setOrderRows((prev) => [...prev, newRow]);
+        } catch (e) {
+            console.error("파일 처리 중 오류:", e);
+            alert("파일 처리 중 오류가 발생했습니다.");
+        } finally {
+            if (event) {
+                event!.target.value = "";
             }
         }
     };
@@ -325,7 +337,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                     </Table>
                 </TableContainer>
             </Paper>
-            {isPop ? <SelectDesignPopUp defaultType={defaultMaterialType} defaultColor={defaultColor} defaultId={defaultId} handleOnClick={setIsPop} setOrderRows={setOrderRows} /> : null}
+            {isPop ? <SelectDesignPopUp handleOnClick={setIsPop} handleFileUpload={handleFileUpload} /> : null}
         </Container>
     );
 };

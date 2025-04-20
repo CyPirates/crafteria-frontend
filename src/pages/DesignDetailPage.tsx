@@ -5,16 +5,15 @@ import "react-quill/dist/quill.snow.css";
 import { Design } from "../types/DesignType";
 import StlRenderContainer from "../components/specific/designDetail/StlRenderContainer";
 import { useEffect, useState } from "react";
-import BuyDesignPopUp from "../components/specific/designDetail/BuyDesignPopUp";
 import { newAxios } from "../utils/axiosWithUrl";
 import { useCart } from "../hooks/useCart";
+import initiatePortOnePayment from "../utils/requestPayment";
 
 const DesignDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const [design, setDesign] = useState<Design | undefined>(undefined);
-    const [isPop, setIsPop] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -51,9 +50,9 @@ const DesignDetailPage = () => {
         return <div>Loading...</div>; // 디자인이 로드되기 전 로딩 메시지 표시
     }
 
-    const { author, name, description, price, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl, purchased } = design;
+    const { author, name, description, price, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl, purchaseAvailability } = design;
     const handleButtonClick = async () => {
-        if (purchased) {
+        if (!purchaseAvailability) {
             handleDownload(modelFileUrl, name);
             return;
         }
@@ -74,7 +73,31 @@ const DesignDetailPage = () => {
                 console.log(e);
             }
         } else {
-            setIsPop(true);
+            handlePurchase();
+        }
+    };
+
+    const handlePurchase = async () => {
+        try {
+            const response = await newAxios.post(`/api/v1/model/user/purchase/${id}`, null, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                },
+            });
+            if (response.data.status === 200) {
+                const { paymentId, id } = response.data.data;
+                if (paymentId && id) {
+                    const isPaymentSuccess = await initiatePortOnePayment(paymentId, id, price.toString(), "modelId");
+                    if (isPaymentSuccess) {
+                        navigate("/my-design");
+                    }
+                }
+            }
+            if (response.data.status === 400) {
+                alert("purchase" + response.data.message);
+            }
+        } catch (e) {
+            console.log(e);
         }
     };
 
@@ -103,7 +126,7 @@ const DesignDetailPage = () => {
                         </Detail>
                     </DetailContainer>
                     <ButtonContainer>
-                        <Button onClick={handleButtonClick}>{purchased ? "다운로드" : "구매하기"}</Button>
+                        <Button onClick={handleButtonClick}>{purchaseAvailability ? "구매하기" : "다운로드"}</Button>
                         <Button onClick={() => addToCart(id!)}>장바구니 담기</Button>
                     </ButtonContainer>
                 </OutlineContentContainer>
@@ -114,7 +137,6 @@ const DesignDetailPage = () => {
             <IntroductionContents>
                 <div className="ql-editor" dangerouslySetInnerHTML={{ __html: description }} />
             </IntroductionContents>
-            {isPop ? <BuyDesignPopUp handleOnClick={setIsPop} name={name} price={price} filePath={modelFileUrl} id={id} /> : null}
         </PageWrapper>
     );
 };

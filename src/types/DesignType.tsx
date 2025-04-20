@@ -11,7 +11,7 @@ export type Design = {
     lengthSize: string;
     heightSize: string;
     modelFileUrl: string;
-    purchased: boolean;
+    purchaseAvailability: boolean;
 };
 
 type AuthorInfo = {

@@ -5,9 +5,9 @@ import { ChangeEvent, useEffect, useState } from "react";
 import useInput from "../../../hooks/useInput";
 import { Company } from "../../../types/CompanyType";
 import { newAxios } from "../../../utils/axiosWithUrl";
-import { useNavigate } from "react-router-dom";
 import convertURLToFile from "../../../utils/convertUrlToFile";
-import PortOne from "@portone/browser-sdk/v2";
+import initiatePortOnePayment from "../../../utils/requestPayment";
+import { useNavigate } from "react-router-dom";
 
 type OrderInfoProps = {
     printOrders: PrintOrderData[];
@@ -26,9 +26,6 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     const [zipcode, setZipcode] = useState<string>("");
     const [address, setAddress] = useState<string>("");
     const [price, setPrice] = useState<number>(0);
-    const [paymentStatus, setPaymentStatus] = useState<any>({
-        status: "IDLE",
-    });
     const { value: detailAddress, onChange: setDetailAddress } = useInput("");
     const [submittedData, setSubmittedData] = useState<SubmittedOrder>({
         manufactureId: company.id,
@@ -88,6 +85,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             "request",
             JSON.stringify({
                 manufacturerId: submittedData.manufactureId,
+                //must price
                 purchasePrice: price,
                 status: "ORDERED",
                 deliveryAddress: submittedData.deliveryAddress,
@@ -116,48 +114,10 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             const { paymentId, orderId } = response.data.data;
             console.log(paymentId, orderId);
             if (paymentId && orderId) {
-                requestPayment(paymentId, orderId, price.toString());
-            }
-        } catch (e) {
-            console.log(e);
-        }
-    };
-
-    const requestPayment = async (paymentId: string, orderId: string, price: string) => {
-        setPaymentStatus({ status: "PENDING" });
-        const response = await PortOne.requestPayment({
-            storeId: "store-fac07677-97a5-457e-a490-fa243d2d40d1",
-            channelKey: "channel-key-cc38c030-f0b0-46b0-8c0d-78695dac8786",
-            paymentId,
-            orderName: "주문하기",
-            totalAmount: +price,
-            currency: "CURRENCY_KRW",
-            payMethod: "CARD",
-            customData: {},
-            customer: {
-                fullName: "이찬호",
-                email: "qboooodp@naver.com",
-                phoneNumber: "010-8152-1000",
-            },
-        });
-        if (response?.code) {
-            console.log(response.message);
-        }
-        try {
-            const notified: any = await newAxios.post(
-                "/api/v1/payment/complete",
-                { paymentId: paymentId, order: orderId },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                    },
+                const isPaymentSuccess = await initiatePortOnePayment(paymentId, orderId, price.toString(), "orderId");
+                if (isPaymentSuccess) {
+                    navigate("/my-design");
                 }
-            );
-            if (notified.status === 200) {
-                setPaymentStatus({ status: "SUCCESS" });
-                navigate("/my-order");
-            } else {
-                alert(notified.message);
             }
         } catch (e) {
             console.log(e);

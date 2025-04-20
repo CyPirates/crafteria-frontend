@@ -6,11 +6,8 @@ import { Design } from "../../../types/DesignType";
 import { PrintOrderData } from "../../../types/OrderType";
 
 type BuyDesignPopUpProps = {
-    defaultType: string;
-    defaultColor: string;
-    defaultId: string;
     handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
-    setOrderRows: React.Dispatch<React.SetStateAction<PrintOrderData[]>>;
+    handleFileUpload: (event?: React.ChangeEvent<HTMLInputElement>, url?: string) => Promise<void>;
 };
 
 type DesignLayoutProps = {
@@ -18,7 +15,7 @@ type DesignLayoutProps = {
     handleSelect: (data: Design) => void;
 };
 
-const SelectDesignPopUp = ({ defaultType, defaultColor, defaultId, handleOnClick, setOrderRows }: BuyDesignPopUpProps) => {
+const SelectDesignPopUp = ({ handleOnClick, handleFileUpload }: BuyDesignPopUpProps) => {
     const [purchasedDesigns, setPurchasedDesigns] = useState<Design[]>([]);
     useEffect(() => {
         // 팝업이 열릴 때 스크롤을 막기 위해 body에 overflow hidden 설정
@@ -48,18 +45,7 @@ const SelectDesignPopUp = ({ defaultType, defaultColor, defaultId, handleOnClick
     }, []);
 
     const handleSelect = (data: Design) => {
-        const designData: PrintOrderData = {
-            fileUrl: data.modelFileUrl,
-            widthSize: data.widthSize,
-            lengthSize: data.lengthSize,
-            heightSize: data.heightSize,
-            magnification: 1,
-            quantity: 1,
-            materialType: defaultType,
-            color: defaultColor,
-            technologyId: defaultId,
-        };
-        setOrderRows((prev) => [...prev, designData]);
+        handleFileUpload(undefined, data.modelFileUrl);
         handleOnClick(false);
     };
     return (

@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 import { Design } from "../../../types/DesignType";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
+import { newAxios } from "../../../utils/axiosWithUrl";
 
 type DesignOutlineCardProps = {
     designData: Design;
@@ -12,10 +13,7 @@ type DesignOutlineCardProps = {
 const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) => {
     const { name, widthSize, lengthSize, heightSize, price, downloadCount, modelFileUrl, id } = designData;
     const navigate = useNavigate();
-    const handleOnclick = () => {
-        navigate(`/design/${id}`);
-    };
-    // 파일 이름을 생성하는 함수 (수정됨)
+
     const handleDownload = async (url: string, filename: string) => {
         const file = await fetch(url);
         const blob = await file.blob();
@@ -27,6 +25,27 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
         document.body.appendChild(link);
         link.click();
         link.remove();
+    };
+
+    const handleDelete = async () => {
+        const letDelete = confirm("정말 삭제하시겠습니까?");
+        if (!letDelete) return;
+        try {
+            const response = await newAxios.delete(`/api/v1/model/author/delete/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                },
+            });
+            if (response.data.status === 200) {
+                alert("삭제가 완료되었습니다.");
+                window.location.reload();
+            }
+            if (response.data.status === 400) {
+                alert(response.data.message);
+            }
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     return (
@@ -43,9 +62,9 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
                 </InformationContainer>
                 <ButtonConatiner>
                     <Button onClick={() => handleDownload(modelFileUrl, name)}>다운로드</Button>
-
-                    {/* {published && <Button>수정</Button>} */}
-                    <Button onClick={handleOnclick}>상세보기</Button>
+                    <Button onClick={() => navigate(`/design/${id}`)}>상세보기</Button>
+                    {published && <Button>수정</Button>}
+                    {published && <Button onClick={handleDelete}>삭제</Button>}
                 </ButtonConatiner>
             </CardWrapper>
         </>
@@ -56,6 +75,7 @@ export default DesignOutlineCard;
 
 const CardWrapper = styled.div`
     width: 700px;
+    height: 180px;
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 10px;
@@ -73,6 +93,8 @@ const InformationContainer = styled.div`
     flex-direction: column;
     justify-content: space-between;
     margin-left: 30px;
+
+    flex: 1;
 `;
 const Information = styled.div`
     //color: #d2d2d2;
@@ -82,19 +104,21 @@ const Information = styled.div`
 
 const ButtonConatiner = styled.div`
     display: flex;
-    flex-direction: row;
-    gap: 10px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
 
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    height: 100%;
+    width: 160px;
+    border-left: 0.5px solid #dddddd;
 `;
 const Button = styled.div`
-    width: 100px;
-    height: 20px;
-    border-radius: 15px;
+    width: 120px;
+    height: 28px;
+    border-radius: 5px;
     border: 0.5px solid #dddddd;
-    font-size: 11px;
+    font-size: 12px;
 
     display: flex;
     justify-content: center;
