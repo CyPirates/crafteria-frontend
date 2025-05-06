@@ -26,12 +26,14 @@ const SellDesignPage = () => {
     const { moveToLogin } = useLoginNavigation();
     const [data, setData] = useState<DesignFormData>({
         name: "",
-        file: null,
+        modelFile: null,
         widthSize: "",
         heightSize: "",
         lengthSize: "",
         price: "",
         description: "",
+        category: "INTERIOR_DECORATION",
+        downloadable: false,
     });
     const [value, setValue] = useState("");
 
@@ -52,18 +54,20 @@ const SellDesignPage = () => {
     };
 
     const handleSubmit = async () => {
-        if (!data.file) {
+        if (!data.modelFile) {
             alert("파일을 선택해주세요.");
             return;
         }
         const formData = new FormData();
         formData.append("name", data.name);
-        formData.append("modelFile", data.file);
+        formData.append("modelFile", data.modelFile);
         formData.append("widthSize", data.widthSize);
         formData.append("heightSize", data.heightSize);
         formData.append("lengthSize", data.lengthSize);
         formData.append("price", data.price);
         formData.append("description", data.description);
+        formData.append("category", data.category);
+        formData.append("downloadable", data.downloadable ? "true" : "false");
 
         try {
             const token = localStorage.getItem("accessToken");
@@ -94,6 +98,18 @@ const SellDesignPage = () => {
                     <input id="name" value={data.name} onChange={handleInputChange} />
                     <Step>가격</Step>
                     <input id="price" value={data.price} onChange={handleInputChange} />
+                    <Step>카테고리</Step>
+                    <select onChange={(e) => setData((prev) => ({ ...prev, category: e.target.value }))} defaultValue={"INTERIOR_DECORATION"}>
+                        <option value={"INTERIOR_DECORATION"}>인테리어 & 장식용</option>
+                        <option value={"PLANTER_GARDENING"}>플랜테리어 / 정원용</option>
+                        <option value={"STORAGE_ORGANIZATION"}>보관 & 정리용</option>
+                        <option value={"GIFTS_SOUVENIRS"}>선물 & 기념품</option>
+                        <option value={"TOOLS_FUNCTIONALITY"}>도구 & 기능성</option>
+                        <option value={"HOBBIES_PLAY"}>취미 & 놀이</option>
+                        <option value={"COMMERCIAL_BRANDING"}>상업/브랜딩</option>
+                    </select>
+                    <Step>다운로드 가능</Step>
+                    <input id="downloadable" type="checkbox" checked={data.downloadable} onChange={(e) => setData((prev) => ({ ...prev, downloadable: e.target.checked }))} />
                 </InputContainer>
             </RowContainer>
             <Step>설명</Step>
@@ -134,6 +150,7 @@ const RowContainer = styled.div`
 const InputContainer = styled.div`
     display: flex;
     flex-direction: column;
+    align-items: start;
     gap: 10px;
 `;
 

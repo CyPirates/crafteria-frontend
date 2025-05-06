@@ -12,7 +12,11 @@ export type Design = {
     heightSize: string;
     modelFileUrl: string;
     purchaseAvailability: boolean;
+    category: DesignCategory;
+    downloadable: boolean;
 };
+
+export type DesignCategory = "INTERIOR_DECORATION" | "PLANTER_GARDENING" | "STORAGE_ORGANIZATION" | "GIFTS_SOUVENIRS" | "TOOLS_FUNCTIONALITY" | "HOBBIES_PLAY" | "COMMERCIAL_BRANDING";
 
 type AuthorInfo = {
     id: string;
@@ -31,5 +35,7 @@ export type DesignFormData = {
     widthSize: string;
     lengthSize: string;
     heightSize: string;
-    file: File | null;
+    modelFile: File | null;
+    category: string;
+    downloadable: boolean;
 };

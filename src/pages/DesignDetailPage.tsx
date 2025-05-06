@@ -8,24 +8,40 @@ import { useEffect, useState } from "react";
 import { newAxios } from "../utils/axiosWithUrl";
 import { useCart } from "../hooks/useCart";
 import initiatePortOnePayment from "../utils/requestPayment";
+import getStlModelVolume from "../utils/getStlModelVolume";
 
 const DesignDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const [design, setDesign] = useState<Design | undefined>(undefined);
+    const [modelVolume, setModelVolume] = useState<number>(0);
+    const categoryKeys = {
+        INTERIOR_DECORATION: "인테리어 & 장식용",
+        PLANTER_GARDENING: "플랜테리어 / 정원용",
+        STORAGE_ORGANIZATION: "보관 & 정리용",
+        GIFTS_SOUVENIRS: "선물 & 기념품",
+        TOOLS_FUNCTIONALITY: "도구 & 기능성",
+        HOBBIES_PLAY: "취미 & 놀이",
+        COMMERCIAL_BRANDING: "상업/브랜딩",
+    };
 
     useEffect(() => {
         const fetchData = async () => {
+            const token = localStorage.getItem("accessToken");
+            const headers: Record<string, string> = {};
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
             try {
                 const response = await newAxios.get(`/api/v1/model/user/view/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                    },
+                    headers: headers,
                 });
                 let data = response.data.data;
                 console.log(data);
                 setDesign(data);
+                setModelVolume(await getStlModelVolume(data.modelFileUrl));
+                console.log(modelVolume);
             } catch (error) {
                 console.log(error);
             }
@@ -50,9 +66,13 @@ const DesignDetailPage = () => {
         return <div>Loading...</div>; // 디자인이 로드되기 전 로딩 메시지 표시
     }
 
-    const { author, name, description, price, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl, purchaseAvailability } = design;
+    const { author, name, description, price, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl, purchaseAvailability, category, downloadable } = design;
     const handleButtonClick = async () => {
         if (!purchaseAvailability) {
+            if (!downloadable) {
+                navigate("/print-order");
+                return;
+            }
             handleDownload(modelFileUrl, name);
             return;
         }
@@ -78,14 +98,17 @@ const DesignDetailPage = () => {
     };
 
     const handlePurchase = async () => {
+        console.log("11111");
         try {
             const response = await newAxios.post(`/api/v1/model/user/purchase/${id}`, null, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
                 },
             });
+            console.log(response.data.status);
             if (response.data.status === 200) {
                 const { paymentId, id } = response.data.data;
+                console.log(response.data.data);
                 if (paymentId && id) {
                     const isPaymentSuccess = await initiatePortOnePayment(paymentId, id, price.toString(), "modelId");
                     if (isPaymentSuccess) {
@@ -121,12 +144,20 @@ const DesignDetailPage = () => {
                         <Detail>
                             <DetailTitle>모델 크기</DetailTitle>
                             <DetailContent>
-                                {widthSize} x {lengthSize} x {heightSize} mm
+                                {modelVolume} mm3 ({widthSize} x {lengthSize} x {heightSize} mm)
                             </DetailContent>
+                        </Detail>
+                        <Detail>
+                            <DetailTitle>카테고리</DetailTitle>
+                            <DetailContent>{categoryKeys[category]}</DetailContent>
+                        </Detail>
+                        <Detail>
+                            <DetailTitle>다운로드</DetailTitle>
+                            <DetailContent>{downloadable ? "가능" : "불가능"}</DetailContent>
                         </Detail>
                     </DetailContainer>
                     <ButtonContainer>
-                        <Button onClick={handleButtonClick}>{purchaseAvailability ? "구매하기" : "다운로드"}</Button>
+                        <Button onClick={handleButtonClick}>{purchaseAvailability ? "구매하기" : downloadable ? "다운로드" : "프린트하기"}</Button>
                         <Button onClick={() => addToCart(id!)}>장바구니 담기</Button>
                     </ButtonContainer>
                 </OutlineContentContainer>

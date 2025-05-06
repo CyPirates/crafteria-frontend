@@ -2,15 +2,27 @@ import { useEffect, useState } from "react";
 import { newAxios } from "../../utils/axiosWithUrl";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
+import { MdFileDownload, MdShoppingCart, MdRemoveRedEye, MdOutlineStar } from "react-icons/md";
 
 import { Design } from "../../types/DesignType";
 import { Card } from "react-bootstrap";
 import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
+import { Key } from "@mui/icons-material";
 
-//TODO: Filter 기능 추가, SummaryCard 받아온 데이터로 변경
+const categoryKeys: Record<string, string> = {
+    INTERIOR_DECORATION: "인테리어 & 장식용",
+    PLANTER_GARDENING: "플랜테리어 / 정원용",
+    STORAGE_ORGANIZATION: "보관 & 정리용",
+    GIFTS_SOUVENIRS: "선물 & 기념품",
+    TOOLS_FUNCTIONALITY: "도구 & 기능성",
+    HOBBIES_PLAY: "취미 & 놀이",
+    COMMERCIAL_BRANDING: "상업/브랜딩",
+};
 
 const WholeDesignCardContainer = () => {
     const [designList, setDesignList] = useState<Design[]>([]);
+    const [filteredDesignList, setFilteredDesignList] = useState<Design[]>([]);
+    const [categoryFilter, setCategoryFilter] = useState<string>("");
     const [isActive, setIsActive] = useState<number>(0);
 
     const fetchData = async () => {
@@ -19,22 +31,33 @@ const WholeDesignCardContainer = () => {
             let data = response.data.data;
             console.log(data);
             setDesignList(data);
+            setFilteredDesignList(data);
         } catch (error) {
             console.log(error);
         }
     };
 
+    const filterDesignList = (filter: string): Design[] => {
+        const temp = [...designList];
+        if (filter == "") return temp;
+        return temp.filter((e) => e.category == filter);
+    };
+
+    useEffect(() => {
+        setFilteredDesignList(filterDesignList(categoryFilter));
+    }, [categoryFilter]);
+
     const sortDefault = () => {
         setIsActive(0);
-        fetchData();
+        setFilteredDesignList(filterDesignList(categoryFilter));
     };
 
     const sortDesignList = () => {
-        const temp = [...designList];
+        const temp = [...filteredDesignList];
         temp.sort((a, b) => {
             return +b.downloadCount - +a.downloadCount;
         });
-        setDesignList(temp);
+        setFilteredDesignList(temp);
         setIsActive(1);
     };
 
@@ -45,8 +68,18 @@ const WholeDesignCardContainer = () => {
     return (
         <>
             <Container>
-                <CategoryText>모든 도면</CategoryText>
+                <CategoryText>도면 장터</CategoryText>
                 <FilterTextContainer>
+                    <FilterText isActive={categoryFilter == ""} onClick={() => setCategoryFilter("")}>
+                        전체
+                    </FilterText>
+                    {Object.entries(categoryKeys).map(([key, value]) => (
+                        <FilterText isActive={categoryFilter == key} onClick={() => setCategoryFilter(key)}>
+                            {value}
+                        </FilterText>
+                    ))}
+
+                    <div style={{ borderLeft: "1px solid #B3B3B3", marginRight: "20px" }} />
                     <FilterText onClick={() => sortDefault()} isActive={isActive == 0}>
                         기본순
                     </FilterText>
@@ -55,8 +88,8 @@ const WholeDesignCardContainer = () => {
                     </FilterText>
                 </FilterTextContainer>
                 <CardContainer>
-                    {designList.map((e, i) => {
-                        return <WholeDesignCards designData={e} key={i} />;
+                    {filteredDesignList.map((e, i) => {
+                        return <DesignCard designData={e} key={i} />;
                     })}
                 </CardContainer>
             </Container>
@@ -64,9 +97,9 @@ const WholeDesignCardContainer = () => {
     );
 };
 
-const WholeDesignCards = ({ designData }: { designData: Design }) => {
+const DesignCard = ({ designData }: { designData: Design }) => {
     const navigate = useNavigate();
-    const { id, name, description, rating, price, viewCount, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl } = designData;
+    const { id, name, author, description, rating, price, viewCount, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl, category, downloadable } = designData;
 
     const handleOnClick = () => {
         navigate(`/design/${id}`);
@@ -79,14 +112,22 @@ const WholeDesignCards = ({ designData }: { designData: Design }) => {
                 <Card.Body>
                     <Card.Title>{name}</Card.Title>
                     <Card.Text>
-                        <DetailText>가격: {price}원</DetailText>
-                        <DetailText>
-                            크기: {widthSize} x {lengthSize} x {heightSize}(mm)
-                        </DetailText>
-                        <DetailText>판매량: {downloadCount}</DetailText>
-                        <DetailText>조회수: {viewCount}</DetailText>
+                        <DetailText>{author.name}</DetailText>
+                        <DetailText>{categoryKeys[category]}</DetailText>
+                        <div style={{ fontSize: "16px" }}>₩{price}</div>
                     </Card.Text>
                 </Card.Body>
+                <CardFooter>
+                    <DetailText>
+                        <MdShoppingCart /> {downloadCount}
+                    </DetailText>
+                    <DetailText>
+                        <MdRemoveRedEye /> {viewCount}
+                    </DetailText>
+                    <DetailText>
+                        <MdOutlineStar /> {rating}
+                    </DetailText>
+                </CardFooter>
             </StyledCard>
         </>
     );
@@ -147,6 +188,21 @@ const StyledCard = styled(Card)`
         font-weight: bold;
         margin-bottom: 10px;
     }
+
+    .footer {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+`;
+
+const CardFooter = styled(Card.Footer)`
+    height: 36px;
+    background-color: white;
+    padding: 0 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 `;
 
 const DetailText = styled.div`

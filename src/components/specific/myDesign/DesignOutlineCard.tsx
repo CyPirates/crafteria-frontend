@@ -11,7 +11,7 @@ type DesignOutlineCardProps = {
 };
 
 const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) => {
-    const { name, widthSize, lengthSize, heightSize, price, downloadCount, modelFileUrl, id } = designData;
+    const { name, widthSize, lengthSize, heightSize, price, downloadCount, modelFileUrl, id, downloadable } = designData;
     const navigate = useNavigate();
 
     const handleDownload = async (url: string, filename: string) => {
@@ -61,8 +61,8 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
                     <Information>판매량: {downloadCount}</Information>
                 </InformationContainer>
                 <ButtonConatiner>
-                    <Button onClick={() => handleDownload(modelFileUrl, name)}>다운로드</Button>
                     <Button onClick={() => navigate(`/design/${id}`)}>상세보기</Button>
+                    {(published || downloadable) && <Button onClick={() => handleDownload(modelFileUrl, name)}>다운로드</Button>}
                     {published && <Button>수정</Button>}
                     {published && <Button onClick={handleDelete}>삭제</Button>}
                 </ButtonConatiner>

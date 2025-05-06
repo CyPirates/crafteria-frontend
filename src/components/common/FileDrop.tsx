@@ -33,7 +33,7 @@ const FileDrop = ({ setData }: OwnProps) => {
             const { width, length, height } = await getStlModelSize(file);
             setData((prev) => ({
                 ...prev,
-                file,
+                modelFile: file,
                 widthSize: width.toString(),
                 lengthSize: length.toString(),
                 heightSize: height.toString(),

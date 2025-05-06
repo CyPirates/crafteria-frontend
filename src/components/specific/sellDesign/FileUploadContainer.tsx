@@ -25,9 +25,9 @@ const FileUploadContainer: React.FC<ownProps> = ({ formData, onFileChange, handl
 
     useEffect(() => {
         const fetchSize = async () => {
-            if (formData.file) {
+            if (formData.modelFile) {
                 try {
-                    const modelSize = await getStlModelSize(formData.file);
+                    const modelSize = await getStlModelSize(formData.modelFile);
                     setSize(modelSize);
                 } catch (error) {
                     console.error("Failed to fetch model size:", error);
@@ -36,7 +36,7 @@ const FileUploadContainer: React.FC<ownProps> = ({ formData, onFileChange, handl
         };
 
         fetchSize();
-    }, [formData.file]);
+    }, [formData.modelFile]);
 
     useEffect(() => {
         if (size) {
@@ -51,10 +51,10 @@ const FileUploadContainer: React.FC<ownProps> = ({ formData, onFileChange, handl
                 파일 선택
                 <HiddenFileInput ref={fileInputRef} type="file" onChange={onFileChange} accept=".stl" />
             </UploadButton>
-            {formData.file && (
+            {formData.modelFile && (
                 <FileDetails>
-                    <StlRenderContainer filePath={URL.createObjectURL(formData.file)} width="200px" height="200px" />
-                    <FileName>파일명: {formData.file.name}</FileName>
+                    <StlRenderContainer filePath={URL.createObjectURL(formData.modelFile)} width="200px" height="200px" />
+                    <FileName>파일명: {formData.modelFile.name}</FileName>
                     <ModelSize>
                         크기: {size?.width}mm x {size?.length}mm x {size?.height}mm
                     </ModelSize>
