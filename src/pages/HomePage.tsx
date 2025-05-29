@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 import Carousel from "../components/specific/home/Carousel";
 import WholeDesignCardContainer from "../components/common/WholeDesignCardContainer";
+import PortOne from "@portone/browser-sdk/v2";
 
 const HomePage = () => {
     return (

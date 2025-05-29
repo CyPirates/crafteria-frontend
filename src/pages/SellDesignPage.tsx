@@ -86,7 +86,7 @@ const SellDesignPage = () => {
 
     return (
         <PageWrapper>
-            <Header>도면 판매</Header>
+            <Title>도면 판매</Title>
 
             <RowContainer>
                 <InputContainer>
@@ -129,15 +129,11 @@ const PageWrapper = styled.div`
     width: 100%;
 `;
 
-const Header = styled.div`
-    height: 50px;
-    padding: 0px 30px;
-    border-bottom: 0.5px solid #dddddd;
-    font-size: 20px;
+const Title = styled.div`
+    width: 100%;
+    font-size: 30px;
     font-weight: bold;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    border-bottom: 1px solid #707074;
 `;
 
 const RowContainer = styled.div`

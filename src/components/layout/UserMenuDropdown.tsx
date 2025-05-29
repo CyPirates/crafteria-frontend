@@ -18,6 +18,9 @@ function UserMenuDropdown() {
             </Dropdown.Toggle>
 
             <Dropdown.Menu style={{ minWidth: "100px" }}>
+                <Dropdown.Item onClick={() => navigate("my-page")}>
+                    <div>내 정보</div>
+                </Dropdown.Item>
                 <Dropdown.Item onClick={() => navigate("my-order")}>
                     <div>내 주문</div>
                 </Dropdown.Item>

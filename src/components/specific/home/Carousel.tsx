@@ -5,16 +5,20 @@ import { useCarousel } from "../../../hooks/useCarousel";
 import { newAxios } from "../../../utils/axiosWithUrl";
 import { useEffect, useState } from "react";
 
+type Advertisement = {
+    id: string;
+    title: string;
+    linkurl: string;
+    imageUrl: string;
+};
 const Carousel = () => {
-    const [images, setImages] = useState<string[]>([]);
+    const [advertisements, setAdvertisements] = useState<Advertisement[]>([]);
+    const images = advertisements.map((e) => e.imageUrl);
 
     const fetchImages = async () => {
         const response = await newAxios.get("/api/v1/advertisement-images");
         const data = response.data.data;
-        data.map((e: any) => {
-            images.push(e.imageUrl);
-        });
-        console.log(images);
+        setAdvertisements(data);
     };
 
     useEffect(() => {
@@ -32,7 +36,15 @@ const Carousel = () => {
         <CarouselContainer>
             <CarouselWrapper translateX={currentIndex * 100} transition={isTransitioning ? `transform ${transitionTime}s ease-in-out` : "none"}>
                 {extendedImages.map((image, index) => (
-                    <CarouselSlide key={index} style={{ backgroundImage: `url(${image})` }} />
+                    <CarouselSlide
+                        key={index}
+                        style={{ backgroundImage: `url(${image})` }}
+                        onClick={() => {
+                            let adIndex = index - 1;
+                            if (adIndex < 0) adIndex += totalImages;
+                            window.open(`https://${advertisements[adIndex].linkurl}`, "_blank");
+                        }}
+                    />
                 ))}
             </CarouselWrapper>
             <PrevButton onClick={prevSlide}>
@@ -65,6 +77,7 @@ const CarouselWrapper = styled.div<{ translateX: number; transition: string }>`
 const CarouselSlide = styled.div`
     min-width: 100%;
     height: 628px;
+    background-size: cover;
     background-position: center;
 `;
 

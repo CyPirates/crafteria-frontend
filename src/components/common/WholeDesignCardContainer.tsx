@@ -1,23 +1,10 @@
 import { useEffect, useState } from "react";
 import { newAxios } from "../../utils/axiosWithUrl";
 import styled from "styled-components";
-import { useNavigate } from "react-router-dom";
-import { MdFileDownload, MdShoppingCart, MdRemoveRedEye, MdOutlineStar } from "react-icons/md";
 
 import { Design } from "../../types/DesignType";
-import { Card } from "react-bootstrap";
-import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
-import { Key } from "@mui/icons-material";
-
-const categoryKeys: Record<string, string> = {
-    INTERIOR_DECORATION: "인테리어 & 장식용",
-    PLANTER_GARDENING: "플랜테리어 / 정원용",
-    STORAGE_ORGANIZATION: "보관 & 정리용",
-    GIFTS_SOUVENIRS: "선물 & 기념품",
-    TOOLS_FUNCTIONALITY: "도구 & 기능성",
-    HOBBIES_PLAY: "취미 & 놀이",
-    COMMERCIAL_BRANDING: "상업/브랜딩",
-};
+import categoryKeys from "../../types/Category";
+import DesignCard from "./DesignCard";
 
 const WholeDesignCardContainer = () => {
     const [designList, setDesignList] = useState<Design[]>([]);
@@ -68,7 +55,7 @@ const WholeDesignCardContainer = () => {
     return (
         <>
             <Container>
-                <CategoryText>도면 장터</CategoryText>
+                <Title>도면 장터</Title>
                 <FilterTextContainer>
                     <FilterText isActive={categoryFilter == ""} onClick={() => setCategoryFilter("")}>
                         전체
@@ -97,51 +84,17 @@ const WholeDesignCardContainer = () => {
     );
 };
 
-const DesignCard = ({ designData }: { designData: Design }) => {
-    const navigate = useNavigate();
-    const { id, name, author, description, rating, price, viewCount, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl, category, downloadable } = designData;
-
-    const handleOnClick = () => {
-        navigate(`/design/${id}`);
-    };
-
-    return (
-        <>
-            <StyledCard onClick={handleOnClick}>
-                <StlRenderContainer filePath={modelFileUrl} width="230px" height="150px" clickDisabled={true} />
-                <Card.Body>
-                    <Card.Title>{name}</Card.Title>
-                    <Card.Text>
-                        <DetailText>{author.name}</DetailText>
-                        <DetailText>{categoryKeys[category]}</DetailText>
-                        <div style={{ fontSize: "16px" }}>₩{price}</div>
-                    </Card.Text>
-                </Card.Body>
-                <CardFooter>
-                    <DetailText>
-                        <MdShoppingCart /> {downloadCount}
-                    </DetailText>
-                    <DetailText>
-                        <MdRemoveRedEye /> {viewCount}
-                    </DetailText>
-                    <DetailText>
-                        <MdOutlineStar /> {rating}
-                    </DetailText>
-                </CardFooter>
-            </StyledCard>
-        </>
-    );
-};
-
 export default WholeDesignCardContainer;
 
 const Container = styled.div`
     margin-top: 50px;
 `;
-
-const CategoryText = styled.div`
+const Title = styled.div`
+    width: 100%;
     font-size: 30px;
-    margin-bottom: 40px;
+    font-weight: bold;
+    border-bottom: 1px solid #707074;
+    margin-bottom: 12px;
 `;
 
 const FilterTextContainer = styled.div`
@@ -161,52 +114,4 @@ const CardContainer = styled.div`
     margin: 0px;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-`;
-
-const StyledCard = styled(Card)`
-    width: 248px;
-    height: auto;
-    color: black;
-    margin-bottom: 4vw;
-    padding-top: 10px;
-
-    &:hover {
-        //box-shadow: 5px 5px 5px black;
-        cursor: pointer;
-    }
-
-    .card-img-top {
-        width: 230px;
-        aspect-ratio: 1.4/1;
-        object-fit: cover;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
-    }
-
-    .card-title {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-
-    .footer {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-    }
-`;
-
-const CardFooter = styled(Card.Footer)`
-    height: 36px;
-    background-color: white;
-    padding: 0 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-`;
-
-const DetailText = styled.div`
-    margin-bottom: 5px;
-    font-size: 14px;
-    color: #555;
 `;

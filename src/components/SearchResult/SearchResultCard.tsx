@@ -1,11 +1,11 @@
 import { Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
 import styled from "styled-components";
 import { Design } from "../../types/DesignType";
 import { newAxios } from "../../utils/axiosWithUrl";
 import { useState, useEffect } from "react";
 import { Company } from "../../types/CompanyType";
+import DesignCard from "../common/DesignCard";
 
 type OwnProps = {
     id: string;
@@ -51,41 +51,33 @@ const SearchResultCard = ({ id, resultType }: OwnProps) => {
         }
     };
 
-    return (
-        <>
-            <StyledCard onClick={handleCardClick}>
-                {resultType === "model" && modelData ? (
-                    <StlRenderContainer filePath={modelData.modelFileUrl} width="230px" height="150px" clickDisabled={true} />
-                ) : resultType === "manufacturer" && manufacturerData ? (
-                    <img src={manufacturerData.imageFileUrl} alt={manufacturerData.name} />
-                ) : (
-                    <div>No Data</div>
-                )}
-                <Card.Body>
-                    <Card.Title>{resultType === "model" && modelData ? modelData.name : resultType === "manufacturer" && manufacturerData ? manufacturerData.name : "No Name"}</Card.Title>
-                    <Card.Text>
-                        {resultType === "model" && modelData && (
-                            <>
-                                <DetailText>가격: {modelData.price}원</DetailText>
-                                <DetailText>
-                                    크기: {modelData.widthSize} x {modelData.lengthSize} x {modelData.heightSize}(mm)
-                                </DetailText>
-                                <DetailText>판매량: {modelData.downloadCount}</DetailText>
-                                <DetailText>조회수: {modelData.viewCount}</DetailText>
-                            </>
-                        )}
-                        {resultType === "manufacturer" && manufacturerData && (
-                            <>
-                                <DetailText>제조 수 : {manufacturerData.equipmentList.length}</DetailText>
-                                <DetailText>주소: {manufacturerData.address}</DetailText>
-                                <DetailText>평점: {manufacturerData.rating}</DetailText>
-                            </>
-                        )}
-                    </Card.Text>
-                </Card.Body>
-            </StyledCard>
-        </>
-    );
+    if (modelData) {
+        return <DesignCard designData={modelData} />;
+    }
+
+    if (manufacturerData) {
+        return (
+            <>
+                <StyledCard onClick={handleCardClick}>
+                    <img className="profile-image" src={manufacturerData.imageFileUrl} alt={manufacturerData.name} />
+                    <Card.Body>
+                        <Card.Title>{manufacturerData ? manufacturerData.name : "No Name"}</Card.Title>
+                        <Card.Text>
+                            {resultType === "manufacturer" && manufacturerData && (
+                                <>
+                                    <DetailText>제조 수 : {manufacturerData.equipmentList.length}</DetailText>
+                                    <DetailText>주소: {manufacturerData.address}</DetailText>
+                                    <DetailText>평점: {manufacturerData.rating}</DetailText>
+                                </>
+                            )}
+                        </Card.Text>
+                    </Card.Body>
+                </StyledCard>
+            </>
+        );
+    }
+
+    return <div>No Data</div>;
 };
 
 export default SearchResultCard;
@@ -99,6 +91,13 @@ const StyledCard = styled(Card)`
 
     &:hover {
         cursor: pointer;
+    }
+
+    .profile-image {
+        width: 230px;
+        height: 230px;
+        object-fit: cover;
+        margin: 0 auto;
     }
 
     .card-img-top {

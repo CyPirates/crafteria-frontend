@@ -110,7 +110,7 @@ const DesignDetailPage = () => {
                 const { paymentId, id } = response.data.data;
                 console.log(response.data.data);
                 if (paymentId && id) {
-                    const isPaymentSuccess = await initiatePortOnePayment(paymentId, id, price.toString(), "modelId");
+                    const isPaymentSuccess = await initiatePortOnePayment(paymentId, id, (+price * 1.1).toString(), "modelId");
                     if (isPaymentSuccess) {
                         navigate("/my-design");
                     }
@@ -119,8 +119,13 @@ const DesignDetailPage = () => {
             if (response.data.status === 400) {
                 alert("purchase" + response.data.message);
             }
-        } catch (e) {
-            console.log(e);
+        } catch (e: any) {
+            if (e.response.status === 401) {
+                const isConfirm = window.confirm("로그인이 필요한 서비스 입니다.");
+                if (isConfirm) {
+                    navigate("/login");
+                }
+            }
         }
     };
 
@@ -135,7 +140,7 @@ const DesignDetailPage = () => {
                     <DetailContainer>
                         <Detail>
                             <DetailTitle>가격</DetailTitle>
-                            <DetailContent>{price}원</DetailContent>
+                            <DetailContent>{+price * 1.1}원(VAT포함)</DetailContent>
                         </Detail>
                         <Detail>
                             <DetailTitle>판매량</DetailTitle>

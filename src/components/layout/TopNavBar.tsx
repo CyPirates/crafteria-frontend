@@ -1,19 +1,19 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { AiOutlineUser } from "react-icons/ai";
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../../store/store";
 import { toggleTheme } from "../../store/themeSlice";
 
-import LoginModal from "../specific/login/LoginModal";
 import Logo from "../../assets/logo.png";
+
 import { newAxios } from "../../utils/axiosWithUrl";
 import { User } from "../../types/UserType";
 import CartDropdown from "./CartDropdown";
 import SearchBar from "./SearchBar";
 import UserMenuDropdown from "./UserMenuDropdown";
+import levelImagesArray from "../common/LevelImagesArray";
 
 const TopNavBar = () => {
     const navigate = useNavigate();
@@ -38,6 +38,8 @@ const TopNavBar = () => {
             try {
                 const response = await newAxios.get("/api/v1/users/me", { headers: { Authorization: `Bearer ${token}` } });
                 setUserData(response.data.data);
+                localStorage.setItem("realname", response.data.data.realname);
+                console.log(response.data.data);
             } catch (e: any) {
                 if (e.response.status == 401) {
                     alert("로그인 세션이 만료되었습니다.");
@@ -75,7 +77,12 @@ const TopNavBar = () => {
                         </NavMenu>
                     </NavMenuContainer>
                     <SearchBar />
-                    {userData ? <div>{userData.realname}님</div> : null}
+                    {userData ? (
+                        <>
+                            <img src={levelImagesArray[userData.userLevel]} alt="레벨" width={24} height={24} />
+                            <div>{userData.realname}님</div>
+                        </>
+                    ) : null}
                     <LoginButton onClick={handleLoginClick}>{localStorage.getItem("accessToken") ? null : "로그인"}</LoginButton>
                     <CartDropdown />
                     <UserMenuDropdown />
@@ -130,7 +137,7 @@ const LogoImage = styled.img`
 `;
 
 const NavMenuContainer = styled.div`
-    width: 500px;
+    width: 480px;
     margin-right: 20px;
     display: flex;
     justify-content: space-between;

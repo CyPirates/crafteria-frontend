@@ -59,6 +59,7 @@ const DesignList = () => {
 
     return (
         <>
+            <Title>내 도면</Title>
             <HeaderContainer>
                 <FilterText isActive={!isPublished} onClick={() => handleFilterClick(false)}>
                     구매한 도면
@@ -92,6 +93,14 @@ const PageWrapper = styled.div`
     display: flex;
     flex-direction: row;
     gap: 40px;
+`;
+
+const Title = styled.div`
+    width: 100%;
+    font-size: 30px;
+    font-weight: bold;
+    border-bottom: 1px solid #707074;
+    margin-bottom: 12px;
 `;
 
 const DesignListContainer = styled.div``;
