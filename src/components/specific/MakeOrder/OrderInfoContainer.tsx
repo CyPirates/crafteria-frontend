@@ -114,9 +114,9 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             const { paymentId, orderId } = response.data.data;
             console.log(paymentId, orderId);
             if (paymentId && orderId) {
-                const isPaymentSuccess = await initiatePortOnePayment(paymentId, orderId, price.toString(), "orderId");
+                const isPaymentSuccess = await initiatePortOnePayment(paymentId, orderId, (price * 1.1 + 3000).toString(), "orderId");
                 if (isPaymentSuccess) {
-                    navigate("/my-design");
+                    navigate("/my-order");
                 }
             }
         } catch (e) {
@@ -155,8 +155,20 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                 <Title>결제 정보</Title>
                 <InformationContainer>
                     <RowGrid>
-                        <InfoTitle>총 가격</InfoTitle>
+                        <InfoTitle>프린트 가격</InfoTitle>
                         <InfoContent>{price} 원</InfoContent>
+                    </RowGrid>
+                    <RowGrid>
+                        <InfoTitle>부가세</InfoTitle>
+                        <InfoContent>{price * 0.1} 원</InfoContent>
+                    </RowGrid>
+                    <RowGrid>
+                        <InfoTitle>배송비</InfoTitle>
+                        <InfoContent>3000 원</InfoContent>
+                    </RowGrid>
+                    <RowGrid>
+                        <InfoTitle>총 가격</InfoTitle>
+                        <InfoContent>{price * 1.1 + 3000} 원</InfoContent>
                     </RowGrid>
                 </InformationContainer>
                 <SubmitButton onClick={handleSubmit}>주문하기</SubmitButton>
