@@ -24,6 +24,7 @@ import MyOrderPage from "./pages/MyOrderPage";
 import LoginPage from "./pages/LoginPage";
 import BottomBar from "./components/layout/BottomBar";
 import MyPage from "./pages/MyPage";
+import PoliciesPage from "./pages/PoliciesPage";
 
 const App: React.FC = () => {
     const isLight = useSelector((state: RootState) => state.theme.isLight);
@@ -52,6 +53,7 @@ const App: React.FC = () => {
                                     <Route path="/company-detail/:id" element={<AboutPage />} />
                                     <Route path="/search" element={<SearchResultPage />} />
                                     <Route path="my-page" element={<MyPage />} />
+                                    <Route path="/policies/:type" element={<PoliciesPage />} />
                                 </Routes>
                             </ContentContainer>
                         </div>
