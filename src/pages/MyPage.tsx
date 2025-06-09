@@ -74,6 +74,7 @@ const MyPage = () => {
                 ) : (
                     <div style={{ fontWeight: "bold" }}>{userData.username ? userData.username : userData.realname}</div>
                 )}
+                <div style={{ color: "#707074" }}>{userData.oauth2Id}</div>
 
                 <BlackButton style={{ width: "60px", height: "24px", fontSize: "14px" }} onClick={handleNameEditButtonClick}>
                     {isNameEdited ? "저장" : "수정"}
