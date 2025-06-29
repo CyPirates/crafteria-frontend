@@ -53,6 +53,14 @@ const MyPage = () => {
     };
     const handleNameEditButtonClick = async () => {
         if (isNameEdited) {
+            if (newName.trim().length === 0) {
+                alert("이름을 입력해주세요.");
+                return;
+            }
+            if (newName.length > 12) {
+                alert("이름은 12글자를 초과할 수 없습니다.");
+                return;
+            }
             await postUserData("name");
             fetchUserData();
         }
@@ -70,7 +78,7 @@ const MyPage = () => {
             <ColoumnContainer>
                 <PiUserCircleLight size={"12em"} />
                 {isNameEdited ? (
-                    <input value={newName} onChange={(e) => setNewName(e.target.value)} />
+                    <input value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={12} />
                 ) : (
                     <div style={{ fontWeight: "bold" }}>{userData.username ? userData.username : userData.realname}</div>
                 )}
