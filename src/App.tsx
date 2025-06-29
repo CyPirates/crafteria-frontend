@@ -25,23 +25,29 @@ import LoginPage from "./pages/LoginPage";
 import BottomBar from "./components/layout/BottomBar";
 import MyPage from "./pages/MyPage";
 import PoliciesPage from "./pages/PoliciesPage";
+import CouponBoxPage from "./pages/CouponBoxPage";
 
-const App: React.FC = () => {
+const AppRoutes: React.FC = () => {
+    const location = useLocation();
     const isLight = useSelector((state: RootState) => state.theme.isLight);
+
     return (
-        <>
-            <CartProvider>
-                <ThemeProvider theme={isLight ? lightTheme : darkTheme}>
-                    <GlobalStyle />
-                    <BrowserRouter>
-                        <div className="App">
-                            <ScrollToTop />
-                            <ConditionalTopNavBar /> {/* 수정된 부분 */}
+        <ThemeProvider theme={isLight ? lightTheme : darkTheme}>
+            <GlobalStyle />
+            <ScrollToTop />
+            <Routes>
+                <Route path="/coupon" element={<CouponBoxPage />} />
+                {/* 레이아웃 적용되는 페이지들 */}
+                <Route
+                    path="*"
+                    element={
+                        <>
+                            {location.pathname !== "/login" && <TopNavBar />}
                             <ContentContainer>
                                 <Routes>
                                     <Route path="/" element={<Navigate to="/home" />} />
                                     <Route path="/home" element={<HomePage />} />
-                                    <Route path="login" element={<LoginPage />} />
+                                    <Route path="/login" element={<LoginPage />} />
                                     <Route path="/design-market" element={<DesignMarket />} />
                                     <Route path="/my-design" element={<MyDesignPage />} />
                                     <Route path="/design/:id" element={<DesignDetailPage />} />
@@ -52,31 +58,32 @@ const App: React.FC = () => {
                                     <Route path="/createReview/:id" element={<CreateReviewPage />} />
                                     <Route path="/company-detail/:id" element={<AboutPage />} />
                                     <Route path="/search" element={<SearchResultPage />} />
-                                    <Route path="my-page" element={<MyPage />} />
+                                    <Route path="/my-page" element={<MyPage />} />
                                     <Route path="/policies/:type" element={<PoliciesPage />} />
                                 </Routes>
                             </ContentContainer>
-                        </div>
-                        <BottomBar />
-                    </BrowserRouter>
-                </ThemeProvider>
-            </CartProvider>
-        </>
+                            {location.pathname !== "/login" && <BottomBar />}
+                        </>
+                    }
+                />
+            </Routes>
+        </ThemeProvider>
     );
 };
 
-const ConditionalTopNavBar = () => {
-    const location = useLocation();
-    return location.pathname === "/login" ? null : <TopNavBar />;
+const App: React.FC = () => {
+    return (
+        <Provider store={store}>
+            <CartProvider>
+                <BrowserRouter>
+                    <AppRoutes />
+                </BrowserRouter>
+            </CartProvider>
+        </Provider>
+    );
 };
 
-const Root: React.FC = () => (
-    <Provider store={store}>
-        <App />
-    </Provider>
-);
-
-export default Root;
+export default App;
 
 const ContentContainer = styled.div`
     width: 1300px;

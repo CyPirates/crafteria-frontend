@@ -8,7 +8,7 @@ import categoryKeys from "../../types/Category";
 
 const DesignCard = ({ designData }: { designData: Design }) => {
     const navigate = useNavigate();
-    const { id, name, author, description, rating, price, viewCount, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl, category, downloadable } = designData;
+    const { id, name, author, description, rating, price, viewCount, downloadCount, modelFileUrl, category, downloadable } = designData;
 
     const handleOnClick = () => {
         navigate(`/design/${id}`);

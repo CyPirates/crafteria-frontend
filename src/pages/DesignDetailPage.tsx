@@ -9,11 +9,13 @@ import { newAxios } from "../utils/axiosWithUrl";
 import { useCart } from "../hooks/useCart";
 import initiatePortOnePayment from "../utils/requestPayment";
 import getStlModelVolume from "../utils/getStlModelVolume";
+import BuyDesignPopUp from "../components/specific/designDetail/BuyDesignPopUp";
 
 const DesignDetailPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
+    const [isOpen, setIsOpen] = useState<boolean>(false);
     const [design, setDesign] = useState<Design | undefined>(undefined);
     const [modelVolume, setModelVolume] = useState<number>(0);
     const categoryKeys = {
@@ -93,20 +95,26 @@ const DesignDetailPage = () => {
                 console.log(e);
             }
         } else {
-            handlePurchase();
+            //handlePurchase();
+            setIsOpen(true);
         }
     };
 
     const handlePurchase = async () => {
-        console.log("11111");
         try {
-            const response = await newAxios.post(`/api/v1/model/user/purchase/${id}`, null, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                },
-            });
+            const response = await newAxios.post(
+                `/api/v1/model/user/purchase/${id}`,
+                { modelId: id, couponId: null },
+                {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                    },
+                }
+            );
             console.log(response.data.status);
-            if (response.data.status === 200) {
+            if (response.data.status === 400) {
+                alert("purchase" + response.data.message);
+            } else {
                 const { paymentId, id } = response.data.data;
                 console.log(response.data.data);
                 if (paymentId && id) {
@@ -115,9 +123,6 @@ const DesignDetailPage = () => {
                         navigate("/my-design");
                     }
                 }
-            }
-            if (response.data.status === 400) {
-                alert("purchase" + response.data.message);
             }
         } catch (e: any) {
             if (e.response.status === 401) {
@@ -131,6 +136,7 @@ const DesignDetailPage = () => {
 
     return (
         <PageWrapper>
+            {isOpen && <BuyDesignPopUp handleOnClick={setIsOpen} name={name} price={+price} filePath={modelFileUrl} id={id} />}
             <OutlineContainer>
                 <StlRenderContainer filePath={modelFileUrl} width="500px" height="500px" />
                 <OutlineContentContainer>

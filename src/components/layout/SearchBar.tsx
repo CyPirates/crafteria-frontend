@@ -36,7 +36,7 @@ const SearchContainer = styled.form`
     border: 1px solid #ccc;
     border-radius: 20px;
     padding: 5px;
-    width: 340px;
+    width: 400px;
     height: 32px;
 `;
 

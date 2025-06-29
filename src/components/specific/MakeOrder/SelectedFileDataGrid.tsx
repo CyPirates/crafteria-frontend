@@ -20,6 +20,7 @@ import { PrintOrderData } from "../../../types/OrderType";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import getStlModelVolume from "../../../utils/getStlModelVolume";
+import convertHoursToDHM from "../../../utils/convertHoursToDHM";
 
 type Column = {
     id: "fileUrl" | "magnification" | "quantity" | "materialType" | "color" | "delete" | "time" | "price";
@@ -30,14 +31,14 @@ type Column = {
 };
 
 const columns: Column[] = [
-    { id: "fileUrl", label: "도면", width: 120 },
+    { id: "fileUrl", label: "도면", width: 112 },
     { id: "magnification", label: "배율", width: 120 },
     { id: "quantity", label: "수량", width: 120 },
-    { id: "materialType", label: "재료타입", width: 140 },
+    { id: "materialType", label: "재료타입", width: 120 },
     { id: "color", label: "색상", width: 100 },
-    { id: "time", label: "예상 출력 시간(시간)", width: 160 },
+    { id: "time", label: "예상 출력 시간", width: 200 },
     { id: "price", label: "가격(원)", width: 120 },
-    { id: "delete", label: "", align: "right" },
+    { id: "delete", label: "", width: 20, align: "right" },
 ];
 
 type OwnProps = {
@@ -58,17 +59,17 @@ const calculateAndRoundPrintTime = (magnification: number, volume: number | unde
     if (volume === undefined || volume === null || isNaN(volume) || printSpeed === undefined || printSpeed === null || isNaN(printSpeed) || printSpeed === 0) {
         return "계산 불가";
     }
-    const calculatedTime = (magnification * volume) / printSpeed; // 분 단위로 가정
+    const calculatedTime = (magnification * volume) / printSpeed; // hour 단위
     if (isNaN(calculatedTime)) {
         return "계산 불가";
     }
-    // 10의 자리에서 반올림 (분 단위)
-    return Math.round(calculatedTime / 10) * 10;
+    // 10의 자리에서 반올림
+    return Math.round(calculatedTime * 10) / 10;
 };
 
 const calculatePrice = (
     materialPrice: number | undefined,
-    time: number | string | undefined, // 분 단위 시간
+    time: number | string | undefined, // 시간 단위
     quantity: number
 ): number | string => {
     if (materialPrice && time) {
@@ -199,8 +200,8 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                 </label>
                 <input type="file" accept=".stl" id="file-upload" style={{ display: "none" }} onChange={handleFileUpload} />
             </ButtonContainer>
-            <Paper sx={{ width: "900px", overflow: "hidden" }}>
-                <TableContainer sx={{ width: "900px", maxHeight: `${maxHeightForFiveItems}px` }}>
+            <Paper sx={{ width: "956px", overflow: "hidden" }}>
+                <TableContainer sx={{ width: "956px", maxHeight: `${maxHeightForFiveItems}px` }}>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
                             <TableRow>
@@ -225,7 +226,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                                                 return (
                                                     <TableCell key={column.id} align={column.align}>
                                                         {/* 상태 값을 표시하거나, 표시용 계산값을 사용 */}
-                                                        {row.time ?? displayTime ?? "계산 불가"}
+                                                        {convertHoursToDHM(+displayTime) ?? "계산 불가"}
                                                     </TableCell>
                                                 );
                                             }
@@ -235,7 +236,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                                                 return (
                                                     <TableCell key={column.id} align={column.align}>
                                                         {/* 상태에 저장된 price 표시 */}
-                                                        {row.price ?? "계산 불가"}
+                                                        {row.price}
                                                     </TableCell>
                                                 );
                                             }
@@ -258,7 +259,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                                             if (column.id === "fileUrl") {
                                                 return (
                                                     <TableCell key={column.id} align={column.align} style={{ display: "flex", alignItems: "center" }}>
-                                                        <StlRenderContainer key={column.id} filePath={value!.toString()} width="120px" height="120px" clickDisabled={true} />
+                                                        <StlRenderContainer key={column.id} filePath={value!.toString()} width="112px" height="112px" clickDisabled={true} />
                                                     </TableCell>
                                                 );
                                             }
@@ -344,7 +345,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
 
 // Styled-components 정의 (기존 코드 유지)
 const Container = styled.div`
-    width: 900px;
+    width: 960px;
 `;
 
 const ButtonContainer = styled.div`
@@ -368,7 +369,7 @@ const SelectFileButton = styled.div`
     font-weight: 500;
 
     &:hover {
-        background-color: #4682b4;
+        background-color: #2e2e2e;
     }
 `;
 

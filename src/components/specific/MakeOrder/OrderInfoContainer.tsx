@@ -8,6 +8,8 @@ import { newAxios } from "../../../utils/axiosWithUrl";
 import convertURLToFile from "../../../utils/convertUrlToFile";
 import initiatePortOnePayment from "../../../utils/requestPayment";
 import { useNavigate } from "react-router-dom";
+import CouponBoxPage from "../../../pages/CouponBoxPage";
+import { Coupon } from "../../../types/CouponType";
 
 type OrderInfoProps = {
     printOrders: PrintOrderData[];
@@ -22,10 +24,15 @@ type ModalProps = {
 
 const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     const navigate = useNavigate();
-    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isDesignSelectOpen, setIsDesignSelectOpen] = useState<boolean>(false);
+    const [isCouponOpen, setIsCouponOpen] = useState<boolean>(false);
+    const [coupon, setCoupon] = useState<Coupon | null>(null);
     const [zipcode, setZipcode] = useState<string>("");
     const [address, setAddress] = useState<string>("");
     const [price, setPrice] = useState<number>(0);
+    const [discountedPrice, setDiscountedPrice] = useState<number>(0);
+    const [vat, setVat] = useState<number>(0);
+    const [finalPrice, setFinalPrice] = useState<number>(0);
     const { value: detailAddress, onChange: setDetailAddress } = useInput("");
     const [submittedData, setSubmittedData] = useState<SubmittedOrder>({
         manufactureId: company.id,
@@ -39,6 +46,21 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
         specialRequest: "",
         files: [],
     });
+
+    useEffect(() => {
+        setVat(Math.ceil(price * 0.1));
+        const shipping = 3000;
+        if (!coupon) {
+            setFinalPrice(price + vat + shipping);
+            return;
+        }
+        const newDiscountedPrice = price - Math.min(+coupon.maxDiscountAmount, Math.floor((price * +coupon.discountRate) / 100));
+        const discountedVAT = Math.ceil(newDiscountedPrice * 0.1);
+        setDiscountedPrice(newDiscountedPrice);
+        setVat(discountedVAT);
+
+        setFinalPrice(newDiscountedPrice + discountedVAT + shipping);
+    }, [price, coupon]);
 
     useEffect(() => {
         console.log(printOrders);
@@ -70,7 +92,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     }, [detailAddress, address]);
 
     const handleIsOpen = () => {
-        setIsOpen((prev) => !prev);
+        setIsDesignSelectOpen((prev) => !prev);
     };
 
     const handleOnchange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -94,9 +116,12 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                 recipientPhone: submittedData.recipentPhone,
                 recipientEmail: "example@naver.com",
                 specialRequest: submittedData.specialRequest,
+                couponId: coupon ? coupon.id : null,
             })
         );
-
+        for (const [key, value] of formData.entries()) {
+            console.log(key, value);
+        }
         for (let i = 0; i < submittedData.files.length; i++) {
             const file = await convertURLToFile(submittedData.files[i], i);
             if (file) formData.append("files", file);
@@ -114,7 +139,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             const { paymentId, orderId } = response.data.data;
             console.log(paymentId, orderId);
             if (paymentId && orderId) {
-                const isPaymentSuccess = await initiatePortOnePayment(paymentId, orderId, (price * 1.1 + 3000).toString(), "orderId");
+                const isPaymentSuccess = await initiatePortOnePayment(paymentId, orderId, finalPrice.toString(), "orderId");
                 if (isPaymentSuccess) {
                     navigate("/my-order");
                 }
@@ -126,17 +151,26 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
 
     return (
         <>
+            {isCouponOpen && (
+                <CouponOverlay onClick={() => setIsCouponOpen(false)}>
+                    <CouponModalContainer onClick={(e) => e.stopPropagation()}>
+                        <CouponBoxPage isCouponUseMode={true} couponType="ORDER_PURCHASE" handleCouponSelect={setCoupon} price={price} setIsOpen={setIsCouponOpen} />
+                    </CouponModalContainer>
+                </CouponOverlay>
+            )}
             <UserArea>
                 <Title>배송지 입력</Title>
                 <AddressInputContainer>
-                    <ZipcodeAndButton>
+                    <RowContainer>
                         <ZipcodeInput placeholder="우편번호" disabled={true} value={zipcode} />
-                        <SearchAddressButton onClick={handleIsOpen}>주소 찾기</SearchAddressButton>
-                    </ZipcodeAndButton>
+                        <Button style={{ width: "100px", height: "40px" }} onClick={handleIsOpen}>
+                            주소 찾기
+                        </Button>
+                    </RowContainer>
                     <AddressInput placeholder="도로명 주소" disabled={true} value={address} />
                     <AddressInput placeholder="상세 주소" value={detailAddress} onChange={setDetailAddress} />
                 </AddressInputContainer>
-                {isOpen && <Modal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
+                {isDesignSelectOpen && <Modal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
                 <Title>구매자 정보</Title>
                 <InformationContainer>
                     <RowGrid>
@@ -152,15 +186,21 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                         <InformationInput id="specialRequest" onChange={handleOnchange} />
                     </RowGrid>
                 </InformationContainer>
-                <Title>결제 정보</Title>
+                <Title>
+                    결제 정보{" "}
+                    <Button style={{ width: "80px", height: "24px", fontSize: "14px" }} onClick={() => setIsCouponOpen(true)}>
+                        쿠폰 사용
+                    </Button>
+                </Title>
                 <InformationContainer>
                     <RowGrid>
                         <InfoTitle>프린트 가격</InfoTitle>
-                        <InfoContent>{price} 원</InfoContent>
+                        <InfoContent style={{ textDecoration: coupon ? "line-through" : "none", color: coupon ? "#858585" : "black" }}>{price} 원</InfoContent>
+                        {coupon && <InfoContent style={{ color: "red" }}>{discountedPrice} 원</InfoContent>}
                     </RowGrid>
                     <RowGrid>
-                        <InfoTitle>부가세</InfoTitle>
-                        <InfoContent>{price * 0.1} 원</InfoContent>
+                        <InfoTitle>VAT</InfoTitle>
+                        <InfoContent>{vat} 원</InfoContent>
                     </RowGrid>
                     <RowGrid>
                         <InfoTitle>배송비</InfoTitle>
@@ -168,7 +208,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                     </RowGrid>
                     <RowGrid>
                         <InfoTitle>총 가격</InfoTitle>
-                        <InfoContent>{price * 1.1 + 3000} 원</InfoContent>
+                        <InfoContent>{finalPrice} 원</InfoContent>
                     </RowGrid>
                 </InformationContainer>
                 <SubmitButton onClick={handleSubmit}>주문하기</SubmitButton>
@@ -216,29 +256,29 @@ const Title = styled.div`
     font-size: 20px;
     font-weight: bold;
     border-bottom: 1px solid #707074;
+
+    display: flex;
+    align-items: center;
 `;
 
 const AddressInputContainer = styled.div``;
 
-const ZipcodeAndButton = styled.div`
+const RowContainer = styled.div`
     display: flex;
-    gap: 20px;
 `;
 
 const ZipcodeInput = styled.input`
     width: 120px;
     height: 40px;
     font-size: 15px;
+    margin-bottom: 12px;
 `;
 
-const SearchAddressButton = styled.div`
-    width: 100px;
-    height: 40px;
+const Button = styled.button`
     background-color: #000000;
     color: white;
     border-radius: 3px;
-    margin-bottom: 10px;
-
+    margin-left: 12px;
     cursor: pointer;
 
     display: flex;
@@ -246,7 +286,7 @@ const SearchAddressButton = styled.div`
     align-items: center;
 
     &:hover {
-        background-color: #4682b4;
+        background-color: #2e2e2e;
     }
 `;
 
@@ -254,7 +294,7 @@ const AddressInput = styled.input`
     width: 360px;
     height: 40px;
     font-size: 15px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 `;
 
 const ModalOverlay = styled.div`
@@ -309,7 +349,7 @@ const SubmitButton = styled.div`
 
     cursor: pointer;
     &:hover {
-        background-color: #4682b4;
+        background-color: #2e2e2e;
     }
     display: flex;
     justify-content: center;
@@ -317,4 +357,23 @@ const SubmitButton = styled.div`
 
     position: absolute;
     bottom: 20px;
+`;
+
+const CouponOverlay = styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; // BuyDesignPopUp보다 높게
+`;
+
+const CouponModalContainer = styled.div`
+    background-color: white;
+    width: 520px;
+    height: 860px;
 `;

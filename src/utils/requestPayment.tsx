@@ -5,7 +5,7 @@ const initiatePortOnePayment = async (paymentId: string, orderId: string, price:
     try {
         const response = await PortOne.requestPayment({
             storeId: "store-fac07677-97a5-457e-a490-fa243d2d40d1",
-            channelKey: "channel-key-34aa25bf-744d-40bf-bb55-99ca683c7fbf",
+            channelKey: "channel-key-266ff6b5-c9ca-4704-912d-8c1b355ed13e",
             paymentId: paymentId,
             orderName: "주문하기",
             // must +price
@@ -15,6 +15,7 @@ const initiatePortOnePayment = async (paymentId: string, orderId: string, price:
             customData: {},
             customer: {
                 fullName: localStorage.getItem("realname")?.toString(),
+                email: localStorage.getItem("email")?.toString(),
             },
         });
         if (response?.code) {

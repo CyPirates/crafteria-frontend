@@ -30,6 +30,15 @@ const TopNavBar = () => {
         navigate("/login");
     };
 
+    const openCouponBox = () => {
+        const width = 520;
+        const height = 860;
+        const url = "/coupon"; // 절대 경로로 바꾸고 싶다면 origin 붙이기
+
+        const features = `width=${width},height=${height},resizable=no,scrollbars=no`;
+        window.open(url, "_blank", features);
+    };
+
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         if (token == null) return;
@@ -39,6 +48,7 @@ const TopNavBar = () => {
                 const response = await newAxios.get("/api/v1/users/me", { headers: { Authorization: `Bearer ${token}` } });
                 setUserData(response.data.data);
                 localStorage.setItem("realname", response.data.data.realname);
+                localStorage.setItem("email", response.data.data.oauth2Id);
                 console.log(response.data.data);
             } catch (e: any) {
                 if (e.response.status == 401) {
@@ -77,15 +87,23 @@ const TopNavBar = () => {
                         </NavMenu>
                     </NavMenuContainer>
                     <SearchBar />
-                    {userData ? (
-                        <>
-                            <img src={levelImagesArray[userData.userLevel]} alt="레벨" width={24} height={24} />
-                            <div>{userData.realname}님</div>
-                        </>
-                    ) : null}
-                    <LoginButton onClick={handleLoginClick}>{localStorage.getItem("accessToken") ? null : "로그인"}</LoginButton>
-                    <CartDropdown />
-                    <UserMenuDropdown />
+                    <UserInfoArea>
+                        {userData ? (
+                            <>
+                                <div>
+                                    <img src={levelImagesArray[Math.min(userData.userLevel, 4)]} alt="레벨" width={24} height={24} />
+                                    {userData.realname}님
+                                </div>
+
+                                <CartDropdown />
+                                <UserMenuDropdown />
+                                <LoginButton onClick={openCouponBox}>쿠폰함</LoginButton>
+                            </>
+                        ) : (
+                            <LoginButton onClick={handleLoginClick}>로그인</LoginButton>
+                        )}
+                    </UserInfoArea>
+
                     {/* <button onClick={() => dispatch(toggleTheme())}>{isLight ? "라이트모드" : "다크모드"}</button> */}
                 </ContentsContainer>
             </NavContainer>
@@ -111,7 +129,7 @@ const NavContainer = styled.div`
 `;
 
 const ContentsContainer = styled.div`
-    width: 1300px;
+    width: 1500px;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -138,7 +156,7 @@ const LogoImage = styled.img`
 
 const NavMenuContainer = styled.div`
     width: 480px;
-    margin-right: 20px;
+    margin-right: 40px;
     display: flex;
     justify-content: space-between;
 `;
@@ -148,6 +166,7 @@ const NavMenu = styled(Link)<{ isActive: boolean }>`
     font-size: 18px;
     color: ${({ isActive }) => (isActive ? "#F4351D" : "#a5a5a7")};
     font-weight: ${({ isActive }) => (isActive ? "bold" : "normal")};
+    border-bottom: ${({ isActive }) => (isActive ? "2px solid #F4351D" : "none")};
 
     &:hover {
         font-weight: bold;
@@ -162,4 +181,11 @@ const LoginButton = styled.div`
     &:hover {
         font-weight: bold;
     }
+`;
+
+const UserInfoArea = styled.div`
+    flex: 1;
+    padding: 0 20px;
+    display: flex;
+    gap: 20px;
 `;
