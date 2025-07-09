@@ -1,6 +1,8 @@
 export type User = {
     id: string;
     oauth2Id: string;
+    banned: boolean;
+    banUntil: string;
     realname: string;
     role: string;
     username: string | null;

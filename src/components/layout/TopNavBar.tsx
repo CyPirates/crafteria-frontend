@@ -62,6 +62,16 @@ const TopNavBar = () => {
         fetchUserData();
     }, []);
 
+    useEffect(() => {
+        const checkIsBanned = () => {
+            if (!userData || !userData.banned) return;
+            alert("사용 정지된 회원입니다.\n관리자에게 문의해주세요.\n 기간: " + userData.banUntil);
+            localStorage.removeItem("accessToken");
+            window.location.reload();
+        };
+        checkIsBanned();
+    }, [userData]);
+
     return (
         <>
             <NavContainer>
@@ -129,7 +139,7 @@ const NavContainer = styled.div`
 `;
 
 const ContentsContainer = styled.div`
-    width: 1500px;
+    min-width: 1500px;
     display: flex;
     flex-direction: row;
     align-items: center;

@@ -3,24 +3,34 @@ import { FetchedOrder } from "../../../types/OrderType";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { useNavigate } from "react-router-dom";
 import { newAxios } from "../../../utils/axiosWithUrl";
+import { useEffect, useState } from "react";
+import convertMaterialName from "../../../utils/convertMaterialName";
 
 type OrderCardProps = {
     data: FetchedOrder;
 };
 
+type ModelOrder = {
+    modelFileUrl: string;
+    magnification: number;
+    quantity: number;
+    materialType: string;
+    color: string;
+};
+
 const OrderCard = ({ data }: OrderCardProps) => {
-    const { status, modelFileUrls, orderItems, purchasePrice, orderId } = data;
+    const { status, modelFileUrls, orderItems, purchasePrice, orderId, orderDate } = data;
+    const [modelData, setModelData] = useState<ModelOrder[]>([]);
     const navigate = useNavigate();
-    const convertStatusToString = (status: string) => {
-        switch (status) {
-            case "ORDERED":
-                return "출력 대기";
-            case "IN_PRODUCTING":
-                return "출력 중";
-            case "DELIVERED":
-                return "배송 중";
-        }
+    const statusMap = {
+        PAID: "출력 대기",
+        IN_PRODUCTING: "출력 중",
+        PRODUCTED: "출력 완료",
+        DELIVERING: "배송 중",
+        DELIVERED: "배송 완료",
+        CANCELED: "주문 취소",
     };
+
     const handleCancel = async () => {
         const token = localStorage.getItem("accessToken");
         const response = await newAxios.post(`/api/v1/order/my/cancel/${orderId}`, null, {
@@ -31,60 +41,92 @@ const OrderCard = ({ data }: OrderCardProps) => {
         console.log(response.data.data);
         window.location.reload();
     };
-    let convertedStatus = convertStatusToString(data.status);
+
+    useEffect(() => {
+        modelFileUrls.map(async (url, i) => {
+            const { magnification, quantity, technologyId } = orderItems[i];
+            const newModelOrderData: ModelOrder = { modelFileUrl: url, magnification: magnification, quantity: quantity, materialType: "", color: "" };
+            const response = await newAxios.get(`/api/v1/technologies/${technologyId}`);
+            newModelOrderData.materialType = response.data.data.material;
+            newModelOrderData.color = response.data.data.colorValue;
+            setModelData((prev) => [...prev, newModelOrderData]);
+        });
+    }, [data]);
     return (
-        <>
-            <CardWrapper>
-                <Status>{convertedStatus}</Status>
+        <CardWrapper>
+            <Title>
+                <span>{orderDate.split("T")[0]} 주문</span>
+                <span>{purchasePrice}원</span>
+            </Title>
+            <ContentsContainer>
+                <Status>{statusMap[status]}</Status>
                 <RowContainer>
                     <ColumnContainer>
-                        {modelFileUrls.map((e, i) => {
+                        {modelData.map((e, i) => {
                             return (
                                 <ItemContainer>
-                                    <StlRenderContainer filePath={e} width="100px" height="100px" clickDisabled={true} />
+                                    <StlRenderContainer filePath={e.modelFileUrl} width="100px" height="100px" clickDisabled={true} />
                                     <TextContainer>
                                         <Text style={{ whiteSpace: "pre-line" }}></Text>
-                                        <Text>
-                                            재료타입, 색상, {orderItems[i].magnification}배, {orderItems[i].quantity}개
+                                        <Text style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                            <div style={{ backgroundColor: e.color, width: "16px", height: "16px" }} />
+                                            {convertMaterialName(e.materialType)}, {e.magnification}배, {e.quantity}개
                                         </Text>
                                     </TextContainer>
                                 </ItemContainer>
                             );
                         })}
-
-                        <TextContainer>
-                            <Text>총 {purchasePrice}원</Text>
-                        </TextContainer>
                     </ColumnContainer>
                     <ButtonContainer>
-                        {status === "ORDERED" ? <ReviewButton onClick={handleCancel}>주문취소</ReviewButton> : null}
-                        {status === "DELIVERED" ? <ReviewButton onClick={() => navigate(`/createReview/${data.manufacturerId}`)}>리뷰쓰기</ReviewButton> : null}
+                        {status === "PAID" ? <Button onClick={handleCancel}>주문취소</Button> : null}
+                        {status === "DELIVERED" ? <Button onClick={() => navigate(`/createReview/${data.manufacturerId}`)}>리뷰쓰기</Button> : null}
                     </ButtonContainer>
                 </RowContainer>
-            </CardWrapper>
-        </>
+            </ContentsContainer>
+        </CardWrapper>
     );
 };
 
 export default OrderCard;
 
 const CardWrapper = styled.div`
-    width: 700px;
+    width: 720px;
     height: auto;
-    padding: 15px;
+    padding: 16px;
     margin-bottom: 20px;
     border: 1px solid #e6e6e6;
     border-radius: 10px;
 
     display: flex;
     flex-direction: column;
-    align-items: start;
+    align-items: center;
+    justify-content: center;
+`;
 
-    position: relative;
+const Title = styled.div`
+    width: 100%;
+    display: flex;
+    gap: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+`;
+
+const ContentsContainer = styled.div`
+    width: 700px;
+    height: auto;
+    padding: 16px;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: start;
 `;
 
 const RowContainer = styled.div`
     height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: row;
     gap: 10px;
@@ -97,8 +139,6 @@ const ColumnContainer = styled.div`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    justify-content: center;
-    align-items: center;
 `;
 
 const ItemContainer = styled.div`
@@ -113,9 +153,7 @@ const ItemContainer = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-    position: absolute;
-    right: 20px;
-    top: 20px;
+    border-left: 1px solid #e6e6e6;
 
     display: flex;
     gap: 20px;
@@ -125,7 +163,7 @@ const ButtonContainer = styled.div`
 `;
 
 const Status = styled.div`
-    font-size: 23px;
+    font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
 `;
@@ -133,27 +171,24 @@ const Status = styled.div`
 const TextContainer = styled.div`
     display: flex;
     flex-direction: column;
-
-    justify-content: space-between;
 `;
 
 const Text = styled.div`
     font-size: 16px;
 `;
 
-const ReviewButton = styled.div`
+const Button = styled.div`
     width: 100px;
     height: 32px;
-    background-color: #000000;
-    color: white;
     border-radius: 5px;
-    cursor: pointer;
+    border: 1px solid #e6e6e6;
 
     display: flex;
     align-items: center;
     justify-content: center;
 
     &:hover {
-        background-color: #4682b4;
+        background-color: #dddddd;
+        cursor: pointer;
     }
 `;

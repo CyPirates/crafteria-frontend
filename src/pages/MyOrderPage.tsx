@@ -9,10 +9,44 @@ import useAuthErrorHandler from "../hooks/useAuthErrorHandler";
 const MyOrderPage = () => {
     const { handleAuthError } = useAuthErrorHandler();
     const [orderList, setOrderList] = useState<FetchedOrder[]>([]);
-    const { ordered, inProducting, delivered } = useClassifiedOrderList({ orderList });
+    const { PAID, IN_PRODUCTING, PRODUCTED, DELIVERING, DELIVERED, CANCELED } = useClassifiedOrderList({ orderList });
 
-    const filterTextArray = ["전체", "출력 대기", "출력 중", "배송 중"];
+    const filterTextArray = ["전체", "출력 대기", "출력 중", "출력 완료", "배송 중", "배송 완료"];
     const [filterText, setFilterText] = useState<string[]>([]);
+
+    const statusMap: Record<string, FetchedOrder[]> = {
+        "출력 대기": PAID,
+        "출력 중": IN_PRODUCTING,
+        "출력 완료": PRODUCTED,
+        "배송 중": DELIVERING,
+        "배송 완료": DELIVERED,
+        "주문 취소": CANCELED,
+    };
+    const filteredOrders: FetchedOrder[] = (() => {
+        if (filterText.length === 0) {
+            return orderList.filter((order) => order.status !== "CANCELED");
+        }
+
+        const matchedOrderSet = new Set<FetchedOrder>();
+
+        filterText.forEach((text) => {
+            const orders = statusMap[text];
+            orders?.forEach((order) => matchedOrderSet.add(order));
+        });
+        return Array.from(matchedOrderSet);
+    })();
+
+    const handleCheckboxChange = (text: string) => {
+        if (text === "전체") {
+            setFilterText([]); // "전체" 선택 시 다른 필터 해제
+        } else {
+            setFilterText((prev) =>
+                prev.includes(text)
+                    ? prev.filter((item) => item !== text) // 이미 선택된 항목이면 해제
+                    : [...prev, text]
+            );
+        }
+    };
 
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
@@ -32,28 +66,6 @@ const MyOrderPage = () => {
         getOrderList();
     }, []);
 
-    // 🔹 필터링된 주문 리스트 생성
-    const filteredOrders = orderList.filter((order) => {
-        if (filterText.length === 0 && order.status !== "CANCELED") return true;
-        if (filterText.includes("출력 대기") && ordered.includes(order)) return true;
-        if (filterText.includes("출력 중") && inProducting.includes(order)) return true;
-        if (filterText.includes("배송 중") && delivered.includes(order)) return true;
-        return false;
-    });
-
-    const handleCheckboxChange = (text: string) => {
-        if (text === "전체") {
-            setFilterText([]); // "전체" 선택 시 다른 필터 해제
-        } else {
-            setFilterText(
-                (prev) =>
-                    prev.includes(text)
-                        ? prev.filter((item) => item !== text) // 이미 선택된 항목이면 해제
-                        : [...prev.filter((item) => item !== "전체"), text] // "전체" 제거 후 추가
-            );
-        }
-    };
-
     return (
         <>
             <Title>나의 주문</Title>
@@ -66,7 +78,9 @@ const MyOrderPage = () => {
                     </FilterLabel>
                 ))}
             </FilterContainer>
-            <CardContainer>{filteredOrders.length > 0 ? filteredOrders.map((order) => <OrderCard data={order} />) : <NoOrders>해당 상태의 주문이 없습니다.</NoOrders>}</CardContainer>
+            <CardContainer>
+                {filteredOrders.length > 0 ? filteredOrders.map((order) => <OrderCard key={order.orderId} data={order} />) : <NoOrders>해당 상태의 주문이 없습니다.</NoOrders>}
+            </CardContainer>
         </>
     );
 };

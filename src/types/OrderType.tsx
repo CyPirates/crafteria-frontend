@@ -25,13 +25,30 @@ export type FetchedOrder = {
     userId: string;
     manufacturerId: string;
     purchasePrice: string;
-    status: string;
+    status: OrderStatus;
     modelFileUrls: string[];
     deliveryAddress: string;
     recipientName: string;
     recipientEmail: string;
     specialRequest: string;
     orderItems: OrderItems[];
+    paymentId: string;
+    orderDate: string;
+    delivery: Delivery;
+};
+
+export type OrderStatus = "PAID" | "IN_PRODUCTING" | "PRODUCTED" | "DELIVERING" | "DELIVERED" | "CANCELED";
+
+export type Delivery = {
+    deliveryId: string;
+    orderId: string;
+    customerName: string;
+    deliveryAddress: string;
+    orderDate: string;
+    trackingNumber: string;
+    courier: string;
+    orderStatus: string;
+    deliveryDate: string;
 };
 
 export type PrintOrderData = {

@@ -1,29 +1,36 @@
 import { useEffect, useState } from "react";
-import { FetchedOrder } from "../types/OrderType";
+import { FetchedOrder, OrderStatus } from "../types/OrderType";
+
+type ClassifiedOrders = {
+    [key in OrderStatus]: FetchedOrder[];
+};
+
+const initialClassifiedOrders: ClassifiedOrders = {
+    PAID: [],
+    IN_PRODUCTING: [],
+    PRODUCTED: [],
+    DELIVERING: [],
+    DELIVERED: [],
+    CANCELED: [],
+};
 
 type OwnProps = {
     orderList: FetchedOrder[];
 };
 
 const useClassifiedOrderList = ({ orderList }: OwnProps) => {
-    const [ordered, setOrdered] = useState<FetchedOrder[]>([]);
-    const [inProducting, setInProducting] = useState<FetchedOrder[]>([]);
-    const [delivered, setDelivered] = useState<FetchedOrder[]>([]);
-    const [canceled, setCanceled] = useState<FetchedOrder[]>([]);
+    const [classifiedOrders, setClassifiedOrders] = useState<ClassifiedOrders>(initialClassifiedOrders);
 
     useEffect(() => {
-        const classifiedOrdered = orderList.filter((order) => order.status === "ORDERED");
-        const classifiedInProducting = orderList.filter((order) => order.status === "IN_PRODUCTING");
-        const classifiedDelivered = orderList.filter((order) => order.status === "DELIVERED");
-        const classifiedCanceled = orderList.filter((order) => order.status === "CANCELED");
-
-        setOrdered(classifiedOrdered);
-        setInProducting(classifiedInProducting);
-        setDelivered(classifiedDelivered);
-        setCanceled(classifiedCanceled);
+        const newClassifiedOrders: ClassifiedOrders = { ...initialClassifiedOrders };
+        orderList.forEach((order) => {
+            const status = order.status as OrderStatus;
+            newClassifiedOrders[status].push(order);
+        });
+        setClassifiedOrders(newClassifiedOrders);
     }, [orderList]);
 
-    return { ordered, inProducting, delivered, canceled };
+    return classifiedOrders;
 };
 
 export default useClassifiedOrderList;
