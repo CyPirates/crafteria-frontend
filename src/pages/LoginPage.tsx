@@ -13,7 +13,7 @@ const LoginPage = () => {
             <Container>간편로그인/회원가입</Container>
             <ImagesContainer>
                 <OauthImageContainer src={GoogleLoginImage} onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/google")} />
-                <OauthImageContainer src={KakaoLoginImage} alt="x" onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/kakao")} />
+                {/* <OauthImageContainer src={KakaoLoginImage} alt="x" onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/kakao")} /> */}
                 <OauthImageContainer src={NaverLoginImage} onClick={() => (window.location.href = "https://api.crafteria.co.kr/oauth2/authorization/naver")} />
             </ImagesContainer>
         </PageWrapper>

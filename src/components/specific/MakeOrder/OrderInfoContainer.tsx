@@ -48,9 +48,10 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     });
 
     useEffect(() => {
-        setVat(Math.ceil(price * 0.1));
+        const vat = Math.ceil(price * 0.1);
         const shipping = 3000;
         if (!coupon) {
+            setVat(vat);
             setFinalPrice(price + vat + shipping);
             return;
         }

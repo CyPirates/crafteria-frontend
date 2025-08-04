@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { newAxios } from "../../utils/axiosWithUrl";
 import styled from "styled-components";
 
@@ -12,73 +12,108 @@ const WholeDesignCardContainer = () => {
     const [categoryFilter, setCategoryFilter] = useState<string>("");
     const [isActive, setIsActive] = useState<number>(0);
 
-    const fetchData = async () => {
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const observerRef = useRef<IntersectionObserver | null>(null);
+
+    const fetchData = async (currentPage: number) => {
+        if (isLoading || !hasMore) return;
+
+        setIsLoading(true);
         try {
-            const response = await newAxios.get("/api/v1/model/user/list/popular");
-            let data = response.data.data;
-            console.log(data);
-            setDesignList(data);
-            setFilteredDesignList(data);
+            const response = await newAxios.get(`/api/v1/model/user/list/popular?page=${currentPage}`);
+            const data = response.data.data;
+
+            if (data.length === 0) {
+                setHasMore(false);
+            } else {
+                setDesignList((prev) => [...prev, ...data]);
+                setFilteredDesignList((prev) => {
+                    const newList = [...prev, ...data];
+                    return categoryFilter ? newList.filter((e) => e.category === categoryFilter) : newList;
+                });
+            }
         } catch (error) {
             console.log(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const filterDesignList = (filter: string): Design[] => {
-        const temp = [...designList];
-        if (filter == "") return temp;
-        return temp.filter((e) => e.category == filter);
-    };
+    useEffect(() => {
+        fetchData(page);
+    }, [page]);
 
     useEffect(() => {
-        setFilteredDesignList(filterDesignList(categoryFilter));
-    }, [categoryFilter]);
+        const filtered = categoryFilter ? designList.filter((e) => e.category === categoryFilter) : designList;
+        setFilteredDesignList(filtered);
+    }, [categoryFilter, designList]);
 
     const sortDefault = () => {
         setIsActive(0);
-        setFilteredDesignList(filterDesignList(categoryFilter));
+        const sorted = categoryFilter ? designList.filter((e) => e.category === categoryFilter) : [...designList];
+        setFilteredDesignList(sorted);
     };
 
     const sortDesignList = () => {
-        const temp = [...filteredDesignList];
-        temp.sort((a, b) => {
-            return +b.downloadCount - +a.downloadCount;
-        });
-        setFilteredDesignList(temp);
         setIsActive(1);
+        const sorted = [...filteredDesignList].sort((a, b) => +b.downloadCount - +a.downloadCount);
+        setFilteredDesignList(sorted);
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    const lastElementRef = useCallback(
+        (node: HTMLDivElement | null) => {
+            if (isLoading) return;
+            if (observerRef.current) observerRef.current.disconnect();
+
+            observerRef.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && hasMore) {
+                    setPage((prev) => prev + 1);
+                }
+            });
+
+            if (node) observerRef.current.observe(node);
+        },
+        [isLoading, hasMore]
+    );
 
     return (
         <>
             <Container>
                 <Title>도면 장터</Title>
                 <FilterTextContainer>
-                    <FilterText isActive={categoryFilter == ""} onClick={() => setCategoryFilter("")}>
+                    <FilterText isActive={categoryFilter === ""} onClick={() => setCategoryFilter("")}>
                         전체
                     </FilterText>
                     {Object.entries(categoryKeys).map(([key, value]) => (
-                        <FilterText isActive={categoryFilter == key} onClick={() => setCategoryFilter(key)}>
+                        <FilterText key={key} isActive={categoryFilter === key} onClick={() => setCategoryFilter(key)}>
                             {value}
                         </FilterText>
                     ))}
-
                     <div style={{ borderLeft: "1px solid #B3B3B3", marginRight: "20px" }} />
-                    <FilterText onClick={() => sortDefault()} isActive={isActive == 0}>
+                    <FilterText onClick={sortDefault} isActive={isActive === 0}>
                         기본순
                     </FilterText>
-                    <FilterText onClick={() => sortDesignList()} isActive={isActive == 1}>
+                    <FilterText onClick={sortDesignList} isActive={isActive === 1}>
                         판매량순
                     </FilterText>
                 </FilterTextContainer>
+
                 <CardContainer>
                     {filteredDesignList.map((e, i) => {
-                        return <DesignCard designData={e} key={i} />;
+                        const isLast = i === filteredDesignList.length - 1;
+                        return (
+                            <div key={i} ref={isLast ? lastElementRef : null}>
+                                <DesignCard designData={e} />
+                            </div>
+                        );
                     })}
                 </CardContainer>
+
+                {isLoading && <Loading>불러오는 중...</Loading>}
+                {!hasMore && <Loading>모든 데이터를 불러왔습니다.</Loading>}
             </Container>
         </>
     );
@@ -114,4 +149,11 @@ const CardContainer = styled.div`
     margin: 0px;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+`;
+
+const Loading = styled.div`
+    text-align: center;
+    padding: 20px;
+    color: #999;
 `;

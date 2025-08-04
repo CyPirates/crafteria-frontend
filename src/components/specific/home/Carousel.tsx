@@ -18,6 +18,7 @@ const Carousel = () => {
     const fetchImages = async () => {
         const response = await newAxios.get("/api/v1/advertisement-images");
         const data = response.data.data;
+        console.log(data);
         setAdvertisements(data);
     };
 
@@ -42,7 +43,9 @@ const Carousel = () => {
                         onClick={() => {
                             let adIndex = index - 1;
                             if (adIndex < 0) adIndex += totalImages;
-                            window.open(`https://${advertisements[adIndex].linkurl}`, "_blank");
+                            const linkUrl = advertisements[adIndex].linkurl;
+                            const url = linkUrl.startsWith("https://") ? linkUrl : `https://${linkUrl}`;
+                            window.open(url, "_blank");
                         }}
                     />
                 ))}

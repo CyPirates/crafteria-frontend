@@ -5,6 +5,7 @@ import MaterialPopover from "./MaterialPopover";
 import classifyMaterial from "../../../utils/classifyMaterial";
 import convertMaterialName from "../../../utils/convertMaterialName";
 import React from "react";
+import convertHoursToDHM from "../../../utils/convertHoursToDHM";
 
 type CompanyInfoProps = {
     data: Company;
@@ -17,14 +18,14 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
     if (isMaterialsEmpty) return null;
     console.log(data);
     console.log(materials);
-    const checkPrintNow = () => {
-        const equipments: Equipment[] = data.equipmentList;
-        for (let i = 0; i < equipments.length; i++) {
-            if (equipments[i].status === "Available") return true;
-        }
-        return false;
-    };
-    const isAvailable = checkPrintNow();
+    // const checkPrintNow = () => {
+    //     const equipments: Equipment[] = data.equipmentList;
+    //     for (let i = 0; i < equipments.length; i++) {
+    //         if (equipments[i].status === "Available") return true;
+    //     }
+    //     return false;
+    // };
+    // const isAvailable = checkPrintNow();
     const moveToAboutPage = () => {
         window.open(`/company-detail/${data.id}`);
     };
@@ -45,37 +46,63 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
             </CompanyInfo>
             <Divider />
             <MaterialContainer>
-                <h5>보유 재료</h5>
-                {Object.entries(materials).map(([key, value]) => {
-                    if (value.materials.length === 0) return null;
+                <MaterialTable>
+                    <thead>
+                        <tr>
+                            <th>보유 재료</th>
+                            <th>1cm³당 시간</th>
+                            <th>1cm³당 평균가격</th>
+                            <th>색상</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Object.entries(materials).map(([key, value]) => {
+                            if (value.materials.length === 0) return null;
 
-                    return (
-                        <MaterialAndPopover>
-                            <MaterialText>
-                                {convertMaterialName(key)} <br />
-                                평균 {value.totalPrice / value.materials.length}원/시간
-                                <br />
-                                {value.printSpeed}mm³/시간
-                            </MaterialText>
-                            {value.materials.map((e) => (
-                                <MaterialPopover color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                            ))}
-                        </MaterialAndPopover>
-                    );
-                })}
+                            const avgPrice = Math.round(value.totalPrice / value.materials.length);
+
+                            return (
+                                <tr key={key}>
+                                    <td>{convertMaterialName(key)}</td>
+                                    <td>{convertHoursToDHM(+(100 / value.printSpeed).toFixed(2))}</td>
+                                    <td>{avgPrice} 원</td>
+                                    <td>
+                                        <ColorContainer>
+                                            {value.materials.map((e, index) => (
+                                                <>
+                                                    <MaterialPopover key={index} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                    <MaterialPopover key={index * 5} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                    <MaterialPopover key={index * 10} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                </>
+                                            ))}
+                                        </ColorContainer>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </MaterialTable>
             </MaterialContainer>
-            <StatusContainer>
+
+            {/* <StatusContainer>
                 <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: isAvailable ? "#4CAF50" : "#FF9800" }} />
                 <div>{isAvailable ? "제작 가능" : "제작 대기"}</div>
-            </StatusContainer>
+            </StatusContainer> */}
             <RowGridButtonContainer>
-                <Button
+                {/* <Button
                     onClick={() => {
                         moveToAboutPage();
                     }}
                 >
                     자세히
-                </Button>
+                </Button> */}
                 {setSelectedCompany ? (
                     <Button
                         onClick={() => {
@@ -195,15 +222,27 @@ const MaterialContainer = styled.div`
     justify-content: center;
 `;
 
-const MaterialAndPopover = styled.div`
-    display: flex;
-    flex-direction: row;
-    gap: 12px;
-    align-items: center;
-    margin-bottom: 8px;
+const MaterialTable = styled.table`
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    text-align: center;
+
+    th,
+    td {
+        border: 1px solid #ececec;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #f9f9f9;
+        font-weight: bold;
+    }
 `;
-const MaterialText = styled.div`
-    width: 100px;
-    font-size: 11px;
-    font-weight: bold;
+
+const ColorContainer = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
 `;

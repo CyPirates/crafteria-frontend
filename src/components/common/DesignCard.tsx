@@ -17,7 +17,7 @@ const DesignCard = ({ designData }: { designData: Design }) => {
     return (
         <>
             <StyledCard onClick={handleOnClick}>
-                <StlRenderContainer filePath={modelFileUrl} width="230px" height="150px" clickDisabled={true} />
+                {modelFileUrl ? <StlRenderContainer filePath={modelFileUrl} width="230px" height="150px" clickDisabled={true} /> : <div style={{ width: "230px", height: "150px" }} />}
                 <Card.Body>
                     <Card.Title>{name}</Card.Title>
                     <Card.Text>

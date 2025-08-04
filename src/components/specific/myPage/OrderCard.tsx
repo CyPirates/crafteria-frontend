@@ -19,7 +19,7 @@ type ModelOrder = {
 };
 
 const OrderCard = ({ data }: OrderCardProps) => {
-    const { status, modelFileUrls, orderItems, purchasePrice, orderId, orderDate } = data;
+    const { status, modelFileUrls, orderItems, purchasePrice, orderId, orderDate, delivery } = data;
     const [modelData, setModelData] = useState<ModelOrder[]>([]);
     const navigate = useNavigate();
     const statusMap = {
@@ -29,6 +29,15 @@ const OrderCard = ({ data }: OrderCardProps) => {
         DELIVERING: "배송 중",
         DELIVERED: "배송 완료",
         CANCELED: "주문 취소",
+    };
+
+    const openDeliveryTracking = () => {
+        const width = 520;
+        const height = 860;
+        const url = "/coupon";
+
+        const features = `width=${width},height=${height},resizable=no,scrollbars=no`;
+        window.open(url, "_blank", features);
     };
 
     const handleCancel = async () => {
@@ -59,7 +68,14 @@ const OrderCard = ({ data }: OrderCardProps) => {
                 <span>{purchasePrice}원</span>
             </Title>
             <ContentsContainer>
-                <Status>{statusMap[status]}</Status>
+                <Status>
+                    {statusMap[status]}
+                    {delivery ? (
+                        <div style={{ fontSize: "16px", fontWeight: "initial" }}>
+                            {delivery.courier} {delivery.trackingNumber}
+                        </div>
+                    ) : null}
+                </Status>
                 <RowContainer>
                     <ColumnContainer>
                         {modelData.map((e, i) => {
@@ -78,8 +94,9 @@ const OrderCard = ({ data }: OrderCardProps) => {
                         })}
                     </ColumnContainer>
                     <ButtonContainer>
-                        {status === "PAID" ? <Button onClick={handleCancel}>주문취소</Button> : null}
-                        {status === "DELIVERED" ? <Button onClick={() => navigate(`/createReview/${data.manufacturerId}`)}>리뷰쓰기</Button> : null}
+                        {status === "PAID" && <Button onClick={handleCancel}>주문취소</Button>}
+                        {delivery && <Button>배송추적</Button>}
+                        {status === "DELIVERED" && <Button onClick={() => navigate(`/createReview/${data.manufacturerId}`)}>리뷰쓰기</Button>}
                     </ButtonContainer>
                 </RowContainer>
             </ContentsContainer>

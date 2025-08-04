@@ -138,7 +138,7 @@ const DesignDetailPage = () => {
         <PageWrapper>
             {isOpen && <BuyDesignPopUp handleOnClick={setIsOpen} name={name} price={+price} filePath={modelFileUrl} id={id} />}
             <OutlineContainer>
-                <StlRenderContainer filePath={modelFileUrl} width="500px" height="500px" />
+                {modelFileUrl ? <StlRenderContainer filePath={modelFileUrl} width="500px" height="500px" /> : <div style={{ width: "500px", height: "500px" }} />}
                 <OutlineContentContainer>
                     <Title>{name}</Title>
                     <ArtistName>작가: {author.name}</ArtistName>

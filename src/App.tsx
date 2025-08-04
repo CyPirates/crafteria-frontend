@@ -26,6 +26,7 @@ import BottomBar from "./components/layout/BottomBar";
 import MyPage from "./pages/MyPage";
 import PoliciesPage from "./pages/PoliciesPage";
 import CouponBoxPage from "./pages/CouponBoxPage";
+import DeliveryTrackingPage from "./pages/DeliveryTrackingPage";
 
 const AppRoutes: React.FC = () => {
     const location = useLocation();
@@ -37,6 +38,7 @@ const AppRoutes: React.FC = () => {
             <ScrollToTop />
             <Routes>
                 <Route path="/coupon" element={<CouponBoxPage />} />
+                <Route path="/track" element={<DeliveryTrackingPage />} />
                 {/* 레이아웃 적용되는 페이지들 */}
                 <Route
                     path="*"

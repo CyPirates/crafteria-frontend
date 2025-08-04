@@ -23,7 +23,7 @@ const SelectCompany = (props: OwnProps) => {
     const [searchResult, setSearchResult] = useState<SearchResult[]>([]);
     const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
     const [filterText, setFilterText] = useState<string[]>([]);
-    const filterTextArray = ["상관없음", "필라멘트", "분말", "액상"];
+    const filterTextArray = ["상관없음", "필라멘트", "액상 레진", "나일론 분말", "금속 분말"];
 
     const fetchCompanies = async () => {
         try {

@@ -16,9 +16,9 @@ const MaterialPopover = ({ color, imgUrl, price }: OwnProps) => {
                 placement="bottom"
                 overlay={
                     <Popover id={`popover-positioned-`}>
-                        <Popover.Body>
+                        <Popover.Body style={{ textAlign: "center" }}>
                             <MaterialImg src={imgUrl} alt="x" />
-                            <div>{price}원/시간</div>
+                            <div>{price}원/1cm³</div>
                         </Popover.Body>
                     </Popover>
                 }

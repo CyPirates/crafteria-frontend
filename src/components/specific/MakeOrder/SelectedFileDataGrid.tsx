@@ -21,6 +21,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import getStlModelVolume from "../../../utils/getStlModelVolume";
 import convertHoursToDHM from "../../../utils/convertHoursToDHM";
+import convertMaterialName from "../../../utils/convertMaterialName";
+import { Row } from "react-bootstrap";
 
 type Column = {
     id: "fileUrl" | "magnification" | "quantity" | "materialType" | "color" | "delete" | "time" | "price";
@@ -67,21 +69,15 @@ const calculateAndRoundPrintTime = (magnification: number, volume: number | unde
     return Math.round(calculatedTime * 10) / 10;
 };
 
-const calculatePrice = (
-    materialPrice: number | undefined,
-    time: number | string | undefined, // 시간 단위
-    quantity: number
-): number | string => {
-    if (materialPrice && time) {
-        const calculatedPrice = quantity * materialPrice * +time;
+const calculatePrice = (materialPrice: number | undefined, volume: number | undefined, magnification: number, quantity: number): number | string => {
+    if (materialPrice && volume) {
+        const calculatedPrice = ((volume * magnification) / 10000) * materialPrice * quantity;
         return Math.round(calculatedPrice);
     }
-
     return 0;
 };
 
 const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) => {
-    // 기본값 설정 로직 개선
     const defaultMaterialType = Object.keys(materials)[0] || "";
     const defaultMaterialInfo = materials[defaultMaterialType]?.materials[0];
     const defaultColor = defaultMaterialInfo?.colorValue || "";
@@ -115,7 +111,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
 
             // 초기 time 및 price 계산
             const initialTime = calculateAndRoundPrintTime(1, modelVolume, defaultPrintSpeed);
-            const initialPrice = calculatePrice(defaultMaterialPrice ? +defaultMaterialPrice : undefined, initialTime, 1);
+            const initialPrice = calculatePrice(defaultMaterialPrice ? +defaultMaterialPrice : undefined, modelVolume, 1, 1);
 
             const newRow: PrintOrderData = {
                 fileUrl: fileUrl,
@@ -170,7 +166,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                         // time과 price 재계산 (magnification, quantity, materialType, color 변경 시 영향)
                         const printSpeed = materials[updatedItem.materialType]?.printSpeed;
                         const newTime = calculateAndRoundPrintTime(updatedItem.magnification, updatedItem.volume, printSpeed);
-                        const newPrice = calculatePrice(updatedItem.materialPrice, newTime, updatedItem.quantity);
+                        const newPrice = calculatePrice(updatedItem.materialPrice, updatedItem.volume, updatedItem.magnification, updatedItem.quantity);
 
                         updatedItem.time = typeof newTime === "number" ? newTime : undefined;
                         updatedItem.price = typeof newPrice === "number" ? newPrice : undefined;
@@ -292,7 +288,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                                                         >
                                                             {Object.keys(materials).map((materialType) => (
                                                                 <MenuItem key={materialType} value={materialType} sx={{ fontSize: 12 }}>
-                                                                    {materialType}
+                                                                    {convertMaterialName(materialType)}
                                                                 </MenuItem>
                                                             ))}
                                                         </StyledSelect>
