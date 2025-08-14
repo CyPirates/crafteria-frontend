@@ -12,7 +12,7 @@ const WholeDesignCardContainer = () => {
     const [categoryFilter, setCategoryFilter] = useState<string>("");
     const [isActive, setIsActive] = useState<number>(0);
 
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 

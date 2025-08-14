@@ -2,25 +2,19 @@ import { useNavigate, useLocation } from "react-router-dom";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "../../store/store";
-import { toggleTheme } from "../../store/themeSlice";
-
-import Logo from "../../assets/logo.png";
 
 import { newAxios } from "../../utils/axiosWithUrl";
 import { User } from "../../types/UserType";
 import CartDropdown from "./CartDropdown";
 import SearchBar from "./SearchBar";
 import UserMenuDropdown from "./UserMenuDropdown";
-import levelImagesArray from "../common/LevelImagesArray";
+import { smallLevelImagesArray as levelImagesArray } from "../common/LevelImagesArray";
+import CouponBoxIcon from "../../assets/images/topNavBar/coupon.svg";
 
 const TopNavBar = () => {
     const navigate = useNavigate();
     const location = useLocation(); // 현재 URL 경로 가져오기
     const [userData, setUserData] = useState<User | undefined>(undefined);
-    const isLight = useSelector((state: RootState) => state.theme.isLight);
-    const dispatch = useDispatch<AppDispatch>();
 
     const handleLoginClick = () => {
         if (localStorage.getItem("accessToken")) {
@@ -76,9 +70,7 @@ const TopNavBar = () => {
         <>
             <NavContainer>
                 <ContentsContainer>
-                    <LogoContainer onClick={() => navigate("/home")}>
-                        <LogoImage src={Logo} alt="x" />
-                    </LogoContainer>
+                    <LogoContainer onClick={() => navigate("/home")}>Crafteria</LogoContainer>
                     <NavMenuContainer>
                         <NavMenu to="/home" isActive={location.pathname === "/home"}>
                             홈
@@ -87,34 +79,28 @@ const TopNavBar = () => {
                             내 도면
                         </NavMenu>
                         <NavMenu to="/design-market" isActive={location.pathname === "/design-market" || location.pathname.startsWith("/design")}>
-                            도면 장터
+                            도면장터
                         </NavMenu>
                         <NavMenu to="/print-order" isActive={location.pathname === "/print-order"}>
                             주문하기
                         </NavMenu>
                         <NavMenu to="/sell-design" isActive={location.pathname === "/sell-design"}>
-                            도면 판매
+                            도면판매
                         </NavMenu>
                     </NavMenuContainer>
                     <SearchBar />
                     <UserInfoArea>
                         {userData ? (
                             <>
-                                <div>
-                                    <img src={levelImagesArray[Math.min(userData.userLevel, 4)]} alt="레벨" width={24} height={24} />
-                                    {userData.realname}님
-                                </div>
-
+                                <img src={CouponBoxIcon} alt="쿠폰박스" width={24} height={24} onClick={openCouponBox} />
                                 <CartDropdown />
-                                <UserMenuDropdown />
-                                <LoginButton onClick={openCouponBox}>쿠폰함</LoginButton>
+
+                                <UserMenuDropdown userLevel={userData.userLevel} userName={userData.realname} />
                             </>
                         ) : (
                             <LoginButton onClick={handleLoginClick}>로그인</LoginButton>
                         )}
                     </UserInfoArea>
-
-                    {/* <button onClick={() => dispatch(toggleTheme())}>{isLight ? "라이트모드" : "다크모드"}</button> */}
                 </ContentsContainer>
             </NavContainer>
         </>
@@ -124,7 +110,7 @@ const TopNavBar = () => {
 export default TopNavBar;
 
 const NavContainer = styled.div`
-    width: 100%;
+    min-width: 100%;
     height: 50px;
     position: fixed;
     top: 0;
@@ -134,49 +120,52 @@ const NavContainer = styled.div`
     align-items: center;
     justify-content: center;
 
-    border-bottom: 1px solid #464649;
+    border-bottom: ${({ theme }) => theme.border};
     z-index: 3000;
 `;
 
 const ContentsContainer = styled.div`
-    min-width: 1500px;
+    width: 1440px;
+    padding: 0 80px;
+    height: 100%;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
 `;
 
 const LogoContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 50px; // TopNavBar의 높이에 맞추기
     width: auto;
-    overflow: hidden; // 튀어나오는 외곽을 숨김
+    font-weight: bold;
+    font-size: 20px;
+    color: ${({ theme }) => theme.text.heading};
+
     &:hover {
         cursor: pointer;
     }
 `;
 
-const LogoImage = styled.img`
-    height: 80px; // 원하는 이미지 크기
-    width: auto; // 원본 비율 유지
-    object-fit: contain; // 이미지 비율 유지하면서 영역에 맞춤
-`;
-
 const NavMenuContainer = styled.div`
-    width: 480px;
-    margin-right: 40px;
+    width: auto;
+    height: 100%;
+    margin: 0 187px;
+    gap: 48px;
+
     display: flex;
-    justify-content: space-between;
 `;
 
 const NavMenu = styled(Link)<{ isActive: boolean }>`
+    height: 100%;
     text-decoration: none;
-    font-size: 18px;
-    color: ${({ isActive }) => (isActive ? "#F4351D" : "#a5a5a7")};
+    color: ${({ theme, isActive }) => (isActive ? theme.text.heading : theme.text.placeholder)};
     font-weight: ${({ isActive }) => (isActive ? "bold" : "normal")};
-    border-bottom: ${({ isActive }) => (isActive ? "2px solid #F4351D" : "none")};
+    font-size: 14px;
+    border-bottom: ${({ isActive }) => (isActive ? "2px solid #111111" : "none")};
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     &:hover {
         font-weight: bold;
@@ -185,8 +174,7 @@ const NavMenu = styled(Link)<{ isActive: boolean }>`
 
 const LoginButton = styled.div`
     text-decoration: none;
-    font-size: 18px;
-    color: #a5a5a7;
+    color: ${({ theme }) => theme.text.placeholder};
 
     &:hover {
         font-weight: bold;
@@ -194,8 +182,19 @@ const LoginButton = styled.div`
 `;
 
 const UserInfoArea = styled.div`
-    flex: 1;
-    padding: 0 20px;
+    margin-left: 16px;
+
     display: flex;
-    gap: 20px;
+    align-items: center;
+    gap: 16px;
+`;
+
+const UserInfoBox = styled.div`
+    width: 117px;
+    height: 40px;
+    border-radius: 20px;
+    background-color: ${({ theme }) => theme.grayScale[100]};
+
+    display: flex;
+    align-items: center;
 `;

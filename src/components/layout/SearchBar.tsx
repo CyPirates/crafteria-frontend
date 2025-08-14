@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import styled from "styled-components";
+import SearchIcon from "../../assets/images/topNavBar/search.svg";
 import { AiOutlineSearch } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 
@@ -20,33 +21,36 @@ const SearchBar = () => {
 
     return (
         <SearchContainer onSubmit={handleSearchSubmit}>
-            <SearchInput type="text" placeholder="검색어를 입력하세요" value={searchQuery} onChange={handleSearchChange} />
             <SearchButton type="submit">
-                <AiOutlineSearch size={16} />
+                <img src={SearchIcon} alt="검색 아이콘" />
             </SearchButton>
+            <SearchInput type="text" placeholder="검색어를 입력하세요" value={searchQuery} onChange={handleSearchChange} />
         </SearchContainer>
     );
 };
 
 export default SearchBar;
 
-const SearchContainer = styled.form`
-    display: flex;
-    align-items: center;
+const SearchContainer = styled.div`
+    width: 192px;
+    height: 40px;
+    padding: 0 12px;
+    gap: 8px;
     border: 1px solid #ccc;
     border-radius: 20px;
-    padding: 5px;
-    width: 400px;
-    height: 32px;
+
+    display: flex;
+    align-items: center;
 `;
 
 const SearchInput = styled.input`
     border: none;
     outline: none;
-    flex-grow: 1;
-    padding: 5px;
-    height: 24px;
-    font-size: 16px;
+    width: 136px;
+    height: 20px;
+    padding: 0;
+    font-size: 13px;
+    box-sizing: border-box;
 `;
 
 const SearchButton = styled.button`

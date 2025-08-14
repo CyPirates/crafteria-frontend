@@ -1,5 +1,5 @@
 import Dropdown from "react-bootstrap/Dropdown";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ShoppingCartIcon from "../../assets/images/topNavBar/shopping-cart.svg";
 import { MdDelete } from "react-icons/md";
 import { Badge, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -13,8 +13,8 @@ function CartDropdown() {
     const { cartItems, removeFromCart } = useCart(); // ✅ Context에서 데이터 가져오기
 
     return (
-        <Dropdown>
-            <Dropdown.Toggle as="div" id="dropdown-custom-toggle" style={{ cursor: "pointer" }}>
+        <StyledDropdown>
+            <Dropdown.Toggle as="div" id="dropdown-custom-toggle" className="no-caret" style={{ cursor: "pointer" }}>
                 <Badge
                     badgeContent={cartItems.length}
                     sx={{
@@ -24,7 +24,7 @@ function CartDropdown() {
                         },
                     }}
                 >
-                    <ShoppingCartIcon />
+                    <img src={ShoppingCartIcon} alt="x" />
                 </Badge>
             </Dropdown.Toggle>
 
@@ -46,7 +46,7 @@ function CartDropdown() {
                     </Dropdown.Item>
                 )}
             </Dropdown.Menu>
-        </Dropdown>
+        </StyledDropdown>
     );
 }
 
@@ -77,4 +77,11 @@ const ItemWrapper = styled.div`
 const NameContainer = styled.div`
     flex: 1;
     margin-left: 10px;
+`;
+
+const StyledDropdown = styled(Dropdown)`
+    .dropdown-toggle.no-caret::after {
+        display: none;
+        min-width: 24px;
+    }
 `;

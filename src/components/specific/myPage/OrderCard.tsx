@@ -34,7 +34,7 @@ const OrderCard = ({ data }: OrderCardProps) => {
     const openDeliveryTracking = () => {
         const width = 520;
         const height = 860;
-        const url = "/coupon";
+        const url = `/track?courier=${delivery.courier}&trackingNumber=${delivery.trackingNumber}`;
 
         const features = `width=${width},height=${height},resizable=no,scrollbars=no`;
         window.open(url, "_blank", features);
@@ -95,7 +95,7 @@ const OrderCard = ({ data }: OrderCardProps) => {
                     </ColumnContainer>
                     <ButtonContainer>
                         {status === "PAID" && <Button onClick={handleCancel}>주문취소</Button>}
-                        {delivery && <Button>배송추적</Button>}
+                        {delivery && <Button onClick={openDeliveryTracking}>배송추적</Button>}
                         {status === "DELIVERED" && <Button onClick={() => navigate(`/createReview/${data.manufacturerId}`)}>리뷰쓰기</Button>}
                     </ButtonContainer>
                 </RowContainer>

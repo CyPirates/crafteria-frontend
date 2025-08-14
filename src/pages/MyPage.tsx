@@ -4,7 +4,7 @@ import { User } from "../types/UserType";
 import { newAxios } from "../utils/axiosWithUrl";
 import { PiUserCircleLight } from "react-icons/pi";
 
-import levelImagesArray from "../components/common/LevelImagesArray";
+import { bigLevelImagesArray as levelImagesArray } from "../components/common/LevelImagesArray";
 import BlackButton from "../components/common/BlackButton";
 
 const MyPage = () => {

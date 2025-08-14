@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import { courierNameToCode } from "../utils/courierMap";
 
 const DeliveryTrackingPage = () => {
+    const location = useLocation();
+    const searchParams = new URLSearchParams(location.search);
+    const carrierId = searchParams.get("courier");
+    const trackingNumber = searchParams.get("trackingNumber");
+
     const [data, setData] = useState<any[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     const fetchTrackingInfo = async () => {
+        if (!carrierId || !trackingNumber) {
+            setError("배송 정보가 없습니다.");
+            return;
+        }
+
         try {
             const response = await fetch("https://apis.tracker.delivery/graphql", {
                 method: "POST",
@@ -41,8 +53,8 @@ const DeliveryTrackingPage = () => {
             }
           `,
                     variables: {
-                        carrierId: "kr.cjlogistics",
-                        trackingNumber: "585290991661",
+                        carrierId: courierNameToCode[carrierId],
+                        trackingNumber,
                     },
                 }),
             });

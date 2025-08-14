@@ -88,8 +88,8 @@ const App: React.FC = () => {
 export default App;
 
 const ContentContainer = styled.div`
-    width: 1300px;
-    max-width: 1300px;
+    width: 1440px;
+    max-width: 1440px;
     margin: 80px auto 0;
     min-height: calc(100vh - 50px);
 `;

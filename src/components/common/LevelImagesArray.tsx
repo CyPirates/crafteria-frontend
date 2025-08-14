@@ -1,9 +1,15 @@
-import Level0 from "../../assets/level/lv0.png";
-import Level1 from "../../assets/level/lv1.png";
-import Level2 from "../../assets/level/lv2.png";
-import Level3 from "../../assets/level/lv3.png";
-import Level4 from "../../assets/level/lv4.png";
+import SmallLevel1 from "../../assets/images/level/medal_11x.png";
+import SmallLevel2 from "../../assets/images/level/medal_21x.png";
+import SmallLevel3 from "../../assets/images/level/medal_31x.png";
+import SmallLevel4 from "../../assets/images/level/medal_41x.png";
+import SmallLevel5 from "../../assets/images/level/medal_51x.png";
 
-const levelImagesArray = [Level0, Level1, Level2, Level3, Level4];
+import BigLevel1 from "../../assets/images/level/medal_12x.png";
+import BigLevel2 from "../../assets/images/level/medal_22x.png";
+import BigLevel3 from "../../assets/images/level/medal_32x.png";
+import BigLevel4 from "../../assets/images/level/medal_42x.png";
+import BigLevel5 from "../../assets/images/level/medal_52x.png";
 
-export default levelImagesArray;
+export const bigLevelImagesArray = [undefined, BigLevel1, BigLevel2, BigLevel3, BigLevel4, BigLevel5];
+
+export const smallLevelImagesArray = [undefined, SmallLevel1, SmallLevel2, SmallLevel3, SmallLevel4, SmallLevel5];
