@@ -4,15 +4,21 @@ import styled from "styled-components";
 import { Design } from "../../../types/DesignType";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
-
+import { Typography } from "../../common/Typography";
+import BuyIcon from "../../../assets/images/icons/buy.png";
+import EyeIcon from "../../../assets/images/icons/eye.png";
+import { useState } from "react";
+import { useStlModelVolume } from "../../../hooks/useStlModelVolume";
+import categoryKeys from "../../../types/Category";
 type DesignOutlineCardProps = {
     designData: Design;
     published: boolean;
 };
 
 const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) => {
-    const { name, widthSize, lengthSize, heightSize, price, downloadCount, modelFileUrl, id, downloadable } = designData;
+    const { name, viewCount, downloadCount, modelFileUrl, id, downloadable, category, author } = designData;
     const navigate = useNavigate();
+    const [volume, setVolume] = useState<number | undefined>(undefined);
 
     const handleDownload = async (url: string, filename: string) => {
         const file = await fetch(url);
@@ -51,19 +57,30 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
     return (
         <>
             <CardWrapper>
-                <StlRenderContainer filePath={modelFileUrl} width="150px" height="150px" clickDisabled={true} />
+                <StlRenderContainer filePath={modelFileUrl} width="232px" height="186px" clickDisabled={true} />
                 <InformationContainer>
-                    <Information>도면명: {name}</Information>
+                    <Typography variant="body.medium_b" color="text.heading">
+                        {name}
+                    </Typography>
                     <Information>
-                        모델크기: {widthSize}mm x {lengthSize}mm x {heightSize}mm
+                        <img src={BuyIcon} className="img" alt="x" />
+                        <Typography variant="body.small_m" color="grayScale.400">
+                            {downloadCount}
+                        </Typography>
+
+                        <img src={EyeIcon} className="img" alt="x" />
+                        <Typography variant="body.small_m" color="grayScale.400">
+                            {viewCount}
+                        </Typography>
                     </Information>
-                    <Information>가격: {price}원</Information>
-                    <Information>판매량: {downloadCount}</Information>
+                    <Typography variant="body.small_r" color="grayScale.400">
+                        {useStlModelVolume(modelFileUrl)}mm³ · {author.name} · {categoryKeys[category]}
+                    </Typography>
                 </InformationContainer>
                 <ButtonConatiner>
                     <Button onClick={() => navigate(`/design/${id}`)}>상세보기</Button>
                     {(published || downloadable) && <Button onClick={() => handleDownload(modelFileUrl, name)}>다운로드</Button>}
-                    {published && <Button>수정</Button>}
+                    {published && <Button onClick={() => navigate(`/edit-design?modelId=${id}`)}>수정</Button>}
                     {published && <Button onClick={handleDelete}>삭제</Button>}
                 </ButtonConatiner>
             </CardWrapper>
@@ -74,12 +91,12 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
 export default DesignOutlineCard;
 
 const CardWrapper = styled.div`
-    width: 700px;
-    height: 180px;
-    padding: 15px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    border: 0.5px solid #dddddd;
+    width: 1280px;
+    height: 218px;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid ${({ theme }) => theme.grayScale[200]};
 
     display: flex;
     align-items: center;
@@ -88,18 +105,27 @@ const CardWrapper = styled.div`
 `;
 
 const InformationContainer = styled.div`
-    height: 150px;
+    margin-left: 32px;
+    flex: 1;
+
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    margin-left: 30px;
-
-    flex: 1;
 `;
 const Information = styled.div`
-    //color: #d2d2d2;
-    font-size: 15px;
-    font-weight: 400;
+    margin: 4px 0 12px 0;
+
+    display: flex;
+    align-items: center;
+
+    .img {
+        width: 12px;
+        height: 12px;
+        margin-right: 4px;
+    }
+
+    > ${Typography} {
+        margin-right: 8px;
+    }
 `;
 
 const ButtonConatiner = styled.div`

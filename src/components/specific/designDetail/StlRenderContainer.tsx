@@ -44,5 +44,6 @@ export default StlRenderContainer;
 const StlContainer = styled.div<{ width: string; height: string }>`
     width: ${(props) => props.width};
     height: ${(props) => props.height};
-    background-color: #ffffff;
+    background-color: #f3f4f5;
+    border-radius: 8px;
 `;

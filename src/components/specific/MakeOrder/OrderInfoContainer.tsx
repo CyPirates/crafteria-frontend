@@ -10,6 +10,7 @@ import initiatePortOnePayment from "../../../utils/requestPayment";
 import { useNavigate } from "react-router-dom";
 import CouponBoxPage from "../../../pages/CouponBoxPage";
 import { Coupon } from "../../../types/CouponType";
+import { Typography } from "../../common/Typography";
 
 type OrderInfoProps = {
     printOrders: PrintOrderData[];
@@ -152,64 +153,90 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
 
     return (
         <>
-            {isCouponOpen && (
+            {/* {isCouponOpen && (
                 <CouponOverlay onClick={() => setIsCouponOpen(false)}>
                     <CouponModalContainer onClick={(e) => e.stopPropagation()}>
                         <CouponBoxPage isCouponUseMode={true} couponType="ORDER_PURCHASE" handleCouponSelect={setCoupon} price={price} setIsOpen={setIsCouponOpen} />
                     </CouponModalContainer>
                 </CouponOverlay>
-            )}
+            )} */}
             <UserArea>
-                <Title>배송지 입력</Title>
+                <Typography variant="heading.h6">결졔 정보</Typography>
+                <TitleTypography variant="misc.label" color="text.body">
+                    배송 정보
+                </TitleTypography>
                 <AddressInputContainer>
                     <RowContainer>
                         <ZipcodeInput placeholder="우편번호" disabled={true} value={zipcode} />
-                        <Button style={{ width: "100px", height: "40px" }} onClick={handleIsOpen}>
-                            주소 찾기
+                        <Button style={{ width: "96px", height: "32px" }} onClick={handleIsOpen}>
+                            주소 검색
                         </Button>
                     </RowContainer>
-                    <AddressInput placeholder="도로명 주소" disabled={true} value={address} />
-                    <AddressInput placeholder="상세 주소" value={detailAddress} onChange={setDetailAddress} />
+                    <StyledInput placeholder="도로명 주소" disabled={true} value={address} />
+                    <StyledInput placeholder="상세 주소" value={detailAddress} onChange={setDetailAddress} />
                 </AddressInputContainer>
                 {isDesignSelectOpen && <Modal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
-                <Title>구매자 정보</Title>
+                <TitleTypography variant="misc.label" color="text.body">
+                    구매자 정보
+                </TitleTypography>
                 <InformationContainer>
-                    <RowGrid>
-                        <InfoTitle>이름</InfoTitle>
-                        <InformationInput id="recipientName" onChange={handleOnchange} />
-                    </RowGrid>
-                    <RowGrid>
-                        <InfoTitle>전화번호</InfoTitle>
-                        <InformationInput id="recipentPhone" onChange={handleOnchange} />
-                    </RowGrid>
-                    <RowGrid>
-                        <InfoTitle>요청사항</InfoTitle>
-                        <InformationInput id="specialRequest" onChange={handleOnchange} />
-                    </RowGrid>
+                    <StyledInput id="recipientName" onChange={handleOnchange} placeholder="이름" />
+
+                    <StyledInput id="recipentPhone" onChange={handleOnchange} placeholder="전화번호" />
+
+                    <StyledInput id="specialRequest" onChange={handleOnchange} placeholder="요청사항" />
                 </InformationContainer>
-                <Title>
-                    결제 정보{" "}
-                    <Button style={{ width: "80px", height: "24px", fontSize: "14px" }} onClick={() => setIsCouponOpen(true)}>
-                        쿠폰 사용
-                    </Button>
-                </Title>
+                <TitleTypography variant="misc.label" color="text.body">
+                    가격
+                </TitleTypography>
                 <InformationContainer>
                     <RowGrid>
-                        <InfoTitle>프린트 가격</InfoTitle>
-                        <InfoContent style={{ textDecoration: coupon ? "line-through" : "none", color: coupon ? "#858585" : "black" }}>{price} 원</InfoContent>
-                        {coupon && <InfoContent style={{ color: "red" }}>{discountedPrice} 원</InfoContent>}
+                        <Typography variant="body.small_b" color="grayScale.500">
+                            프린트 가격
+                        </Typography>
+                        <InfoContent style={{ textDecoration: coupon ? "line-through" : "none", color: coupon ? "#858585" : "black" }}>
+                            <Typography variant="body.small_r" color="text.body">
+                                {price} 원
+                            </Typography>
+                        </InfoContent>
+                        {coupon && (
+                            <InfoContent style={{ color: "red" }}>
+                                <Typography variant="body.small_r" color="text.body">
+                                    {discountedPrice} 원
+                                </Typography>
+                            </InfoContent>
+                        )}
                     </RowGrid>
                     <RowGrid>
-                        <InfoTitle>VAT</InfoTitle>
-                        <InfoContent>{vat} 원</InfoContent>
+                        <Typography variant="body.small_b" color="grayScale.500">
+                            VAT
+                        </Typography>
+                        <InfoContent>
+                            <Typography variant="body.small_r" color="text.body">
+                                {vat}원
+                            </Typography>
+                        </InfoContent>
                     </RowGrid>
                     <RowGrid>
-                        <InfoTitle>배송비</InfoTitle>
-                        <InfoContent>3000 원</InfoContent>
+                        <Typography variant="body.small_b" color="grayScale.500">
+                            배송비
+                        </Typography>
+                        <InfoContent>
+                            <Typography variant="body.small_r" color="text.body">
+                                3000원
+                            </Typography>
+                        </InfoContent>
                     </RowGrid>
+                    <Divider />
                     <RowGrid>
-                        <InfoTitle>총 가격</InfoTitle>
-                        <InfoContent>{finalPrice} 원</InfoContent>
+                        <Typography variant="body.medium_b" color="text.body">
+                            총 가격
+                        </Typography>
+                        <InfoContent>
+                            <Typography variant="body.medium_b" color="text.heading">
+                                {finalPrice} 원
+                            </Typography>
+                        </InfoContent>
                     </RowGrid>
                 </InformationContainer>
                 <SubmitButton onClick={handleSubmit}>주문하기</SubmitButton>
@@ -241,61 +268,66 @@ const Modal = ({ setZipcode, setAddress, handleIsOpen }: ModalProps) => {
 export default OrderInfoContainer;
 
 const UserArea = styled.div`
-    width: 400px;
-    min-height: 800px;
+    width: 272px;
     height: 100%;
-    padding: 0 20px;
-    //background-color: #5c5c60;
-    //border-radius: 10px;
-    border-left: 1px solid #707074;
-    position: relative;
-`;
-
-const Title = styled.div`
-    width: 100%;
-    margin: 20px 0px;
-    font-size: 20px;
-    font-weight: bold;
-    border-bottom: 1px solid #707074;
 
     display: flex;
-    align-items: center;
+    flex-direction: column;
+`;
+
+const TitleTypography = styled(Typography)`
+    margin-top: 16px;
 `;
 
 const AddressInputContainer = styled.div``;
 
 const RowContainer = styled.div`
     display: flex;
+    width: 272px;
+    margin: 4px 0;
 `;
 
 const ZipcodeInput = styled.input`
-    width: 120px;
-    height: 40px;
-    font-size: 15px;
-    margin-bottom: 12px;
+    width: 168px;
+    height: 32px;
+    padding-left: 12px;
+    background-color: ${({ theme }) => theme.text.disabled};
+    border: 1px solid ${({ theme }) => theme.grayScale[300]};
+    border-radius: 8px;
+
+    font-size: ${({ theme }) => theme.typography.misc.placeholder.fontSize};
+    font-weight: ${({ theme }) => theme.typography.misc.placeholder.fontWeight};
+    line-height: ${({ theme }) => theme.typography.misc.placeholder.lineHeight};
 `;
 
-const Button = styled.button`
-    background-color: #000000;
-    color: white;
-    border-radius: 3px;
-    margin-left: 12px;
-    cursor: pointer;
+const StyledInput = styled.input`
+    width: 272px;
+    height: 32px;
+    padding-left: 12px;
+    margin: 4px 0;
+    border: 1px solid ${({ theme }) => theme.grayScale[300]};
+    border-radius: 8px;
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    font-size: ${({ theme }) => theme.typography.misc.placeholder.fontSize};
+    font-weight: ${({ theme }) => theme.typography.misc.placeholder.fontWeight};
+    line-height: ${({ theme }) => theme.typography.misc.placeholder.lineHeight};
 
-    &:hover {
-        background-color: #2e2e2e;
+    &:disabled {
+        background-color: ${({ theme }) => theme.text.disabled};
     }
 `;
 
-const AddressInput = styled.input`
-    width: 360px;
-    height: 40px;
-    font-size: 15px;
-    margin-bottom: 12px;
+const Button = styled.button`
+    background-color: ${({ theme }) => theme.grayScale[100]};
+    border: 1px solid ${({ theme }) => theme.grayScale[300]};
+    border-radius: 4px;
+    margin-left: 8px;
+    cursor: pointer;
+
+    text-align: center;
+    &:hover {
+        background-color: #2e2e2e;
+    }
 `;
 
 const ModalOverlay = styled.div`
@@ -322,31 +354,29 @@ const ModalContainer = styled.div`
     align-items: center;
 `;
 
-const InformationContainer = styled.div``;
+const InformationContainer = styled.div`
+    margin-top: 8px;
+`;
 const RowGrid = styled.div`
     display: flex;
 `;
-const InformationInput = styled.input`
-    width: 400px;
-    height: 40px;
-    font-size: 15px;
-    margin-bottom: 10px;
-`;
-const InfoTitle = styled.div`
-    font-size: 16px;
-    width: 100px;
-`;
 const InfoContent = styled.div`
     font-size: 20px;
+    flex: 1;
+    text-align: right;
 `;
 
 const SubmitButton = styled.div`
-    width: 360px;
-    height: 50px;
-    background-color: #000000;
+    width: 272px;
+    height: 40px;
+    margin-top: 24px;
+    background-color: ${({ theme }) => theme.grayScale[600]};
     color: white;
-    border-radius: 5px;
-    font-size: 25px;
+    border-radius: 8px;
+    font-size: ${({ theme }) => theme.typography.body.small_m.fontSize};
+    font-weight: ${({ theme }) => theme.typography.body.small_m.fontWeight};
+    line-height: ${({ theme }) => theme.typography.body.small_m.lineHeight};
+    text-align: center;
 
     cursor: pointer;
     &:hover {
@@ -355,11 +385,12 @@ const SubmitButton = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-
-    position: absolute;
-    bottom: 20px;
 `;
-
+const Divider = styled.div`
+    width: 272px;
+    border-top: 1px solid ${({ theme }) => theme.grayScale[200]};
+    margin: 12px 0;
+`;
 const CouponOverlay = styled.div`
     position: fixed;
     top: 0;

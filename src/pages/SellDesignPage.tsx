@@ -7,6 +7,7 @@ import ReactQuill from "react-quill";
 import { newAxios } from "../utils/axiosWithUrl";
 import { useNavigate } from "react-router-dom";
 import useLoginNavigation from "../hooks/useLoginNavigation";
+import { Typography } from "../components/common/Typography";
 
 const modules = {
     toolbar: [
@@ -45,6 +46,11 @@ const SellDesignPage = () => {
     }, []);
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
+        // if (id === "price") {
+        //     const rawValue = value.replace(/[^0-9]/g, "");
+        //     setData((prev) => ({ ...prev, price: rawValue }));
+        //     return;
+        // }
         setData((prev) => ({ ...prev, [id]: value }));
     };
 
@@ -59,15 +65,15 @@ const SellDesignPage = () => {
             return;
         }
         const formData = new FormData();
-        formData.append("name", data.name);
-        formData.append("modelFile", data.modelFile);
-        formData.append("widthSize", data.widthSize);
-        formData.append("heightSize", data.heightSize);
-        formData.append("lengthSize", data.lengthSize);
-        formData.append("price", data.price);
-        formData.append("description", data.description);
-        formData.append("category", data.category);
-        formData.append("downloadable", data.downloadable ? "true" : "false");
+        Object.entries(data).forEach(([key, value]) => {
+            if (value instanceof File) {
+                formData.append(key, value);
+            } else if (typeof value === "boolean") {
+                formData.append(key, value ? "true" : "false");
+            } else {
+                formData.append(key, String(value));
+            }
+        });
 
         try {
             const token = localStorage.getItem("accessToken");
@@ -86,20 +92,17 @@ const SellDesignPage = () => {
 
     return (
         <PageWrapper>
-            <Title>도면 판매</Title>
+            <Typography variant="heading.h6">도면판매</Typography>
 
             <RowContainer>
                 <InputContainer>
-                    <Step>도면 선택</Step>
                     <FileDrop setData={setData} />
                 </InputContainer>
                 <InputContainer>
                     <Step>제목</Step>
-                    <input id="name" value={data.name} onChange={handleInputChange} />
-                    <Step>가격</Step>
-                    <input id="price" value={data.price} onChange={handleInputChange} />
+                    <StyledInput id="name" value={data.name} onChange={handleInputChange} placeholder="제목을 입력해 주세요" />
                     <Step>카테고리</Step>
-                    <select onChange={(e) => setData((prev) => ({ ...prev, category: e.target.value }))} defaultValue={"INTERIOR_DECORATION"}>
+                    <StyledSelect onChange={(e) => setData((prev) => ({ ...prev, category: e.target.value }))} defaultValue={"INTERIOR_DECORATION"}>
                         <option value={"INTERIOR_DECORATION"}>인테리어 & 장식용</option>
                         <option value={"PLANTER_GARDENING"}>플랜테리어 / 정원용</option>
                         <option value={"STORAGE_ORGANIZATION"}>보관 & 정리용</option>
@@ -107,16 +110,24 @@ const SellDesignPage = () => {
                         <option value={"TOOLS_FUNCTIONALITY"}>도구 & 기능성</option>
                         <option value={"HOBBIES_PLAY"}>취미 & 놀이</option>
                         <option value={"COMMERCIAL_BRANDING"}>상업/브랜딩</option>
-                    </select>
-                    <Step>다운로드 가능</Step>
-                    <input id="downloadable" type="checkbox" checked={data.downloadable} onChange={(e) => setData((prev) => ({ ...prev, downloadable: e.target.checked }))} />
+                    </StyledSelect>
+                    <Step>가격</Step>
+                    <StyledInput id="price" value={data.price} onChange={handleInputChange} placeholder="가격을 입력해 주세요" />
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <Step>다운로드 가능</Step>
+                        <input id="downloadable" type="checkbox" checked={data.downloadable} onChange={(e) => setData((prev) => ({ ...prev, downloadable: e.target.checked }))} />
+                    </div>
                 </InputContainer>
             </RowContainer>
-            <Step>설명</Step>
+            <Step>작품 소개</Step>
             <QuillWrapper>
                 <ReactQuill theme="snow" value={value} onChange={handleDescriptionChange} modules={modules} formats={formats} />
             </QuillWrapper>
-            <SubmitButton onClick={handleSubmit}>제출하기</SubmitButton>
+            <SubmitButton onClick={handleSubmit}>
+                <Typography variant="body.small_m" color="grayScale.0">
+                    판매 시작
+                </Typography>
+            </SubmitButton>
         </PageWrapper>
     );
 };
@@ -124,23 +135,22 @@ const SellDesignPage = () => {
 export default SellDesignPage;
 
 const PageWrapper = styled.div`
+    padding-top: 32px;
     display: flex;
     flex-direction: column;
-    width: 100%;
-`;
+    width: 1120px;
 
-const Title = styled.div`
-    width: 100%;
-    font-size: 30px;
-    font-weight: bold;
-    border-bottom: 1px solid #707074;
+    margin: 0 auto;
 `;
 
 const RowContainer = styled.div`
-    margin-top: 20px;
+    margin: 20px 0 32px 0;
     display: flex;
     align-items: flex-start;
     gap: 20px;
+
+    border-bottom: 1px solid ${({ theme }) => theme.grayScale[200]};
+    padding-bottom: 32px;
 `;
 
 const InputContainer = styled.div`
@@ -151,34 +161,62 @@ const InputContainer = styled.div`
 `;
 
 const Step = styled.div`
-    font-size: 16px;
-    font-weight: bold;
+    margin-bottom: 4px;
+    color: ${({ theme }) => theme.text.heading};
+    font-size: ${({ theme }) => theme.typography.misc.label.fontSize};
+    font-weight: ${({ theme }) => theme.typography.misc.label.fontWeight};
+    line-height: ${({ theme }) => theme.typography.misc.label.lineHeight};
+`;
+
+const StyledInput = styled.input`
+    border: 1px solid ${({ theme }) => theme.grayScale[300]};
+    border-radius: 8px;
+    width: 548px;
+    height: 32px;
+    padding-left: 12px;
+
+    font-size: ${({ theme }) => theme.typography.misc.placeholder.fontSize};
+    font-weight: ${({ theme }) => theme.typography.misc.placeholder.fontWeight};
+    line-height: ${({ theme }) => theme.typography.misc.placeholder.lineHeight};
+
+    outline: none;
 `;
 
 const QuillWrapper = styled.div`
     width: 100%;
     .ql-container {
-        height: 320px; /* 에디터 최소 높이 */
+        height: 608px; /* 에디터 최소 높이 */
     }
 
     .ql-editor {
-        min-height: 320px; /* 편집 영역 최소 높이 */
+        min-height: 608px; /* 편집 영역 최소 높이 */
     }
 `;
 const SubmitButton = styled.div`
-    width: 200px;
+    width: 1120px;
     height: 40px;
-    margin-top: 20px;
-    background-color: #000000;
+    margin: 32px 0 130px 0;
+    background-color: ${({ theme }) => theme.grayScale[600]};
     color: white;
-    border-radius: 5px;
+    border-radius: 8px;
     font-size: 20px;
 
     cursor: pointer;
     &:hover {
-        background-color: #4682b4;
+        background-color: ${({ theme }) => theme.text.disabled};
     }
     display: flex;
     justify-content: center;
     align-items: center;
+`;
+
+const StyledSelect = styled.select`
+    width: 548px;
+    height: 32px;
+    border: 1px solid ${({ theme }) => theme.grayScale[300]};
+    border-radius: 8px;
+    padding-left: 12px;
+    font-size: ${({ theme }) => theme.typography.misc.placeholder.fontSize};
+    font-weight: ${({ theme }) => theme.typography.misc.placeholder.fontWeight};
+    line-height: ${({ theme }) => theme.typography.misc.placeholder.lineHeight};
 `;

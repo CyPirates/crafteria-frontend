@@ -1,14 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styled from "styled-components";
 import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
 import { DesignFormData } from "../../types/DesignType";
 import getStlModelSize from "../../utils/getStlModelSize";
+import { Typography } from "./Typography";
+import UploadIcon from "../../assets/images/icons/upload.png";
 
 type OwnProps = {
     setData: React.Dispatch<React.SetStateAction<DesignFormData>>;
+    modelFile?: File | null;
 };
 
-const FileDrop = ({ setData }: OwnProps) => {
+const FileDrop = ({ setData, modelFile }: OwnProps) => {
     const [isActive, setIsActive] = useState<boolean>(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -55,10 +58,28 @@ const FileDrop = ({ setData }: OwnProps) => {
         }
     };
 
+    useEffect(() => {
+        if (modelFile) {
+            setSelectedFile(modelFile);
+        }
+    }, [modelFile]);
+
     return (
         <Label isActive={isActive} onDragEnter={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragEnd} onDrop={handleDrop}>
             <input type="file" accept=".stl" onChange={handleOnChange} style={{ display: "none" }} />
-            {selectedFile ? <StlRenderContainer filePath={URL.createObjectURL(selectedFile)} width="250px" height="250px" clickDisabled={true} /> : <p>파일을 드롭하거나 클릭하여 업로드</p>}
+            {selectedFile ? (
+                <StlRenderContainer filePath={URL.createObjectURL(selectedFile)} width="250px" height="250px" clickDisabled={true} />
+            ) : (
+                <VerticalContainer>
+                    <img src={UploadIcon} alt="x" width="24px" height="24px" />
+                    <Typography variant="body.small_b" color="text.body">
+                        파일을 드롭하거나 클릭하여 업로드하세요
+                    </Typography>
+                    <Typography variant="body.small_r" color="grayScale.400">
+                        (.stl)
+                    </Typography>
+                </VerticalContainer>
+            )}
         </Label>
     );
 };
@@ -69,15 +90,18 @@ const Label = styled.label<{ isActive: boolean }>`
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 300px;
-    height: 300px;
-    border: 2px dashed ${({ isActive }) => (isActive ? "#000000" : "#999999")};
+    width: 548px;
+    height: 440px;
+    border-radius: 8px;
+    border: 2px dashed ${({ theme }) => theme.grayScale[200]};
+    background-color: ${({ theme }) => theme.grayScale[100]};
     cursor: pointer;
-    text-align: center;
-    font-size: 14px;
-    transition: border 0.2s ease-in-out;
+`;
 
-    &:hover {
-        border: 2px dashed #000000;
-    }
+const VerticalContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 `;

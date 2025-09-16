@@ -6,6 +6,7 @@ import { newAxios } from "../../utils/axiosWithUrl";
 import { useState, useEffect } from "react";
 import { Company } from "../../types/CompanyType";
 import DesignCard from "../common/DesignCard";
+import CompanyInfoCard from "../specific/MakeOrder/CompanyInfoCard";
 
 type OwnProps = {
     id: string;
@@ -56,28 +57,10 @@ const SearchResultCard = ({ id, resultType }: OwnProps) => {
     }
 
     if (manufacturerData) {
-        return (
-            <>
-                <StyledCard onClick={handleCardClick}>
-                    <img className="profile-image" src={manufacturerData.imageFileUrl} alt={manufacturerData.name} />
-                    <Card.Body>
-                        <Card.Title>{manufacturerData ? manufacturerData.name : "No Name"}</Card.Title>
-                        <Card.Text>
-                            {resultType === "manufacturer" && manufacturerData && (
-                                <>
-                                    <DetailText>제조 수 : {manufacturerData.equipmentList.length}</DetailText>
-                                    <DetailText>주소: {manufacturerData.address}</DetailText>
-                                    <DetailText>평점: {manufacturerData.rating}</DetailText>
-                                </>
-                            )}
-                        </Card.Text>
-                    </Card.Body>
-                </StyledCard>
-            </>
-        );
+        return <CompanyInfoCard data={manufacturerData} renderMaterial={true} selectMode={false} />;
     }
 
-    return <div>No Data</div>;
+    return <div>검색 결과가 없습니다.</div>;
 };
 
 export default SearchResultCard;

@@ -31,7 +31,7 @@ const SearchBar = () => {
 
 export default SearchBar;
 
-const SearchContainer = styled.div`
+const SearchContainer = styled.form`
     width: 192px;
     height: 40px;
     padding: 0 12px;

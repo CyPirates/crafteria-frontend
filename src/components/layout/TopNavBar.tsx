@@ -8,8 +8,10 @@ import { User } from "../../types/UserType";
 import CartDropdown from "./CartDropdown";
 import SearchBar from "./SearchBar";
 import UserMenuDropdown from "./UserMenuDropdown";
-import { smallLevelImagesArray as levelImagesArray } from "../common/LevelImagesArray";
+import Logo from "../../assets/logo2.png";
 import CouponBoxIcon from "../../assets/images/topNavBar/coupon.svg";
+import { Typography } from "../common/Typography";
+import requestVerify from "../../utils/requestVerify";
 
 const TopNavBar = () => {
     const navigate = useNavigate();
@@ -33,6 +35,38 @@ const TopNavBar = () => {
         window.open(url, "_blank", features);
     };
 
+    const isLogin = () => {
+        if (localStorage.getItem("accessToken")) return true;
+        alert("로그인이 필요합니다.");
+        navigate("/login");
+        return false;
+    };
+
+    const handleNavigate = (url: string) => {
+        if (isLogin()) navigate(url);
+    };
+
+    const verifyBeforeSell = async () => {
+        if (!isLogin()) return;
+
+        const isVerified = localStorage.getItem("verified");
+        if (isVerified === "true") {
+            navigate("/sell-design");
+            return;
+        }
+
+        const confirmResponse = window.confirm("도면 판매는 본인인증이 필요합니다.");
+        if (confirmResponse) {
+            const isVerifySuccess = await requestVerify();
+            if (!isVerifySuccess) return;
+            localStorage.setItem("verified", "true");
+            navigate("/sell-design");
+            return;
+        }
+        console.log(confirmResponse);
+        return;
+    };
+
     useEffect(() => {
         const token = localStorage.getItem("accessToken");
         if (token == null) return;
@@ -40,10 +74,13 @@ const TopNavBar = () => {
         const fetchUserData = async () => {
             try {
                 const response = await newAxios.get("/api/v1/users/me", { headers: { Authorization: `Bearer ${token}` } });
-                setUserData(response.data.data);
-                localStorage.setItem("realname", response.data.data.realname);
-                localStorage.setItem("email", response.data.data.oauth2Id);
-                console.log(response.data.data);
+                const userData = response.data.data;
+                setUserData(userData);
+                localStorage.setItem("user-id", userData.id);
+                localStorage.setItem("realname", userData.realname);
+                localStorage.setItem("email", userData.oauth2Id);
+                localStorage.setItem("verified", userData.identityVerified.toString());
+                console.log("유저정보불러옴" + response.data.data);
             } catch (e: any) {
                 if (e.response.status == 401) {
                     alert("로그인 세션이 만료되었습니다.");
@@ -70,21 +107,23 @@ const TopNavBar = () => {
         <>
             <NavContainer>
                 <ContentsContainer>
-                    <LogoContainer onClick={() => navigate("/home")}>Crafteria</LogoContainer>
+                    <LogoContainer onClick={() => navigate("/home")}>
+                        <img src={Logo} alt="x" />
+                    </LogoContainer>
                     <NavMenuContainer>
-                        <NavMenu to="/home" isActive={location.pathname === "/home"}>
+                        <NavMenu variant="body.medium_r" onClick={() => navigate("/home")} isActive={location.pathname === "/home"}>
                             홈
                         </NavMenu>
-                        <NavMenu to="/my-design" isActive={location.pathname === "/my-design"}>
+                        <NavMenu variant="body.medium_r" onClick={() => handleNavigate("/my-design")} isActive={location.pathname === "/my-design"}>
                             내 도면
                         </NavMenu>
-                        <NavMenu to="/design-market" isActive={location.pathname === "/design-market" || location.pathname.startsWith("/design")}>
+                        <NavMenu variant="body.medium_r" onClick={() => navigate("/design-market")} isActive={location.pathname === "/design-market" || location.pathname.startsWith("/design")}>
                             도면장터
                         </NavMenu>
-                        <NavMenu to="/print-order" isActive={location.pathname === "/print-order"}>
+                        <NavMenu variant="body.medium_r" onClick={() => handleNavigate("/print-order")} isActive={location.pathname === "/print-order"}>
                             주문하기
                         </NavMenu>
-                        <NavMenu to="/sell-design" isActive={location.pathname === "/sell-design"}>
+                        <NavMenu variant="body.medium_r" onClick={verifyBeforeSell} isActive={location.pathname === "/sell-design"}>
                             도면판매
                         </NavMenu>
                     </NavMenuContainer>
@@ -111,10 +150,10 @@ export default TopNavBar;
 
 const NavContainer = styled.div`
     min-width: 100%;
-    height: 50px;
+    height: 56px;
     position: fixed;
     top: 0;
-    background-color: ${({ theme }) => theme.bgColor};
+    background-color: ${({ theme }) => theme.grayScale[0]};
 
     display: flex;
     align-items: center;
@@ -136,10 +175,15 @@ const LogoContainer = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: auto;
+    width: 104px;
+    height: 32px;
     font-weight: bold;
     font-size: 20px;
     color: ${({ theme }) => theme.text.heading};
+
+    img {
+        width: 104px;
+    }
 
     &:hover {
         cursor: pointer;
@@ -147,20 +191,18 @@ const LogoContainer = styled.div`
 `;
 
 const NavMenuContainer = styled.div`
-    width: auto;
+    //width: 404px;
     height: 100%;
-    margin: 0 187px;
+    margin: 0 180px;
     gap: 48px;
-
     display: flex;
 `;
 
-const NavMenu = styled(Link)<{ isActive: boolean }>`
+const NavMenu = styled(Typography)<{ isActive: boolean }>`
     height: 100%;
     text-decoration: none;
-    color: ${({ theme, isActive }) => (isActive ? theme.text.heading : theme.text.placeholder)};
-    font-weight: ${({ isActive }) => (isActive ? "bold" : "normal")};
-    font-size: 14px;
+    color: ${({ theme, isActive }) => (isActive ? theme.grayScale[600] : theme.grayScale[500])};
+    font-weight: ${({ isActive }) => (isActive ? "bold" : 300)};
     border-bottom: ${({ isActive }) => (isActive ? "2px solid #111111" : "none")};
 
     display: flex;
@@ -183,18 +225,9 @@ const LoginButton = styled.div`
 
 const UserInfoArea = styled.div`
     margin-left: 16px;
-
+    flex: 1;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 16px;
-`;
-
-const UserInfoBox = styled.div`
-    width: 117px;
-    height: 40px;
-    border-radius: 20px;
-    background-color: ${({ theme }) => theme.grayScale[100]};
-
-    display: flex;
-    align-items: center;
 `;

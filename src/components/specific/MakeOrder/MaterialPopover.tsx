@@ -41,6 +41,6 @@ const ColorButton = styled.div`
     width: 16px;
     height: 16px;
     background-color: ${(props) => props.color};
-    border: 1px solid #919191;
+    border: 1px solid ${({ theme }) => theme.grayScale[200]};
     border-radius: 50%;
 `;

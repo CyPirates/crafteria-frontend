@@ -6,7 +6,7 @@ export type User = {
     realname: string;
     role: string;
     username: string | null;
-    address: string;
+    addresses: Address[];
     totalPurchaseCount: number;
     totalPurchaseAmount: number;
     totalUploadCount: number;
@@ -16,4 +16,15 @@ export type User = {
     totalPrintedAmount: number;
     userLevel: number;
     sellerLevel: number;
+    profileImageUrl: string;
+    identityVerified: boolean;
+    identityVerifiedAt: string;
+};
+
+export type Address = {
+    id: string;
+    default: boolean;
+    label: string;
+    baseaddress: string;
+    detailAddress: string;
 };

@@ -6,6 +6,7 @@ import DesignOutlineCard from "../components/specific/myDesign/DesignOutlineCard
 import { ErrorType } from "../types/ErrorType";
 import useLoginNavigation from "../hooks/useLoginNavigation";
 import useAuthErrorHandler from "../hooks/useAuthErrorHandler";
+import { Typography } from "../components/common/Typography";
 
 const MyDesignPage = () => {
     return (
@@ -59,14 +60,16 @@ const DesignList = () => {
 
     return (
         <>
-            <Title>내 도면</Title>
+            <Typography variant="heading.h6" color="text.heading">
+                내 도면
+            </Typography>
             <HeaderContainer>
-                <FilterText isActive={!isPublished} onClick={() => handleFilterClick(false)}>
-                    구매한 도면
-                </FilterText>
-                <FilterText isActive={isPublished} onClick={() => handleFilterClick(true)}>
-                    판매중 도면
-                </FilterText>
+                <FilterButton isActive={!isPublished} onClick={() => handleFilterClick(false)}>
+                    <Typography variant="body.small_b">구매한 도면</Typography>
+                </FilterButton>
+                <FilterButton isActive={isPublished} onClick={() => handleFilterClick(true)}>
+                    <Typography variant="body.small_b">업로드한 도면</Typography>
+                </FilterButton>
             </HeaderContainer>
             <CardContainer>
                 {isPublished ? (
@@ -88,43 +91,36 @@ const DesignList = () => {
 export default MyDesignPage;
 
 const PageWrapper = styled.div`
-    margin-top: 50px;
+    padding-top: 32px;
+    padding-left: 80px;
     height: auto;
     display: flex;
-    flex-direction: row;
-    gap: 40px;
-`;
-
-const Title = styled.div`
-    width: 100%;
-    font-size: 30px;
-    font-weight: bold;
-    border-bottom: 1px solid #707074;
-    margin-bottom: 12px;
 `;
 
 const DesignListContainer = styled.div``;
 
 const HeaderContainer = styled.div`
-    margin-bottom: 1vw;
+    margin: 16px 0;
     display: flex;
     flex-direction: row;
+    gap: 4px;
 `;
 
-const FilterText = styled.div<{ isActive: boolean }>`
-    font-size: 15px;
-    margin-right: 20px;
+const FilterButton = styled.div<{ isActive: boolean }>`
+    height: 40px;
+    padding: 0 20px;
+    color: ${({ theme, isActive }) => (isActive ? theme.primaryColor.blue1 : theme.grayScale[300])};
+    border: 1.4px solid ${({ theme, isActive }) => (isActive ? theme.primaryColor.blue1 : theme.grayScale[200])};
+    border-radius: 8px;
+    background-color: ${({ theme, isActive }) => (isActive ? theme.primaryColor.blue3 : theme.grayScale[0])};
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     cursor: pointer;
-    color: ${({ isActive }) => (isActive ? "#F4351D" : "#B3B3B3")};
-`;
-
-const CurrentStateContainer = styled.div`
-    width: 500px;
-    height: 1000px;
-    background-color: #5c5c60;
-    border-radius: 10px;
 `;
 
 const CardContainer = styled.div`
-    width: 700px;
+    width: 1280px;
 `;

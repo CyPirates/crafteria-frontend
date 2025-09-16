@@ -5,10 +5,7 @@ import styled from "styled-components";
 import CompanyInfoCard from "./CompanyInfoCard";
 import useCompanyFilter from "../../../hooks/useCompanyFilter";
 import { IoIosSearch } from "react-icons/io";
-
-type OwnProps = {
-    setSelectedCompany: React.Dispatch<React.SetStateAction<Company | undefined>>;
-};
+import { Typography } from "../../common/Typography";
 
 type SearchResult = {
     type: string;
@@ -18,7 +15,7 @@ type SearchResult = {
     additionalInfo: string | null;
 };
 
-const SelectCompany = (props: OwnProps) => {
+const SelectCompany = () => {
     const [companies, setCompanies] = useState<Company[]>([]);
     const [searchResult, setSearchResult] = useState<SearchResult[]>([]);
     const [filteredCompanies, setFilteredCompanies] = useState<Company[]>([]);
@@ -94,11 +91,13 @@ const SelectCompany = (props: OwnProps) => {
 
     return (
         <>
-            <Step>
-                <StepName>
-                    제조사 선택
+            <PageWrapper>
+                <div style={{ display: "flex" }}>
+                    <Typography variant="heading.h6" color="text.heading">
+                        제조사 선택
+                    </Typography>
                     <SearchBar onSearchSubmit={handleSearchSubmit} />
-                </StepName>
+                </div>
                 <FilterContainer>
                     <FilterCategory>보유 재료</FilterCategory>
 
@@ -118,9 +117,9 @@ const SelectCompany = (props: OwnProps) => {
                     ))}
                 </FilterContainer>
                 {filteredCompanies.map((e) => (
-                    <CompanyInfoCard key={e.id} data={e} setSelectedCompany={props.setSelectedCompany} />
+                    <CompanyInfoCard key={e.id} data={e} renderMaterial={true} selectMode={true} />
                 ))}
-            </Step>
+            </PageWrapper>
         </>
     );
 };
@@ -140,20 +139,11 @@ const SearchBar: React.FC<{
 
 export default SelectCompany;
 
-const Step = styled.div`
-    margin-top: 10px;
+const PageWrapper = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    border-bottom: 1px solid #707074;
-`;
-
-const StepName = styled.div`
-    margin-bottom: 4px;
-    font-size: 20px;
-    font-weight: bold;
-
-    display: flex;
+    width: 1280px;
+    //padding: 10px;
 `;
 
 const FilterCategory = styled.div`

@@ -1,38 +1,16 @@
 import { createGlobalStyle } from "styled-components";
-import PoppinsRegular from "../fonts/Poppins-Regular.ttf";
-import PoppinsMedium from "../fonts/Poppins-Medium.ttf";
-import PoppinsBold from "../fonts/Poppins-Bold.ttf";
 
 export const GlobalStyle = createGlobalStyle`
-  /* Regular */
-  @font-face {
-    font-family: 'Poppins';
-    src: url(${PoppinsRegular}) format('truetype');
-    font-weight: 400;
-    font-style: normal;
-  }
 
-  /* Medium */
-  @font-face {
-    font-family: 'Poppins';
-    src: url(${PoppinsMedium}) format('truetype');
-    font-weight: 500;
-    font-style: normal;
-  }
-
-  /* Bold */
-  @font-face {
-    font-family: 'Poppins';
-    src: url(${PoppinsBold}) format('truetype');
-    font-weight: 700;
-    font-style: normal;
-  }
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
   body {
     margin: 0;
     padding: 0;
     background-color: ${({ theme }) => theme.bgColor};
     color: ${({ theme }) => theme.textColor};
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui,
+                 Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo',
+                 'Noto Sans KR', 'Malgun Gothic', sans-serif;
   }
 `;

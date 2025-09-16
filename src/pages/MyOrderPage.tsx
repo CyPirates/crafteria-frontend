@@ -5,6 +5,7 @@ import styled from "styled-components";
 import OrderCard from "../components/specific/myPage/OrderCard";
 import useClassifiedOrderList from "../hooks/useClassifiedOrderList";
 import useAuthErrorHandler from "../hooks/useAuthErrorHandler";
+import { Typography } from "../components/common/Typography";
 
 const MyOrderPage = () => {
     const { handleAuthError } = useAuthErrorHandler();
@@ -67,10 +68,11 @@ const MyOrderPage = () => {
     }, []);
 
     return (
-        <>
-            <Title>나의 주문</Title>
+        <PageWrapper>
+            <Typography variant="heading.h6" color="text.heading">
+                주문 내역
+            </Typography>
             <FilterContainer>
-                <FilterCategory>상태</FilterCategory>
                 {filterTextArray.map((text) => (
                     <FilterLabel key={text}>
                         <input type="checkbox" checked={text === "전체" ? filterText.length === 0 : filterText.includes(text)} onChange={() => handleCheckboxChange(text)} />
@@ -78,22 +80,15 @@ const MyOrderPage = () => {
                     </FilterLabel>
                 ))}
             </FilterContainer>
-            <CardContainer>
-                {filteredOrders.length > 0 ? filteredOrders.map((order) => <OrderCard key={order.orderId} data={order} />) : <NoOrders>해당 상태의 주문이 없습니다.</NoOrders>}
-            </CardContainer>
-        </>
+            <CardContainer>{filteredOrders.length > 0 ? filteredOrders.map((order) => <OrderCard key={order.orderId} data={order} />) : <NoOrders>주문이 없습니다.</NoOrders>}</CardContainer>
+        </PageWrapper>
     );
 };
 
 export default MyOrderPage;
 
-// 스타일링
-const Title = styled.div`
-    width: 100%;
-    font-size: 30px;
-    font-weight: bold;
-    border-bottom: 3px solid #707074;
-    margin-bottom: 10px;
+const PageWrapper = styled.div`
+    padding: 32px 0 0 80px;
 `;
 
 const CardContainer = styled.div``;

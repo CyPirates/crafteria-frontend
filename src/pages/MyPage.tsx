@@ -4,16 +4,16 @@ import { User } from "../types/UserType";
 import { newAxios } from "../utils/axiosWithUrl";
 import { PiUserCircleLight } from "react-icons/pi";
 
-import { bigLevelImagesArray as levelImagesArray } from "../components/common/LevelImagesArray";
+import { bigLevelImagesArray as levelImagesArray, smallLevelImagesArray } from "../components/common/LevelImagesArray";
 import BlackButton from "../components/common/BlackButton";
+import { Typography } from "../components/common/Typography";
 
 const MyPage = () => {
     const [userData, setUserData] = useState<User | undefined>(undefined);
     const [isNameEdited, setIsNameEdited] = useState<boolean>(false);
     const [newName, setNewName] = useState<string>("");
     const [newAddress, setNewAddress] = useState<string>("");
-    const userLevelImg = userData && levelImagesArray[userData.userLevel];
-    const sellerLevelImg = userData && levelImagesArray[userData.sellerLevel];
+    const [addressEditMode, setAddressEditMode] = useState<boolean>(false);
     const fetchUserData = async () => {
         const token = localStorage.getItem("accessToken");
         try {
@@ -32,7 +32,7 @@ const MyPage = () => {
             try {
                 const response = await newAxios.patch(
                     `/api/v1/users/me`,
-                    { username: newName, realname: userData?.realname, address: userData?.address },
+                    { username: newName, realname: userData?.realname, addresses: userData?.addresses },
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
             } catch (e) {
@@ -72,11 +72,14 @@ const MyPage = () => {
     }, []);
     if (!userData) return null;
     return (
-        <>
-            <PageTitle>마이페이지</PageTitle>
+        <PageWrapper>
+            <Typography variant="heading.h6" color="text.heading">
+                마이페이지
+            </Typography>
 
             <ColoumnContainer>
-                <PiUserCircleLight size={"12em"} />
+                {userData.profileImageUrl ? <img src={userData.profileImageUrl} alt="x" /> : <PiUserCircleLight size={"12em"} />}
+
                 {isNameEdited ? (
                     <input value={newName} onChange={(e) => setNewName(e.target.value)} maxLength={12} />
                 ) : (
@@ -85,16 +88,21 @@ const MyPage = () => {
                 <div style={{ color: "#707074" }}>{userData.oauth2Id}</div>
 
                 <BlackButton style={{ width: "60px", height: "24px", fontSize: "14px" }} onClick={handleNameEditButtonClick}>
-                    {isNameEdited ? "저장" : "수정"}
+                    <Typography variant="body.small_m">{isNameEdited ? "저장" : "이름 수정"}</Typography>
                 </BlackButton>
             </ColoumnContainer>
-            <Category>구매 현황</Category>
+            <div style={{ display: "flex", marginTop: "16px" }}>
+                <Typography variant="body.medium_b" color="text.heading">
+                    구매 현황
+                </Typography>
+                <LevelContainer>
+                    <img src={smallLevelImagesArray[userData.userLevel]} alt="x" />
+                    <Typography variant="body.xs_m" color="grayScale.400">
+                        LEVEL {userData.userLevel}
+                    </Typography>
+                </LevelContainer>
+            </div>
             <ContentsContainer>
-                <ColoumnContainer style={{ width: "320px" }}>
-                    <img src={userLevelImg} alt="x" width={"100px"} height={"100px"} />
-                    <div>Lv.{userData.userLevel}</div>
-                </ColoumnContainer>
-                <VerticalLine />
                 <SpaceContainer>
                     <ColoumnContainer>
                         <div>구매한 도면</div>
@@ -108,61 +116,60 @@ const MyPage = () => {
                     <VerticalLine />
                     <ColoumnContainer>
                         <div>프린트 의뢰</div>
-                        <div>{userData.totalPrintedCount}</div>
+                        <div>{userData.totalPrintedCount} 개</div>
                     </ColoumnContainer>
                     <VerticalLine />
                     <ColoumnContainer>
                         <div>프린트 의뢰 총액</div>
-                        <div>{userData.totalPrintedAmount}</div>
+                        <div>{userData.totalPrintedAmount} 원</div>
                     </ColoumnContainer>
                 </SpaceContainer>
             </ContentsContainer>
-            <Category>판매 현황</Category>
+
+            <div style={{ display: "flex", marginTop: "16px" }}>
+                <Typography variant="body.medium_b" color="text.heading">
+                    판매 현황
+                </Typography>
+                <LevelContainer>
+                    <img src={smallLevelImagesArray[userData.sellerLevel]} alt="x" />
+                    <Typography variant="body.xs_m" color="grayScale.400">
+                        LEVEL {userData.sellerLevel}
+                    </Typography>
+                </LevelContainer>
+            </div>
             <ContentsContainer>
-                <ColoumnContainer style={{ width: "320px" }}>
-                    <img src={sellerLevelImg} alt="x" width={"100px"} height={"100px"} />
-                    <div>Lv.{userData.sellerLevel}</div>
-                </ColoumnContainer>
-                <VerticalLine />
                 <SpaceContainer>
                     <ColoumnContainer>
                         <div>도면 판매 수</div>
-                        <div>{userData.totalSalesCount}</div>
+                        <div>{userData.totalSalesCount}개</div>
                     </ColoumnContainer>
                     <VerticalLine />
                     <ColoumnContainer>
                         <div>도면 판매 총액</div>
-                        <div>{userData.totalSalesAmount}</div>
+                        <div>{userData.totalSalesAmount} 원</div>
                     </ColoumnContainer>
                 </SpaceContainer>
             </ContentsContainer>
-            <Category>기본 주소</Category>
-            <ContentsContainer>
-                {userData.address ? userData.address : "설정된 주소가 없습니다"}
-                <EditAddressButton>수정</EditAddressButton>
-            </ContentsContainer>
+            <div style={{ marginTop: "16px" }} />
+            <Typography variant="body.medium_b" color="text.heading">
+                주소지 관리
+            </Typography>
+            <ContentsContainer>{userData.addresses ? userData.addresses[0].id : "설정된 주소가 없습니다"}</ContentsContainer>
+
             <div style={{ marginBottom: "16px" }} />
-        </>
+        </PageWrapper>
     );
 };
 
 export default MyPage;
 
-const PageTitle = styled.div`
+const PageWrapper = styled.div`
     width: 100%;
-    font-size: 30px;
-    font-weight: bold;
-    border-bottom: 1px solid #707074;
-`;
-
-const Category = styled.div`
-    margin-top: 16px;
-    font-size: 24px;
-    font-weight: bold;
+    padding: 32px 80px;
 `;
 const ContentsContainer = styled.div`
     width: 1260px;
-    height: 140px;
+    min-height: 80px;
     margin-top: 20px;
     border: 1px solid #ececec;
     border-radius: 8px;
@@ -176,7 +183,7 @@ const ContentsContainer = styled.div`
 `;
 
 const SpaceContainer = styled.div`
-    width: 940px;
+    flex: 1;
     height: 100%;
     display: flex;
     justify-content: space-evenly;
@@ -190,16 +197,24 @@ const ColoumnContainer = styled.div`
 `;
 
 const VerticalLine = styled.div`
-    height: 90%;
+    height: 60px;
     border-left: 1px solid #ececec;
 `;
 
-const EditAddressButton = styled(BlackButton)`
-    width: 60px;
+const LevelContainer = styled.div`
+    width: 76px;
     height: 24px;
-    font-size: 14px;
+    margin-left: 12px;
+    background-color: ${({ theme }) => theme.grayScale[100]};
+    border-radius: 30px;
+    padding: 0 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    position: absolute;
-    bottom: 12px;
-    right: 12px;
+    img {
+        width: 16px;
+        height: 16px;
+        margin-right: 2px;
+    }
 `;

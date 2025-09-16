@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { useEffect, useState } from "react";
 import { newAxios } from "../utils/axiosWithUrl";
 import SearchResultCard from "../components/SearchResult/SearchResultCard";
+import { Typography } from "../components/common/Typography";
 
 type ModelResult = {
     type: string;
@@ -22,8 +23,8 @@ type ManufacturerResult = {
 const SearchResultPage = () => {
     const [searchParams] = useSearchParams();
     const query = searchParams.get("query");
-    const [filterText, setFilterText] = useState<string[]>([]);
-    const filterTextArray = ["전체", "도면", "제조사"];
+    const [filterText, setFilterText] = useState<string[]>(["도면", "제조사"]);
+    const filterTextArray = ["도면", "제조사"];
     const [modelIdArray, setModelIdArray] = useState<string[]>([]);
     const [manufacturerIdArray, setManufacturerIdArray] = useState<string[]>([]);
 
@@ -65,42 +66,34 @@ const SearchResultPage = () => {
 
     return (
         <PageWrapper>
-            <Title>"{query}" 에 대한 검색 결과</Title>
-            {/* <FilterContainer>
-                <FilterCategory>검색 필터</FilterCategory>
-
+            <Typography variant="heading.h6" color="text.heading">
+                "{query}" 에 대한 검색 결과
+            </Typography>
+            <FilterContainer>
                 {filterTextArray.map((text) => (
                     <FilterLabel key={text}>
-                        <input
-                            type="checkbox"
-                            checked={
-                                text === "전체"
-                                    ? filterText.length === 0 // "상관없음"은 filterText가 빈 배열일 때 체크
-                                    : filterText.includes(text)
-                            }
-                            onChange={() => handleCheckboxChange(text)}
-                        />
+                        <input type="checkbox" checked={filterText.includes(text)} onChange={() => handleCheckboxChange(text)} />
                         {text}
                     </FilterLabel>
                 ))}
-            </FilterContainer> */}
+            </FilterContainer>
             {modelIdArray.length === 0 && manufacturerIdArray.length === 0 && <div>검색 결과가 없습니다.</div>}
-            {modelIdArray.length > 0 && ( //modelIdArray에 요소가 하나라도 있을 경우에만 렌더링
+            {modelIdArray.length > 0 && filterText.includes("도면") && (
                 <>
                     <Category>도면</Category>
-                    <CardContainer>
+                    <DesignContainer>
                         {modelIdArray.map((id) => (
-                            <SearchResultCard id={id} resultType="model" key={id} /> //key prop 추가
+                            <SearchResultCard id={id} resultType="model" key={id} />
                         ))}
-                    </CardContainer>
+                    </DesignContainer>
                 </>
             )}
-            {manufacturerIdArray.length > 0 && (
+            {manufacturerIdArray.length > 0 && filterText.includes("제조사") && (
                 <>
                     <Category>제조사</Category>
                     <CardContainer>
                         {manufacturerIdArray.map((id) => (
-                            <SearchResultCard id={id} resultType="manufacturer" key={id} /> //key prop 추가
+                            <SearchResultCard id={id} resultType="manufacturer" key={id} />
                         ))}
                     </CardContainer>
                 </>
@@ -111,15 +104,8 @@ const SearchResultPage = () => {
 
 export default SearchResultPage;
 
-const PageWrapper = styled.div``;
-
-const Title = styled.div`
-    width: 100%;
-    font-size: 20px;
-    font-weight: bold;
-    border-bottom: 2px solid #707074;
-    margin-top: 60px;
-    margin-bottom: 10px;
+const PageWrapper = styled.div`
+    padding: 36px 0 36px 80px;
 `;
 
 const Category = styled.div`
@@ -132,12 +118,12 @@ const CardContainer = styled.div`
     width: 100%;
     display: flex;
     flex-wrap: wrap;
-    gap: 20px;
+    gap: 16px;
 `;
-
-const FilterCategory = styled.div`
-    padding-right: 8px;
-    border-right: 1.5px solid black;
+const DesignContainer = styled.div`
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
 `;
 
 const FilterContainer = styled.div`

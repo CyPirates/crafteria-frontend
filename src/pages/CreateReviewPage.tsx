@@ -1,14 +1,18 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { GoStarFill } from "react-icons/go";
 import { MdAddPhotoAlternate } from "react-icons/md";
 
 import { Company } from "../types/CompanyType";
 import { newAxios } from "../utils/axiosWithUrl";
+import { Typography } from "../components/common/Typography";
 
 const CreateReviewPage = () => {
-    const { id } = useParams();
+    const [searchParams] = useSearchParams();
+    const orderId = searchParams.get("orderId");
+    const manufacturerId = searchParams.get("manufacturerId");
+
     const navigate = useNavigate();
     const [companyInfo, setCompanyInfo] = useState<Company | undefined>(undefined);
     const [rating, setRating] = useState(0);
@@ -19,7 +23,7 @@ const CreateReviewPage = () => {
     useEffect(() => {
         const fetchCompanyInfo = async () => {
             try {
-                const response = await newAxios.get(`/api/v1/manufacturers/${id}`);
+                const response = await newAxios.get(`/api/v1/manufacturers/${manufacturerId}`);
                 console.log(response.data.data);
                 setCompanyInfo(response.data.data);
             } catch (e) {
@@ -80,11 +84,8 @@ const CreateReviewPage = () => {
         const token = localStorage.getItem("accessToken");
         const data = new FormData();
 
-        data.append("manufacturerId", id!);
-        console.log(id);
-        console.log(reviewContent);
-        console.log(rating);
-        console.log(imageFiles[0]);
+        data.append("manufacturerId", manufacturerId!);
+        data.append("orderId", orderId!);
         data.append("content", reviewContent);
         data.append("rating", rating.toString());
 
@@ -120,8 +121,9 @@ const CreateReviewPage = () => {
     return (
         <>
             <PageWrapper>
-                <Title> 제조사 리뷰 작성</Title>
-                <Line />
+                <Typography variant="heading.h6" color="text.heading">
+                    리뷰 작성
+                </Typography>
                 <CompanyContainer>
                     <CompanyImage src={companyInfo?.imageFileUrl} alt="x" />
                     <InfoAndRating>
@@ -159,29 +161,23 @@ const CreateReviewPage = () => {
 export default CreateReviewPage;
 
 const PageWrapper = styled.div`
-    margin-top: 50px;
-    /* 
-    display: flex;
-    flex-direction: column;
-    justify-content: center; */
+    padding: 32px 48px;
 `;
-const Title = styled.div`
-    width: 100%;
-    font-size: 30px;
-    font-weight: bold;
-`;
+
 const Line = styled.div`
     width: 100%;
     margin: 30px 0px;
-    border-bottom: 1px solid #464649;
+    border-bottom: 1px solid ${({ theme }) => theme.grayScale[200]};
 `;
 const CompanyContainer = styled.div`
     display: flex;
+    margin-top: 32px;
 `;
 const CompanyImage = styled.img`
-    width: 200px;
-    height: 200px;
+    width: 100px;
+    height: 100px;
     margin-right: 30px;
+    border-radius: 50%;
     object-fit: cover;
 `;
 const InfoAndRating = styled.div`
@@ -245,7 +241,7 @@ const ButtonContainer = styled.div`
 `;
 
 const SubmitButton = styled.div`
-    width: 240px;
+    width: 100%;
     height: 40px;
     margin: 20px;
     background-color: black;

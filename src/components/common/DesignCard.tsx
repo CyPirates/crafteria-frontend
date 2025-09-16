@@ -1,10 +1,14 @@
-import { MdFileDownload, MdShoppingCart, MdRemoveRedEye, MdOutlineStar } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Card } from "react-bootstrap";
+
 import { Design } from "../../types/DesignType";
 import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
 import categoryKeys from "../../types/Category";
+import EyeIcon from "../../assets/images/icons/eye.png";
+import CartIcon from "../../assets/images/icons/shopping-cart-fill.png";
+import BuyIcon from "../../assets/images/icons/buy.png";
+import { Typography } from "./Typography";
 
 const DesignCard = ({ designData }: { designData: Design }) => {
     const navigate = useNavigate();
@@ -17,26 +21,33 @@ const DesignCard = ({ designData }: { designData: Design }) => {
     return (
         <>
             <StyledCard onClick={handleOnClick}>
-                {modelFileUrl ? <StlRenderContainer filePath={modelFileUrl} width="230px" height="150px" clickDisabled={true} /> : <div style={{ width: "230px", height: "150px" }} />}
+                {modelFileUrl ? (
+                    <StlRenderContainer filePath={modelFileUrl} width="244px" height="195px" clickDisabled={true} />
+                ) : (
+                    <div style={{ width: "244px", height: "195px", backgroundColor: "#F3F4F5", borderRadius: "8px" }} />
+                )}
                 <Card.Body>
-                    <Card.Title>{name}</Card.Title>
+                    <Card.Title>
+                        {name}
+                        <HeaderInfoContainer>
+                            <div>
+                                <img src={EyeIcon} style={{ width: "12px", height: "12px" }} alt="x" />
+                                {viewCount}
+                            </div>
+                            <div>
+                                <img src={BuyIcon} style={{ width: "12px", height: "12px" }} alt="x" />
+                                {downloadCount}
+                            </div>
+                        </HeaderInfoContainer>
+                    </Card.Title>
                     <Card.Text>
-                        <DetailText>{author.name}</DetailText>
-                        <DetailText>{categoryKeys[category]}</DetailText>
-                        <div style={{ fontSize: "16px" }}>₩{+price * 1.1}</div>
+                        <div>{author.name}</div>
+                        <div>{categoryKeys[category]}</div>
+                        <Typography variant="body.medium_m" color="text.body">
+                            ₩{Math.round(+price * 1.1)}
+                        </Typography>
                     </Card.Text>
                 </Card.Body>
-                <CardFooter>
-                    <DetailText>
-                        <MdShoppingCart /> {downloadCount}
-                    </DetailText>
-                    <DetailText>
-                        <MdRemoveRedEye /> {viewCount}
-                    </DetailText>
-                    <DetailText>
-                        <MdOutlineStar /> {rating}
-                    </DetailText>
-                </CardFooter>
             </StyledCard>
         </>
     );
@@ -44,30 +55,30 @@ const DesignCard = ({ designData }: { designData: Design }) => {
 
 export default DesignCard;
 
-const StyledCard = styled(Card)`
-    width: 248px;
-    height: auto;
+const StyledCard = styled.div`
+    width: 244px;
+    height: 289px;
     color: black;
-    margin-bottom: 4vw;
-    padding-top: 10px;
+    border: none;
 
     &:hover {
-        //box-shadow: 5px 5px 5px black;
         cursor: pointer;
     }
 
-    .card-img-top {
-        width: 230px;
-        aspect-ratio: 1.4/1;
-        object-fit: cover;
-        border-top-right-radius: 10px;
-        border-top-left-radius: 10px;
+    .card-title {
+        color: ${({ theme }) => theme.text.heading};
+        font-size: 15px;
+        font-weight: bold;
+        margin: 12px 0 4px 0;
+
+        display: flex;
+        justify-content: space-between;
     }
 
-    .card-title {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 10px;
+    .card-text {
+        color: ${({ theme }) => theme.grayScale[400]};
+        font-size: 13px;
+        margin-bottom: 4px;
     }
 
     .footer {
@@ -77,17 +88,22 @@ const StyledCard = styled(Card)`
     }
 `;
 
-const CardFooter = styled(Card.Footer)`
-    height: 36px;
-    background-color: white;
-    padding: 0 20px;
+const HeaderInfoContainer = styled.div`
+    width: auto;
+    height: 12px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-`;
+    gap: 8px;
+    justify-content: start;
 
-const DetailText = styled.div`
-    margin-bottom: 5px;
-    font-size: 14px;
-    color: #555;
+    & > div {
+        width: auto;
+        font-size: ${({ theme }) => theme.typography.body.xs_m.fontSize};
+        font-weight: ${({ theme }) => theme.typography.body.xs_m.fontWeight};
+        line-height: ${({ theme }) => theme.typography.body.xs_m.lineHeight};
+        color: ${({ theme }) => theme.grayScale[400]};
+
+        display: flex;
+        gap: 2px;
+        align-items: center;
+    }
 `;

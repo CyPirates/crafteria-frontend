@@ -6,13 +6,17 @@ import classifyMaterial from "../../../utils/classifyMaterial";
 import convertMaterialName from "../../../utils/convertMaterialName";
 import React from "react";
 import convertHoursToDHM from "../../../utils/convertHoursToDHM";
+import { Typography } from "../../common/Typography";
+import { useNavigate } from "react-router-dom";
 
 type CompanyInfoProps = {
     data: Company;
-    setSelectedCompany?: React.Dispatch<React.SetStateAction<Company | undefined>>;
+    renderMaterial: boolean;
+    selectMode: boolean;
 };
 
-const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
+const CompanyInfoCard = ({ data, renderMaterial, selectMode }: CompanyInfoProps) => {
+    const navigate = useNavigate();
     const materials = classifyMaterial(data);
     const isMaterialsEmpty = Object.keys(materials).length === 0;
     if (isMaterialsEmpty) return null;
@@ -32,64 +36,68 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
     return (
         <CompanyContainer>
             <CompanyImage src={data.imageFileUrl} />
-            <CompanyInfo>
-                <NameAndRating>
-                    <CompanyName>{data.name}</CompanyName>
-                    <Rating>
-                        <img src={Star} alt="x" />
-                        {data.rating}
-                    </Rating>
-                </NameAndRating>
-                <Contents>{data.introduction}</Contents>
-                <Contents>대표 장비: {data.representativeEquipment}</Contents>
-                <Contents>누적 주문 수: {data.productionCount}</Contents>
-            </CompanyInfo>
-            <Divider />
-            <MaterialContainer>
-                <MaterialTable>
-                    <thead>
-                        <tr>
-                            <th>보유 재료</th>
-                            <th>1cm³당 시간</th>
-                            <th>1cm³당 평균가격</th>
-                            <th>색상</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {Object.entries(materials).map(([key, value]) => {
-                            if (value.materials.length === 0) return null;
+            <InfoContainer>
+                <Typography variant="body.medium_b" color="text.heading">
+                    {data.name}
+                </Typography>
+                <Information>
+                    <img src={Star} alt="x" />
+                    <Typography variant="body.small_r">
+                        {data.rating} | 대표장비: {data.representativeEquipment} | 누적 주문 수: {data.productionCount}
+                    </Typography>
+                </Information>
+                {renderMaterial && (
+                    <MaterialContainer>
+                        <Typography variant="body.small_b" color="text.heading">
+                            보유재료
+                        </Typography>
 
-                            const avgPrice = Math.round(value.totalPrice / value.materials.length);
+                        <MaterialTable>
+                            <tbody>
+                                {Object.entries(materials).map(([key, value]) => {
+                                    if (value.materials.length === 0) return null;
 
-                            return (
-                                <tr key={key}>
-                                    <td>{convertMaterialName(key)}</td>
-                                    <td>{convertHoursToDHM(+(100 / value.printSpeed).toFixed(2))}</td>
-                                    <td>{avgPrice} 원</td>
-                                    <td>
-                                        <ColorContainer>
-                                            {value.materials.map((e, index) => (
-                                                <>
-                                                    <MaterialPopover key={index} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                    <MaterialPopover key={index * 5} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                    <MaterialPopover key={index * 10} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                    <MaterialPopover key={index * 15} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
-                                                </>
-                                            ))}
-                                        </ColorContainer>
-                                    </td>
-                                </tr>
-                            );
-                        })}
-                    </tbody>
-                </MaterialTable>
-            </MaterialContainer>
+                                    const avgPrice = Math.round(value.totalPrice / value.materials.length);
+
+                                    return (
+                                        <tr key={key}>
+                                            <td>
+                                                <Typography variant="body.small_r" color="text.body">
+                                                    {convertMaterialName(key)}
+                                                </Typography>
+                                            </td>
+                                            <td>
+                                                <Typography variant="body.small_r" color="grayScale.400">
+                                                    1cm³당
+                                                </Typography>
+                                            </td>
+                                            <td>
+                                                <Typography variant="body.small_r" color="grayScale.400">
+                                                    {convertHoursToDHM(+(100 / value.printSpeed).toFixed(2))}
+                                                </Typography>
+                                            </td>
+                                            <td>
+                                                <Typography variant="body.small_r" color="grayScale.400">
+                                                    {avgPrice} 원
+                                                </Typography>
+                                            </td>
+                                            <td style={{ flex: 1 }}>
+                                                <ColorContainer>
+                                                    {value.materials.map((e, index) => (
+                                                        <>
+                                                            <MaterialPopover key={index} color={e.colorValue} imgUrl={e.imageUrl} price={e.pricePerHour} />
+                                                        </>
+                                                    ))}
+                                                </ColorContainer>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </MaterialTable>
+                    </MaterialContainer>
+                )}
+            </InfoContainer>
 
             {/* <StatusContainer>
                 <div style={{ width: "12px", height: "12px", borderRadius: "50%", backgroundColor: isAvailable ? "#4CAF50" : "#FF9800" }} />
@@ -103,15 +111,15 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
                 >
                     자세히
                 </Button> */}
-                {setSelectedCompany ? (
+                {selectMode && (
                     <Button
                         onClick={() => {
-                            setSelectedCompany(data);
+                            navigate(`/print-order?company=${data.id}`);
                         }}
                     >
                         선택
                     </Button>
-                ) : null}
+                )}
             </RowGridButtonContainer>
         </CompanyContainer>
     );
@@ -120,12 +128,12 @@ const CompanyInfoCard = ({ data, setSelectedCompany }: CompanyInfoProps) => {
 export default CompanyInfoCard;
 
 const CompanyContainer = styled.div`
-    width: 1260px;
-    height: 200px;
-    margin-top: 20px;
+    width: 1280px;
+    height: auto;
+    margin-top: 16px;
     border: 1px solid #ececec;
     border-radius: 8px;
-    padding-left: 10px;
+    padding: 16px;
 
     display: flex;
     align-items: center;
@@ -134,42 +142,32 @@ const CompanyContainer = styled.div`
 `;
 
 const CompanyImage = styled.img`
-    width: 180px;
-    height: 180px;
+    width: 40px;
+    height: 40px;
     object-fit: cover;
-    border-radius: 4px;
+    border-radius: 50%;
     margin-right: 20px;
 `;
 
-const CompanyInfo = styled.div`
+const InfoContainer = styled.div`
     width: 200px;
     display: flex;
     flex-direction: column;
     gap: 5px;
 `;
 
-const NameAndRating = styled.div`
+const Information = styled.div`
     display: flex;
     align-items: center;
-`;
-const CompanyName = styled.div`
-    font-size: 20px;
-    font-weight: 600;
-`;
-const Contents = styled.div`
-    font-size: 12px;
-    font-weight: 600;
-`;
-const Rating = styled.div`
-    margin-left: 8px;
-    color: #e54444;
-    font-size: 20px;
-    img {
-        width: 16px;
-        height: 16px;
+
+    > img {
+        width: 14px;
+        height: 14px;
         object-fit: cover;
         margin-right: 4px;
     }
+
+    color: ${({ theme }) => theme.grayScale[400]};
 `;
 
 const StatusContainer = styled.div`
@@ -189,7 +187,7 @@ const RowGridButtonContainer = styled.div`
     gap: 10px;
 
     position: absolute;
-    bottom: 10px;
+    top: 10px;
     right: 10px;
 `;
 const Button = styled.div`
@@ -197,25 +195,23 @@ const Button = styled.div`
     height: 28px;
     background-color: #000000;
     color: #ffffff;
-    border-radius: 4px;
+    border-radius: 8px;
     font-size: 16px;
 
     cursor: pointer;
     &:hover {
-        background-color: #4682b4;
+        background-color: ${({ theme }) => theme.primaryColor.blue1};
     }
     display: flex;
     justify-content: center;
     align-items: center;
 `;
 
-const Divider = styled.div`
-    height: 100%;
-    border-left: 1px solid #ececec;
-`;
-
 const MaterialContainer = styled.div`
-    flex: 1;
+    width: 1192px;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: ${({ theme }) => theme.grayScale[100]};
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -223,20 +219,22 @@ const MaterialContainer = styled.div`
 `;
 
 const MaterialTable = styled.table`
-    width: 100%;
     border-collapse: collapse;
     font-size: 12px;
-    text-align: center;
+    text-align: start;
+    margin-top: 8px;
 
-    th,
+    table-layout: auto;
+    width: 100%;
+
     td {
-        border: 1px solid #ececec;
-        padding: 8px;
+        white-space: nowrap;
+        padding: 0 8px 4px 0;
     }
 
-    th {
-        background-color: #f9f9f9;
-        font-weight: bold;
+    /* 마지막 컬럼은 flexible */
+    td:last-child {
+        width: 100%;
     }
 `;
 
@@ -244,5 +242,5 @@ const ColorContainer = styled.div`
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
-    justify-content: center;
+    justify-content: start;
 `;

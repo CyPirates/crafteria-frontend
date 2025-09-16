@@ -1,6 +1,6 @@
 export type Design = {
     id: string;
-    author: AuthorInfo;
+    author: Author;
     name: string;
     description: string;
     rating: string;
@@ -18,7 +18,7 @@ export type Design = {
 
 export type DesignCategory = "INTERIOR_DECORATION" | "PLANTER_GARDENING" | "STORAGE_ORGANIZATION" | "GIFTS_SOUVENIRS" | "TOOLS_FUNCTIONALITY" | "HOBBIES_PLAY" | "COMMERCIAL_BRANDING";
 
-type AuthorInfo = {
+export type Author = {
     id: string;
     name: string;
     rating: string;

@@ -27,6 +27,8 @@ import MyPage from "./pages/MyPage";
 import PoliciesPage from "./pages/PoliciesPage";
 import CouponBoxPage from "./pages/CouponBoxPage";
 import DeliveryTrackingPage from "./pages/DeliveryTrackingPage";
+import EditDesignPage from "./pages/EditDesignPage";
+import Test from "./pages/Test";
 
 const AppRoutes: React.FC = () => {
     const location = useLocation();
@@ -57,11 +59,13 @@ const AppRoutes: React.FC = () => {
                                     <Route path="/print-order" element={<MakeOrderPage />} />
                                     <Route path="/auth/success" element={<GetTokenPage />} />
                                     <Route path="/my-order" element={<MyOrderPage />} />
-                                    <Route path="/createReview/:id" element={<CreateReviewPage />} />
+                                    <Route path="/createReview" element={<CreateReviewPage />} />
                                     <Route path="/company-detail/:id" element={<AboutPage />} />
                                     <Route path="/search" element={<SearchResultPage />} />
                                     <Route path="/my-page" element={<MyPage />} />
                                     <Route path="/policies/:type" element={<PoliciesPage />} />
+                                    <Route path="/edit-design" element={<EditDesignPage />} />
+                                    <Route path="/test" element={<Test />} />
                                 </Routes>
                             </ContentContainer>
                             {location.pathname !== "/login" && <BottomBar />}
@@ -90,6 +94,7 @@ export default App;
 const ContentContainer = styled.div`
     width: 1440px;
     max-width: 1440px;
-    margin: 80px auto 0;
-    min-height: calc(100vh - 50px);
+    margin: 56px auto 0;
+    min-height: 100vh;
+    background-color: ${({ theme }) => theme.grayScale[0]};
 `;

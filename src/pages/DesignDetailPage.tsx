@@ -7,9 +7,13 @@ import StlRenderContainer from "../components/specific/designDetail/StlRenderCon
 import { useEffect, useState } from "react";
 import { newAxios } from "../utils/axiosWithUrl";
 import { useCart } from "../hooks/useCart";
-import initiatePortOnePayment from "../utils/requestPayment";
 import getStlModelVolume from "../utils/getStlModelVolume";
 import BuyDesignPopUp from "../components/specific/designDetail/BuyDesignPopUp";
+import { Typography } from "../components/common/Typography";
+import PersonIcon from "../assets/images/icons/person.png";
+import SizeIcon from "../assets/images/icons/open_in_full.png";
+import BuyIcon from "../assets/images/icons/buy.png";
+import DownloadIcon from "../assets/images/icons/download-gray.png";
 
 const DesignDetailPage = () => {
     const { id } = useParams();
@@ -18,15 +22,6 @@ const DesignDetailPage = () => {
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [design, setDesign] = useState<Design | undefined>(undefined);
     const [modelVolume, setModelVolume] = useState<number>(0);
-    const categoryKeys = {
-        INTERIOR_DECORATION: "인테리어 & 장식용",
-        PLANTER_GARDENING: "플랜테리어 / 정원용",
-        STORAGE_ORGANIZATION: "보관 & 정리용",
-        GIFTS_SOUVENIRS: "선물 & 기념품",
-        TOOLS_FUNCTIONALITY: "도구 & 기능성",
-        HOBBIES_PLAY: "취미 & 놀이",
-        COMMERCIAL_BRANDING: "상업/브랜딩",
-    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -100,73 +95,46 @@ const DesignDetailPage = () => {
         }
     };
 
-    const handlePurchase = async () => {
-        try {
-            const response = await newAxios.post(
-                `/api/v1/model/user/purchase/${id}`,
-                { modelId: id, couponId: null },
-                {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                    },
-                }
-            );
-            console.log(response.data.status);
-            if (response.data.status === 400) {
-                alert("purchase" + response.data.message);
-            } else {
-                const { paymentId, id } = response.data.data;
-                console.log(response.data.data);
-                if (paymentId && id) {
-                    const isPaymentSuccess = await initiatePortOnePayment(paymentId, id, (+price * 1.1).toString(), "modelId");
-                    if (isPaymentSuccess) {
-                        navigate("/my-design");
-                    }
-                }
-            }
-        } catch (e: any) {
-            if (e.response.status === 401) {
-                const isConfirm = window.confirm("로그인이 필요한 서비스 입니다.");
-                if (isConfirm) {
-                    navigate("/login");
-                }
-            }
-        }
-    };
-
     return (
         <PageWrapper>
             {isOpen && <BuyDesignPopUp handleOnClick={setIsOpen} name={name} price={+price} filePath={modelFileUrl} id={id} />}
             <OutlineContainer>
-                {modelFileUrl ? <StlRenderContainer filePath={modelFileUrl} width="500px" height="500px" /> : <div style={{ width: "500px", height: "500px" }} />}
+                {modelFileUrl ? <StlRenderContainer filePath={modelFileUrl} width="548px" height="439px" /> : <div style={{ width: "500px", height: "500px" }} />}
                 <OutlineContentContainer>
-                    <Title>{name}</Title>
-                    <ArtistName>작가: {author.name}</ArtistName>
-                    <Divider />
-                    <DetailContainer>
-                        <Detail>
-                            <DetailTitle>가격</DetailTitle>
-                            <DetailContent>{+price * 1.1}원(VAT포함)</DetailContent>
-                        </Detail>
-                        <Detail>
-                            <DetailTitle>판매량</DetailTitle>
-                            <DetailContent>{downloadCount}</DetailContent>
-                        </Detail>
-                        <Detail>
-                            <DetailTitle>모델 크기</DetailTitle>
-                            <DetailContent>
-                                {modelVolume} mm3 ({widthSize} x {lengthSize} x {heightSize} mm)
-                            </DetailContent>
-                        </Detail>
-                        <Detail>
-                            <DetailTitle>카테고리</DetailTitle>
-                            <DetailContent>{categoryKeys[category]}</DetailContent>
-                        </Detail>
-                        <Detail>
-                            <DetailTitle>다운로드</DetailTitle>
-                            <DetailContent>{downloadable ? "가능" : "불가능"}</DetailContent>
-                        </Detail>
-                    </DetailContainer>
+                    <Typography variant="heading.h6">{name}</Typography>
+                    <DetailTable>
+                        <tbody>
+                            <tr>
+                                <DetailTitle>
+                                    <IconContainer src={PersonIcon} />
+                                    작가
+                                </DetailTitle>
+                                <td>{author.name}</td>
+                            </tr>
+                            <tr>
+                                <DetailTitle>
+                                    <IconContainer src={SizeIcon} />
+                                    모델 크기
+                                </DetailTitle>
+                                <td>{modelVolume}mm³</td>
+                            </tr>
+                            <tr>
+                                <DetailTitle>
+                                    <IconContainer src={BuyIcon} />
+                                    판매량
+                                </DetailTitle>
+                                <td>{downloadCount}</td>
+                            </tr>
+                            <tr>
+                                <DetailTitle>
+                                    <IconContainer src={DownloadIcon} />
+                                    다운로드
+                                </DetailTitle>
+                                <td>{downloadable ? "가능" : "불가능"}</td>
+                            </tr>
+                        </tbody>
+                    </DetailTable>
+                    <Price>{Math.round(+price * 1.1)}원 (VAT포함)</Price>
                     <ButtonContainer>
                         <Button onClick={handleButtonClick}>{purchaseAvailability ? "구매하기" : downloadable ? "다운로드" : "프린트하기"}</Button>
                         <Button onClick={() => addToCart(id!)}>장바구니 담기</Button>
@@ -174,11 +142,10 @@ const DesignDetailPage = () => {
                 </OutlineContentContainer>
             </OutlineContainer>
             <Divider />
-            <IntroductionTitle>소개말</IntroductionTitle>
-            <Divider />
-            <IntroductionContents>
-                <div className="ql-editor" dangerouslySetInnerHTML={{ __html: description }} />
-            </IntroductionContents>
+            <Typography variant="heading.h6">작품 소개</Typography>
+            <Typography variant="body.small_r">
+                <div style={{ padding: 0, marginTop: "8px" }} className="ql-editor" dangerouslySetInnerHTML={{ __html: description }} />
+            </Typography>
         </PageWrapper>
     );
 };
@@ -186,7 +153,9 @@ const DesignDetailPage = () => {
 export default DesignDetailPage;
 
 const PageWrapper = styled.div`
-    margin-top: 20px;
+    width: 1120px;
+    margin: 0 auto;
+    padding-top: 32px;
 `;
 
 const OutlineContainer = styled.div`
@@ -196,72 +165,68 @@ const OutlineContainer = styled.div`
     padding-bottom: 10px;
 `;
 
-const IntroductionTitle = styled.div`
+const Divider = styled.div`
     width: 100%;
-    font-size: 30px;
-    font-weight: bold;
-    margin-top: 20px;
-`;
-
-const IntroductionContents = styled.div`
-    margin-top: 20px;
-    font-size: 20px;
+    margin: 32px 0;
+    border-bottom: 1px solid ${({ theme }) => theme.grayScale[200]};
 `;
 
 const OutlineContentContainer = styled.div`
     display: flex;
     flex-direction: column;
+    justify-content: center;
 `;
 
-const Title = styled.div`
-    font-weight: bold;
-    font-size: 40px;
+const DetailTable = styled.table`
+    width: 100%;
+    margin: 16px 0 24px 0;
+    border-collapse: collapse;
 `;
 
-const ArtistName = styled.div`
-    color: #9d9d9f;
-    font-size: 15px;
-`;
+const DetailTitle = styled.td`
+    color: ${({ theme }) => theme.text.body};
 
-const Divider = styled.div`
-    border-bottom: 1px solid #464649;
-`;
-
-const DetailContainer = styled.div`
-    flex: 1;
-`;
-
-const Detail = styled.div`
-    font-size: 20px;
     display: flex;
-    margin-bottom: 5px;
+    align-items: center;
+    gap: 4px;
 `;
 
-const DetailTitle = styled.div`
-    width: 100px;
+const IconContainer = styled.img`
+    width: 16px;
+    height: 16px;
+    alt: "x";
+`;
+
+const Price = styled.div`
+    width: 100%;
+    text-align: end;
+    color: ${({ theme }) => theme.text.body};
+    font-size: 19.2px;
     font-weight: bold;
-`;
-
-const DetailContent = styled.div`
-    flex: 1;
+    margin-bottom: 24px;
 `;
 
 const ButtonContainer = styled.div`
     display: flex;
-    flex-direction: row;
-    gap: 10px;
-    //margin-top: 30px;
+    flex-direction: column;
+    gap: 4px;
 `;
 
 const Button = styled.button`
-    width: 248px;
+    width: 548px;
     height: 40px;
     color: white;
     font-weight: 600;
-    background-color: #000000;
+    background-color: ${({ theme }) => theme.grayScale[600]};
     box-shadow: none;
     border: none;
     border-radius: 8px;
+
+    &:hover {
+        background-color: ${({ theme }) => theme.grayScale[100]};
+        color: ${({ theme }) => theme.text.body};
+        border: 1.4px solid ${({ theme }) => theme.grayScale[200]};
+    }
 
     cursor: pointer;
 `;

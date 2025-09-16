@@ -1,4 +1,5 @@
 const categoryKeys: Record<string, string> = {
+    ALL: "전체보기",
     INTERIOR_DECORATION: "인테리어 & 장식용",
     PLANTER_GARDENING: "플랜테리어 / 정원용",
     STORAGE_ORGANIZATION: "보관 & 정리용",
