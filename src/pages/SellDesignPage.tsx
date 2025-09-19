@@ -5,13 +5,17 @@ import { DesignFormData } from "../types/DesignType";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { newAxios } from "../utils/axiosWithUrl";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useLoginNavigation from "../hooks/useLoginNavigation";
 import { Typography } from "../components/common/Typography";
 import StlRenderContainer from "../components/specific/designDetail/StlRenderContainer";
 
 import RemoveIcon from "../assets/images/icons/deleteBg-dark.svg";
+import convertURLToFile from "../utils/convertUrlToFile";
 
+type OwnProps = {
+    editMode?: boolean;
+};
 const modules = {
     toolbar: [
         [{ size: ["small", false, "large", "huge"] }], // 글자 크기 설정
@@ -25,7 +29,9 @@ const modules = {
 
 const formats = ["size", "bold", "italic", "underline", "strike", "color", "background", "list", "bullet", "align"];
 
-const SellDesignPage = () => {
+const SellDesignPage = ({ editMode }: OwnProps) => {
+    const [searchParams] = useSearchParams();
+    const modelId = searchParams.get("modelId");
     const navigate = useNavigate();
     const { moveToLogin } = useLoginNavigation();
     const [data, setData] = useState<DesignFormData>({
@@ -39,16 +45,11 @@ const SellDesignPage = () => {
         category: "INTERIOR_DECORATION",
         downloadable: false,
     });
-    const [value, setValue] = useState("");
+    const [value, setValue] = useState(""); // description
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
-        // if (id === "price") {
-        //     const rawValue = value.replace(/[^0-9]/g, "");
-        //     setData((prev) => ({ ...prev, price: rawValue }));
-        //     return;
-        // }
         setData((prev) => ({ ...prev, [id]: value }));
     };
 
@@ -87,13 +88,17 @@ const SellDesignPage = () => {
 
         try {
             const token = localStorage.getItem("accessToken");
-            const response = await newAxios.post("/api/v1/model/author/upload", formData, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    "Content-Type": "multipart/form-data",
-                },
-            });
-            console.log(response.data);
+
+            if (editMode && modelId) {
+                await newAxios.put(`/api/v1/model/author/update/${modelId}`, formData, {
+                    headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+                });
+            } else {
+                await newAxios.post(`/api/v1/model/author/upload`, formData, {
+                    headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
+                });
+            }
+
             navigate("/my-design");
         } catch (e) {
             console.log(e);
@@ -110,11 +115,43 @@ const SellDesignPage = () => {
     }, [data.modelFiles]);
 
     useEffect(() => {
-        if (!localStorage.getItem("accessToken")) {
-            console.log("asdf");
-            moveToLogin();
+        if (editMode && modelId) {
+            const fetchData = async () => {
+                try {
+                    const response = await newAxios.get(`/api/v1/model/user/view/${modelId}`);
+                    const fetchedData = response.data.data;
+
+                    if (fetchedData.author.id != localStorage.getItem("user-id")) {
+                        alert("권한이 없습니다.");
+                        navigate("/");
+                        return;
+                    }
+
+                    // 기존 데이터 세팅
+                    setData((prev) => ({
+                        ...prev,
+                        ...fetchedData,
+                        modelFiles: [], // File은 url로 받아온거 변환해야함
+                    }));
+
+                    setValue(fetchedData.description);
+
+                    // url File로  변환
+                    const filesWithNull: (File | null)[] = await Promise.all((fetchedData.modelFileUrls as string[]).map((url, i) => convertURLToFile(url, i)));
+                    const files: File[] = filesWithNull.filter((f): f is File => f !== null);
+
+                    setData((prev) => ({
+                        ...prev,
+                        modelFiles: files,
+                    }));
+                } catch (e) {
+                    console.log(e);
+                }
+            };
+
+            fetchData();
         }
-    }, []);
+    }, [editMode, modelId]);
 
     return (
         <PageWrapper>
@@ -159,7 +196,7 @@ const SellDesignPage = () => {
             </QuillWrapper>
             <SubmitButton onClick={handleSubmit}>
                 <Typography variant="body.small_m" color="grayScale.0">
-                    판매 시작
+                    {editMode ? "도면 수정" : "판매 시작"}
                 </Typography>
             </SubmitButton>
         </PageWrapper>

@@ -27,7 +27,6 @@ import MyPage from "./pages/MyPage";
 import PoliciesPage from "./pages/PoliciesPage";
 import CouponBoxPage from "./pages/CouponBoxPage";
 import DeliveryTrackingPage from "./pages/DeliveryTrackingPage";
-import EditDesignPage from "./pages/EditDesignPage";
 import Test from "./pages/Test";
 
 const AppRoutes: React.FC = () => {
@@ -64,7 +63,7 @@ const AppRoutes: React.FC = () => {
                                     <Route path="/search" element={<SearchResultPage />} />
                                     <Route path="/my-page" element={<MyPage />} />
                                     <Route path="/policies/:type" element={<PoliciesPage />} />
-                                    <Route path="/edit-design" element={<EditDesignPage />} />
+                                    <Route path="/edit-design" element={<SellDesignPage editMode={true} />} />
                                     <Route path="/test" element={<Test />} />
                                 </Routes>
                             </ContentContainer>
