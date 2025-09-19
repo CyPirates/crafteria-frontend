@@ -31,7 +31,7 @@ const EditDesignPage = () => {
     const { moveToLogin } = useLoginNavigation();
     const [data, setData] = useState<DesignFormData>({
         name: "",
-        modelFile: null,
+        modelFiles: [],
         widthSize: "",
         heightSize: "",
         lengthSize: "",
@@ -81,7 +81,7 @@ const EditDesignPage = () => {
     };
 
     const handleSubmit = async () => {
-        if (!data.modelFile) {
+        if (data.modelFiles.length === 0) {
             alert("파일을 선택해주세요.");
             return;
         }
@@ -94,7 +94,7 @@ const EditDesignPage = () => {
         formData.append("lengthSize", data.lengthSize);
         formData.append("category", data.category);
         formData.append("downloadable", data.downloadable.toString());
-        formData.append("modelFile", data.modelFile);
+        //formData.append("modelFiles", data.modelFiles);
 
         try {
             const token = localStorage.getItem("accessToken");
@@ -117,7 +117,7 @@ const EditDesignPage = () => {
 
             <RowContainer>
                 <InputContainer>
-                    <FileDrop setData={setData} modelFile={data.modelFile} />
+                    <FileDrop setData={setData} />
                 </InputContainer>
                 <InputContainer>
                     <Step>제목</Step>

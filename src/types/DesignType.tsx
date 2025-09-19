@@ -10,7 +10,7 @@ export type Design = {
     widthSize: string;
     lengthSize: string;
     heightSize: string;
-    modelFileUrl: string;
+    modelFileUrls: string[];
     purchaseAvailability: boolean;
     category: DesignCategory;
     downloadable: boolean;
@@ -35,7 +35,7 @@ export type DesignFormData = {
     widthSize: string;
     lengthSize: string;
     heightSize: string;
-    modelFile: File | null;
+    modelFiles: File[];
     category: string;
     downloadable: boolean;
 };

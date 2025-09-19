@@ -14,6 +14,14 @@ import PersonIcon from "../assets/images/icons/person.png";
 import SizeIcon from "../assets/images/icons/open_in_full.png";
 import BuyIcon from "../assets/images/icons/buy.png";
 import DownloadIcon from "../assets/images/icons/download-gray.png";
+import getStlModelSize from "../utils/getStlModelSize";
+
+type DesignMeasureData = {
+    volume: number;
+    width: number;
+    height: number;
+    length: number;
+};
 
 const DesignDetailPage = () => {
     const { id } = useParams();
@@ -21,7 +29,8 @@ const DesignDetailPage = () => {
     const { addToCart } = useCart();
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [design, setDesign] = useState<Design | undefined>(undefined);
-    const [modelVolume, setModelVolume] = useState<number>(0);
+    const [selectedFileIndex, setSelectedFileIndex] = useState<number>(0);
+    const [selectedFileMeasureData, setSelectedFileMeasureData] = useState<DesignMeasureData | undefined>(undefined);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,14 +46,23 @@ const DesignDetailPage = () => {
                 let data = response.data.data;
                 console.log(data);
                 setDesign(data);
-                setModelVolume(await getStlModelVolume(data.modelFileUrl));
-                console.log(modelVolume);
             } catch (error) {
                 console.log(error);
             }
         };
         fetchData();
     }, [id]);
+
+    useEffect(() => {
+        const measureModelVolume = async () => {
+            if (!design) return;
+            const url = design.modelFileUrls[selectedFileIndex];
+            const volume = await getStlModelVolume(url);
+            const { width, length, height } = await getStlModelSize(url);
+            setSelectedFileMeasureData({ volume: volume, width: width, length: length, height: height });
+        };
+        measureModelVolume();
+    }, [design, selectedFileIndex]);
 
     const handleDownload = async (url: string, filename: string) => {
         const file = await fetch(url);
@@ -60,17 +78,17 @@ const DesignDetailPage = () => {
     };
 
     if (!design) {
-        return <div>Loading...</div>; // 디자인이 로드되기 전 로딩 메시지 표시
+        return <div>Loading...</div>;
     }
 
-    const { author, name, description, price, downloadCount, widthSize, lengthSize, heightSize, modelFileUrl, purchaseAvailability, category, downloadable } = design;
+    const { author, name, description, price, downloadCount, modelFileUrls, purchaseAvailability, category, downloadable } = design;
     const handleButtonClick = async () => {
         if (!purchaseAvailability) {
             if (!downloadable) {
                 navigate("/print-order");
                 return;
             }
-            handleDownload(modelFileUrl, name);
+            handleDownload(modelFileUrls[0], name); // todo
             return;
         }
         if (price == "0") {
@@ -97,49 +115,62 @@ const DesignDetailPage = () => {
 
     return (
         <PageWrapper>
-            {isOpen && <BuyDesignPopUp handleOnClick={setIsOpen} name={name} price={+price} filePath={modelFileUrl} id={id} />}
+            {isOpen && <BuyDesignPopUp handleOnClick={setIsOpen} name={name} price={+price} filePath={modelFileUrls[0]} id={id} />}
             <OutlineContainer>
-                {modelFileUrl ? <StlRenderContainer filePath={modelFileUrl} width="548px" height="439px" /> : <div style={{ width: "500px", height: "500px" }} />}
-                <OutlineContentContainer>
-                    <Typography variant="heading.h6">{name}</Typography>
-                    <DetailTable>
-                        <tbody>
-                            <tr>
-                                <DetailTitle>
-                                    <IconContainer src={PersonIcon} />
-                                    작가
-                                </DetailTitle>
-                                <td>{author.name}</td>
-                            </tr>
-                            <tr>
-                                <DetailTitle>
-                                    <IconContainer src={SizeIcon} />
-                                    모델 크기
-                                </DetailTitle>
-                                <td>{modelVolume}mm³</td>
-                            </tr>
-                            <tr>
-                                <DetailTitle>
-                                    <IconContainer src={BuyIcon} />
-                                    판매량
-                                </DetailTitle>
-                                <td>{downloadCount}</td>
-                            </tr>
-                            <tr>
-                                <DetailTitle>
-                                    <IconContainer src={DownloadIcon} />
-                                    다운로드
-                                </DetailTitle>
-                                <td>{downloadable ? "가능" : "불가능"}</td>
-                            </tr>
-                        </tbody>
-                    </DetailTable>
-                    <Price>{Math.round(+price * 1.1)}원 (VAT포함)</Price>
-                    <ButtonContainer>
-                        <Button onClick={handleButtonClick}>{purchaseAvailability ? "구매하기" : downloadable ? "다운로드" : "프린트하기"}</Button>
-                        <Button onClick={() => addToCart(id!)}>장바구니 담기</Button>
-                    </ButtonContainer>
-                </OutlineContentContainer>
+                <RowContainer>
+                    {modelFileUrls ? <StlRenderContainer filePath={modelFileUrls[selectedFileIndex]} width="548px" height="439px" /> : <div style={{ width: "500px", height: "500px" }} />}
+                    <OutlineContentContainer>
+                        <Typography variant="heading.h6">{name}</Typography>
+                        <DetailTable>
+                            <tbody>
+                                <tr>
+                                    <DetailTitle>
+                                        <IconContainer src={PersonIcon} />
+                                        작가
+                                    </DetailTitle>
+                                    <td>{author.name}</td>
+                                </tr>
+                                <tr>
+                                    <DetailTitle>
+                                        <IconContainer src={SizeIcon} />
+                                        현재 모델 크기
+                                    </DetailTitle>
+                                    <td>
+                                        {selectedFileMeasureData?.volume}mm³ ({selectedFileMeasureData?.width}mm x {selectedFileMeasureData?.length}mm x {selectedFileMeasureData?.height}mm)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <DetailTitle>
+                                        <IconContainer src={BuyIcon} />
+                                        판매량
+                                    </DetailTitle>
+                                    <td>{downloadCount}</td>
+                                </tr>
+                                <tr>
+                                    <DetailTitle>
+                                        <IconContainer src={DownloadIcon} />
+                                        다운로드
+                                    </DetailTitle>
+                                    <td>{downloadable ? "가능" : "불가능"}</td>
+                                </tr>
+                            </tbody>
+                        </DetailTable>
+                        <Price>{Math.round(+price * 1.1)}원 (VAT포함)</Price>
+                        <ButtonContainer>
+                            <Button onClick={handleButtonClick}>{purchaseAvailability ? "구매하기" : downloadable ? "다운로드" : "프린트하기"}</Button>
+                            <Button onClick={() => addToCart(id!)}>장바구니 담기</Button>
+                        </ButtonContainer>
+                    </OutlineContentContainer>
+                </RowContainer>
+                <FilePreviewContainer>
+                    {modelFileUrls.map((url, i) => {
+                        return (
+                            <FilePreviewBox key={i} isSelected={i === selectedFileIndex} onClick={() => setSelectedFileIndex(i)}>
+                                <StlRenderContainer filePath={url} width="100%" height="100%" clickDisabled={true} />
+                            </FilePreviewBox>
+                        );
+                    })}
+                </FilePreviewContainer>
             </OutlineContainer>
             <Divider />
             <Typography variant="heading.h6">작품 소개</Typography>
@@ -159,22 +190,42 @@ const PageWrapper = styled.div`
 `;
 
 const OutlineContainer = styled.div`
+    padding-bottom: 10px;
+`;
+
+const RowContainer = styled.div`
     display: flex;
     flex-direction: row;
     gap: 20px;
-    padding-bottom: 10px;
+`;
+
+const FilePreviewContainer = styled.div`
+    width: 100%;
+    overflow-y: auto;
+    margin-top: 28px;
+
+    display: flex;
+    gap: 20px;
+`;
+
+const FilePreviewBox = styled.div<{ isSelected: boolean }>`
+    width: 180px;
+    height: 140px;
+    border-radius: 8px;
+
+    border: ${({ isSelected, theme }) => (isSelected ? `1px solid ${theme.grayScale[500]}` : "none")};
 `;
 
 const Divider = styled.div`
     width: 100%;
-    margin: 32px 0;
+    margin: 28px 0;
     border-bottom: 1px solid ${({ theme }) => theme.grayScale[200]};
 `;
 
 const OutlineContentContainer = styled.div`
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: end;
 `;
 
 const DetailTable = styled.table`

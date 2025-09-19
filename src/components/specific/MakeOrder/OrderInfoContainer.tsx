@@ -161,7 +161,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                 </CouponOverlay>
             )} */}
             <UserArea>
-                <Typography variant="heading.h6">결졔 정보</Typography>
+                <Typography variant="heading.h6">결제 정보</Typography>
                 <TitleTypography variant="misc.label" color="text.body">
                     배송 정보
                 </TitleTypography>

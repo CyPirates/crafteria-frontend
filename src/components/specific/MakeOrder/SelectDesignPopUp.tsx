@@ -45,7 +45,7 @@ const SelectDesignPopUp = ({ handleOnClick, handleFileUpload }: BuyDesignPopUpPr
     }, []);
 
     const handleSelect = (data: Design) => {
-        handleFileUpload(undefined, data.modelFileUrl);
+        //handleFileUpload(undefined, data.modelFileUrl);
         handleOnClick(false);
     };
     return (
@@ -65,7 +65,7 @@ const SelectDesignPopUp = ({ handleOnClick, handleFileUpload }: BuyDesignPopUpPr
 const DesignLayout = ({ data, handleSelect }: DesignLayoutProps) => {
     return (
         <DesignLayoutContainer>
-            <StlRenderContainer filePath={data.modelFileUrl} width="100px" height="100px" clickDisabled={true} />
+            <StlRenderContainer filePath={data.modelFileUrls[0]} width="100px" height="100px" clickDisabled={true} />
             <DesignInfo>
                 <InfoText>이름: {data.name}</InfoText>
                 <InfoText>

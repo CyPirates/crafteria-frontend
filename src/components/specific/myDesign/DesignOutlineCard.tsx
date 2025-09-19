@@ -16,7 +16,7 @@ type DesignOutlineCardProps = {
 };
 
 const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) => {
-    const { name, viewCount, downloadCount, modelFileUrl, id, downloadable, category, author } = designData;
+    const { name, viewCount, downloadCount, modelFileUrls, id, downloadable, category, author } = designData;
     const navigate = useNavigate();
     const [volume, setVolume] = useState<number | undefined>(undefined);
 
@@ -57,7 +57,7 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
     return (
         <>
             <CardWrapper>
-                <StlRenderContainer filePath={modelFileUrl} width="232px" height="186px" clickDisabled={true} />
+                <StlRenderContainer filePath={modelFileUrls[0]} width="232px" height="186px" clickDisabled={true} />
                 <InformationContainer>
                     <Typography variant="body.medium_b" color="text.heading">
                         {name}
@@ -74,12 +74,12 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
                         </Typography>
                     </Information>
                     <Typography variant="body.small_r" color="grayScale.400">
-                        {useStlModelVolume(modelFileUrl)}mm³ · {author.name} · {categoryKeys[category]}
+                        {useStlModelVolume(modelFileUrls[0])}mm³ · {author.name} · {categoryKeys[category]}
                     </Typography>
                 </InformationContainer>
                 <ButtonConatiner>
                     <Button onClick={() => navigate(`/design/${id}`)}>상세보기</Button>
-                    {(published || downloadable) && <Button onClick={() => handleDownload(modelFileUrl, name)}>다운로드</Button>}
+                    {(published || downloadable) && <Button onClick={() => handleDownload(modelFileUrls[0], name)}>다운로드</Button>}
                     {published && <Button onClick={() => navigate(`/edit-design?modelId=${id}`)}>수정</Button>}
                     {published && <Button onClick={handleDelete}>삭제</Button>}
                 </ButtonConatiner>

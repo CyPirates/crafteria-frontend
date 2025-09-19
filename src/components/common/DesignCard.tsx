@@ -12,7 +12,7 @@ import { Typography } from "./Typography";
 
 const DesignCard = ({ designData }: { designData: Design }) => {
     const navigate = useNavigate();
-    const { id, name, author, description, rating, price, viewCount, downloadCount, modelFileUrl, category, downloadable } = designData;
+    const { id, name, author, description, rating, price, viewCount, downloadCount, modelFileUrls, category, downloadable } = designData;
 
     const handleOnClick = () => {
         navigate(`/design/${id}`);
@@ -21,8 +21,8 @@ const DesignCard = ({ designData }: { designData: Design }) => {
     return (
         <>
             <StyledCard onClick={handleOnClick}>
-                {modelFileUrl ? (
-                    <StlRenderContainer filePath={modelFileUrl} width="244px" height="195px" clickDisabled={true} />
+                {modelFileUrls.length > 0 ? (
+                    <StlRenderContainer filePath={modelFileUrls[0]} width="244px" height="195px" clickDisabled={true} />
                 ) : (
                     <div style={{ width: "244px", height: "195px", backgroundColor: "#F3F4F5", borderRadius: "8px" }} />
                 )}

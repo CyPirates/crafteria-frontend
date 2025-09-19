@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { User } from "../types/UserType";
+import { Address, User } from "../types/UserType";
 import { newAxios } from "../utils/axiosWithUrl";
 import { PiUserCircleLight } from "react-icons/pi";
 
@@ -12,7 +12,13 @@ const MyPage = () => {
     const [userData, setUserData] = useState<User | undefined>(undefined);
     const [isNameEdited, setIsNameEdited] = useState<boolean>(false);
     const [newName, setNewName] = useState<string>("");
-    const [newAddress, setNewAddress] = useState<string>("");
+    const [newAddress, setNewAddress] = useState<Address>({
+        id: "",
+        default: false,
+        label: "",
+        baseaddress: "",
+        detailAddress: "",
+    });
     const [addressEditMode, setAddressEditMode] = useState<boolean>(false);
     const fetchUserData = async () => {
         const token = localStorage.getItem("accessToken");
@@ -152,9 +158,19 @@ const MyPage = () => {
             </ContentsContainer>
             <div style={{ marginTop: "16px" }} />
             <Typography variant="body.medium_b" color="text.heading">
-                주소지 관리
+                배송지 관리
             </Typography>
-            <ContentsContainer>{userData.addresses ? userData.addresses[0].id : "설정된 주소가 없습니다"}</ContentsContainer>
+            <ContentsContainer style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+                <AddressContainer>
+                    <input value={newAddress.label} onChange={(e) => setNewAddress((prev) => ({ ...prev, label: e.target.value }))} />
+                </AddressContainer>
+
+                <LongButton onClick={() => setAddressEditMode(true)}>
+                    <Typography variant="body.medium_m" color="grayScale.0">
+                        배송지 추가
+                    </Typography>
+                </LongButton>
+            </ContentsContainer>
 
             <div style={{ marginBottom: "16px" }} />
         </PageWrapper>
@@ -168,16 +184,15 @@ const PageWrapper = styled.div`
     padding: 32px 80px;
 `;
 const ContentsContainer = styled.div`
-    width: 1260px;
+    width: 1280px;
     min-height: 80px;
     margin-top: 20px;
     border: 1px solid #ececec;
     border-radius: 8px;
-    padding-left: 10px;
 
     display: flex;
     align-items: center;
-    //justify-content: space-around;
+    justify-content: center;
 
     position: relative;
 `;
@@ -216,5 +231,31 @@ const LevelContainer = styled.div`
         width: 16px;
         height: 16px;
         margin-right: 2px;
+    }
+`;
+
+const AddressContainer = styled.div`
+    width: 1120px;
+    height: 80px;
+    border: 1px solid #ececec;
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+`;
+
+const LongButton = styled.div`
+    width: 1120px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: ${({ theme }) => theme.grayScale[600]};
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    &:hover {
+        background-color: ${({ theme }) => theme.text.disabled};
     }
 `;
