@@ -93,15 +93,18 @@ const DesignDetailPage = () => {
         }
         if (price == "0") {
             try {
-                const response = await newAxios.post(`/api/v1/model/user/purchase/${id}`, null, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-                    },
-                });
-                if (response.data.status === 200) {
+                const response = await newAxios.post(
+                    `/api/v1/model/user/purchase/${id}`,
+                    { modelId: id },
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                        },
+                    }
+                );
+                if (response.data.status === 200 || response.data.status === 201) {
                     navigate("/my-design");
-                }
-                if (response.data.status === 400) {
+                } else {
                     alert(response.data.message);
                 }
             } catch (e) {

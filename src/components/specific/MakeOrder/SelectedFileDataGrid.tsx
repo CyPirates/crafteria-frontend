@@ -1,6 +1,6 @@
 import * as React from "react";
 import getStlModelSize from "../../../utils/getStlModelSize";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import styled from "styled-components";
 import SelectDesignPopUp from "./SelectDesignPopUp";
 import { Material } from "../../../types/CompanyType";
@@ -59,54 +59,85 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
     const defaultId = defaultMaterialInfo?.technologyId || "";
     const defaultMaterialPrice = defaultMaterialInfo?.pricePerHour;
     const defaultPrintSpeed = materials[defaultMaterialType]?.printSpeed;
-
     const [isPop, setIsPop] = useState<boolean>(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
-    const handleFileUpload = async (event?: React.ChangeEvent<HTMLInputElement>, url?: string) => {
-        let fileUrl = "";
-        if (event) {
-            const file = event.target.files?.[0];
-            if (file) {
-                if (!file.name.toLowerCase().endsWith(".stl")) {
-                    alert("stl 파일만 업로드 가능합니다.");
-                    event.target.value = "";
-                    return;
-                }
-                fileUrl = URL.createObjectURL(file);
-            }
-        }
-        if (url) {
-            fileUrl = url;
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const handleWheel = (e: WheelEvent) => {
+            e.preventDefault();
+
+            const rowHeight = 160 + 16; // TableWrapper 높이 + margin
+            // deltaY에 비례해서 스크롤 크기 결정 (100픽셀마다 1칸)
+            const multiplier = Math.max(1, Math.round(Math.abs(e.deltaY) / 100));
+            const direction = e.deltaY > 0 ? 1 : -1;
+
+            // 가속 이동
+            container.scrollTo({
+                top: container.scrollTop + rowHeight * direction * multiplier,
+                behavior: "smooth",
+            });
+        };
+
+        container.addEventListener("wheel", handleWheel, { passive: false });
+        return () => {
+            container.removeEventListener("wheel", handleWheel);
+        };
+    }, []);
+
+    const handleFileInput = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!event.target.files) return;
+
+        const stlFiles: File[] = Array.from(event.target.files).filter((file) => file.name.toLowerCase().endsWith(".stl"));
+
+        if (stlFiles.length === 0) {
+            alert("stl 파일만 업로드 가능합니다.");
+            return;
         }
 
+        const urls = stlFiles.map((file) => URL.createObjectURL(file));
+        await processFiles(urls);
+
+        event.target.value = ""; // input 초기화
+    };
+
+    // 2️⃣ URL 배열 전용
+    const handleFileUrls = async (urls: string[]) => {
+        if (urls.length === 0) return;
+        await processFiles(urls);
+    };
+
+    // 3️⃣ 실제 데이터 처리
+    const processFiles = async (fileUrls: string[]) => {
         try {
-            const modelSize = await getStlModelSize(fileUrl);
-            const modelVolume = await getStlModelVolume(fileUrl);
+            const newRows = await Promise.all(
+                fileUrls.map(async (fileUrl) => {
+                    const modelSize = await getStlModelSize(fileUrl);
+                    const modelVolume = await getStlModelVolume(fileUrl);
 
-            const newRow: PrintOrderData = {
-                fileUrl: fileUrl,
-                widthSize: modelSize.width.toString(),
-                lengthSize: modelSize.length.toString(),
-                heightSize: modelSize.height.toString(),
-                magnification: 1,
-                quantity: 1,
-                materialType: defaultMaterialType,
-                materialPrice: +defaultMaterialPrice,
-                color: defaultColor,
-                technologyId: defaultId,
-                volume: modelVolume,
-                price: undefined, // 계산 불가 시 undefined 저장
-            };
-            console.log("ㅁㄴㅇㄹ");
-            console.log(newRow);
-            setOrderRows((prev) => [...prev, newRow]);
+                    return {
+                        fileUrl,
+                        widthSize: modelSize.width.toString(),
+                        lengthSize: modelSize.length.toString(),
+                        heightSize: modelSize.height.toString(),
+                        magnification: 1,
+                        quantity: 1,
+                        materialType: defaultMaterialType,
+                        materialPrice: +defaultMaterialPrice,
+                        color: defaultColor,
+                        technologyId: defaultId,
+                        volume: modelVolume,
+                        price: undefined,
+                    } as PrintOrderData;
+                })
+            );
+
+            setOrderRows((prev) => [...prev, ...newRows]);
         } catch (e) {
             console.error("파일 처리 중 오류:", e);
             alert("파일 처리 중 오류가 발생했습니다.");
-        } finally {
-            if (event) {
-                event!.target.value = "";
-            }
         }
     };
 
@@ -117,12 +148,14 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
                 <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
                     <SelectFileButton>파일 직접 업로드</SelectFileButton>
                 </label>
-                <input type="file" accept=".stl" id="file-upload" style={{ display: "none" }} onChange={handleFileUpload} />
+                <input type="file" accept=".stl" id="file-upload" style={{ display: "none" }} onChange={handleFileInput} />
             </ButtonContainer>
-            {isPop ? <SelectDesignPopUp handleOnClick={setIsPop} handleFileUpload={handleFileUpload} /> : null}
-            {orderRows.map((row, i) => (
-                <DesignRow key={i} row={row} materials={materials} setOrderRows={setOrderRows} index={i} />
-            ))}
+            {isPop ? <SelectDesignPopUp handlePopUpOpen={setIsPop} handleFileUpload={handleFileUrls} /> : null}
+            <DesignRowContainer ref={containerRef}>
+                {orderRows.map((row, i) => (
+                    <DesignRow key={i} row={row} materials={materials} setOrderRows={setOrderRows} index={i} />
+                ))}
+            </DesignRowContainer>
         </Container>
     );
 };
@@ -263,6 +296,12 @@ const SelectFileButton = styled.div`
     &:hover {
         background-color: ${({ theme }) => theme.primaryColor.blue1};
     }
+`;
+
+const DesignRowContainer = styled.div`
+    width: 840px;
+    height: 520px;
+    overflow-y: auto;
 `;
 
 const TableWrapper = styled.table`

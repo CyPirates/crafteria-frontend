@@ -4,24 +4,22 @@ import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
 import { Design } from "../../../types/DesignType";
 import { PrintOrderData } from "../../../types/OrderType";
+import { Typography } from "../../common/Typography";
+import { Autocomplete, Button, Checkbox, TextField } from "@mui/material";
+import { Check, CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 
-type BuyDesignPopUpProps = {
-    handleOnClick: React.Dispatch<React.SetStateAction<boolean>>;
-    handleFileUpload: (event?: React.ChangeEvent<HTMLInputElement>, url?: string) => Promise<void>;
+type OwnProps = {
+    handlePopUpOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    handleFileUpload: (urls: string[]) => Promise<void>;
 };
 
-type DesignLayoutProps = {
-    data: Design;
-    handleSelect: (data: Design) => void;
-};
-
-const SelectDesignPopUp = ({ handleOnClick, handleFileUpload }: BuyDesignPopUpProps) => {
+const SelectDesignPopUp = ({ handlePopUpOpen, handleFileUpload }: OwnProps) => {
     const [purchasedDesigns, setPurchasedDesigns] = useState<Design[]>([]);
+    const [openIndividual, setOpenIndividual] = useState<string | null>(null);
+
     useEffect(() => {
-        // 팝업이 열릴 때 스크롤을 막기 위해 body에 overflow hidden 설정
         document.body.style.overflow = "hidden";
         return () => {
-            // 팝업이 닫힐 때 스크롤을 다시 활성화
             document.body.style.overflow = "auto";
         };
     }, []);
@@ -44,17 +42,36 @@ const SelectDesignPopUp = ({ handleOnClick, handleFileUpload }: BuyDesignPopUpPr
         fetchData();
     }, []);
 
-    const handleSelect = (data: Design) => {
-        //handleFileUpload(undefined, data.modelFileUrl);
-        handleOnClick(false);
+    const handleSelectAll = async (urls: string[]) => {
+        await handleFileUpload(urls);
+        handlePopUpOpen(false);
     };
+    const handleSelectIndividual = async (selectedUrls: string[]) => {
+        if (selectedUrls.length === 0) {
+            alert("도면을 선택해 주세요.");
+            return;
+        }
+
+        await handleFileUpload(selectedUrls);
+        handlePopUpOpen(false);
+    };
+
     return (
-        <Overlay onClick={() => handleOnClick(false)}>
+        <Overlay onClick={() => handlePopUpOpen(false)}>
             <PopUpContainer onClick={(e) => e.stopPropagation()}>
                 <Title>구매한 도면</Title>
                 <DesignContainer>
                     {purchasedDesigns.map((design, i) => {
-                        return <DesignLayout data={design} handleSelect={handleSelect} />;
+                        return (
+                            <DesignLayout
+                                key={i}
+                                design={design}
+                                handleSelectAll={handleSelectAll}
+                                openIndividual={openIndividual}
+                                setOpenIndividual={setOpenIndividual}
+                                handleSelectIndividual={handleSelectIndividual}
+                            />
+                        );
                     })}
                 </DesignContainer>
             </PopUpContainer>
@@ -62,18 +79,74 @@ const SelectDesignPopUp = ({ handleOnClick, handleFileUpload }: BuyDesignPopUpPr
     );
 };
 
-const DesignLayout = ({ data, handleSelect }: DesignLayoutProps) => {
+type DesignLayoutProps = {
+    design: Design;
+    handleSelectAll: (urls: string[]) => void;
+    openIndividual: string | null;
+    setOpenIndividual: React.Dispatch<React.SetStateAction<string | null>>;
+    handleSelectIndividual: (selectedUrls: string[]) => Promise<void>;
+};
+
+const DesignLayout = ({ design, openIndividual, setOpenIndividual, handleSelectAll, handleSelectIndividual }: DesignLayoutProps) => {
+    const designUrls = design.modelFileUrls;
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [selectedUrlIndex, setSelectedUrlIndex] = useState<number[]>([]);
+
+    const handleSelectedFiles = () => {
+        const selectedUrls = selectedUrlIndex.map((index) => designUrls[index]);
+        handleSelectIndividual(selectedUrls);
+    };
+
+    if (openIndividual && openIndividual !== design.id) return null;
     return (
-        <DesignLayoutContainer>
-            <StlRenderContainer filePath={data.modelFileUrls[0]} width="100px" height="100px" clickDisabled={true} />
-            <DesignInfo>
-                <InfoText>이름: {data.name}</InfoText>
-                <InfoText>
-                    크기: {data.widthSize} x {data.lengthSize} x {data.heightSize} (mm){" "}
-                </InfoText>
-                <SelectButton onClick={() => handleSelect(data)}>선택</SelectButton>
-            </DesignInfo>
-        </DesignLayoutContainer>
+        <>
+            <DesignLayoutContainer>
+                <StlRenderContainer filePath={designUrls[0]} width="100px" height="100px" clickDisabled />
+                <DesignInfo>
+                    <Typography variant="heading.h6">{design.name}</Typography>
+                    <Typography variant="body.medium_r">구성 파일: {designUrls.length}개</Typography>
+                    <ButtonRow>
+                        <SelectButton onClick={() => handleSelectAll(designUrls)}>전체 선택</SelectButton>
+                        <SelectButton
+                            onClick={() => {
+                                setOpenIndividual(design.id);
+                            }}
+                        >
+                            개별 선택
+                        </SelectButton>
+                    </ButtonRow>
+                </DesignInfo>
+            </DesignLayoutContainer>
+            {openIndividual === design.id && (
+                <IndividualSelectContainer>
+                    <CheckboxContainer>
+                        {designUrls.map((url, i) => {
+                            return (
+                                <Label key={i}>
+                                    <input
+                                        type="checkbox"
+                                        checked={selectedUrlIndex.includes(i)}
+                                        onChange={() => {
+                                            setSelectedUrlIndex((prev) => (prev.includes(i) ? prev.filter((item) => item !== i) : [...prev, i]));
+                                        }}
+                                    />
+                                    <StlRenderContainer filePath={url} width="50px" height="50px" clickDisabled />
+                                    <Typography variant="body.medium_r">{url.split("/")[url.split("/").length - 1]}</Typography>
+                                </Label>
+                            );
+                        })}
+                    </CheckboxContainer>
+                    <div style={{ display: "flex", gap: 8 }}>
+                        <SelectButton onClick={handleSelectedFiles} style={{ marginTop: 8 }}>
+                            선택
+                        </SelectButton>
+                        <SelectButton onClick={() => setOpenIndividual(null)} style={{ marginTop: 8 }}>
+                            취소
+                        </SelectButton>
+                    </div>
+                </IndividualSelectContainer>
+            )}
+        </>
     );
 };
 export default SelectDesignPopUp;
@@ -161,18 +234,24 @@ const DesignInfo = styled.div`
     flex: 1;
     height: 100%;
 `;
-const InfoText = styled.div`
-    color: black;
-    font-size: 20px;
-    font-weight: 500;
+
+const ButtonRow = styled.div`
+    position: absolute;
+    bottom: 0;
+    right: 0;
+
+    display: flex;
+    gap: 8px;
 `;
 const SelectButton = styled.div`
-    width: 60px;
-    height: 30px;
-    background-color: #000000;
+    width: 80px;
+    height: 28px;
+    background-color: ${({ theme }) => theme.grayScale[600]};
     color: white;
-    font-size: 15px;
-    border-radius: 5px;
+    font-size: ${({ theme }) => theme.typography.body.medium_r.fontSize};
+    font-weight: ${({ theme }) => theme.typography.body.medium_r.fontWeight};
+    line-height: ${({ theme }) => theme.typography.body.medium_r.lineHeight};
+    border-radius: 8px;
     margin-bottom: 10px;
 
     cursor: pointer;
@@ -181,11 +260,25 @@ const SelectButton = styled.div`
     justify-content: center;
     align-items: center;
 
-    position: absolute;
-    bottom: 0;
-    right: 0;
-
     &:hover {
-        background-color: #4682b4;
+        background-color: ${({ theme }) => theme.grayScale[200]};
     }
+`;
+
+const IndividualSelectContainer = styled.div`
+    margin-top: 8px;
+    margin-left: 20px;
+`;
+const CheckboxContainer = styled.div`
+    height: 400px;
+    margin-bottom: 8px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+`;
+const Label = styled.label`
+    display: flex;
+    gap: 8px;
+    align-items: center;
 `;
