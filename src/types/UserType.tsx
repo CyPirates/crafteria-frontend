@@ -25,6 +25,7 @@ export type Address = {
     id: string;
     default: boolean;
     label: string;
-    baseaddress: string;
+    baseAddress: string;
     detailAddress: string;
+    postalCode: string;
 };

@@ -3,10 +3,7 @@ import styled, { keyframes } from "styled-components";
 import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
 import { Design } from "../../../types/DesignType";
-import { PrintOrderData } from "../../../types/OrderType";
 import { Typography } from "../../common/Typography";
-import { Autocomplete, Button, Checkbox, TextField } from "@mui/material";
-import { Check, CheckBox, CheckBoxOutlineBlank } from "@mui/icons-material";
 
 type OwnProps = {
     handlePopUpOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -15,6 +12,8 @@ type OwnProps = {
 
 const SelectDesignPopUp = ({ handlePopUpOpen, handleFileUpload }: OwnProps) => {
     const [purchasedDesigns, setPurchasedDesigns] = useState<Design[]>([]);
+    const [onSaleDesigns, setOnSaleDesigns] = useState<Design[]>([]);
+    const [isPurchasedSelected, setIsPurchasedSelected] = useState<boolean>(true);
     const [openIndividual, setOpenIndividual] = useState<string | null>(null);
 
     useEffect(() => {
@@ -25,7 +24,7 @@ const SelectDesignPopUp = ({ handlePopUpOpen, handleFileUpload }: OwnProps) => {
     }, []);
 
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchPurchasedData = async () => {
             try {
                 const token = localStorage.getItem("accessToken");
                 const response = await newAxios.get("/api/v1/model/user/list/my", {
@@ -39,7 +38,22 @@ const SelectDesignPopUp = ({ handlePopUpOpen, handleFileUpload }: OwnProps) => {
                 console.log(error);
             }
         };
-        fetchData();
+        const fetchOnSaleData = async () => {
+            try {
+                const token = localStorage.getItem("accessToken");
+                const response = await newAxios.get("/api/v1/model/author/list/my", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+                console.log(response.data.data);
+                setOnSaleDesigns(response.data.data);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchPurchasedData();
+        fetchOnSaleData();
     }, []);
 
     const handleSelectAll = async (urls: string[]) => {
@@ -59,20 +73,32 @@ const SelectDesignPopUp = ({ handlePopUpOpen, handleFileUpload }: OwnProps) => {
     return (
         <Overlay onClick={() => handlePopUpOpen(false)}>
             <PopUpContainer onClick={(e) => e.stopPropagation()}>
-                <Title>구매한 도면</Title>
+                <FilterContainer>
+                    <Filter isActive={isPurchasedSelected} onClick={() => setIsPurchasedSelected(true)}>
+                        구매한 도면
+                    </Filter>
+                    <Filter isActive={!isPurchasedSelected} onClick={() => setIsPurchasedSelected(false)}>
+                        판매중 도면
+                    </Filter>
+                </FilterContainer>
                 <DesignContainer>
-                    {purchasedDesigns.map((design, i) => {
-                        return (
-                            <DesignLayout
-                                key={i}
-                                design={design}
-                                handleSelectAll={handleSelectAll}
-                                openIndividual={openIndividual}
-                                setOpenIndividual={setOpenIndividual}
-                                handleSelectIndividual={handleSelectIndividual}
-                            />
-                        );
-                    })}
+                    {(isPurchasedSelected ? purchasedDesigns : onSaleDesigns).length === 0 ? (
+                        <Typography variant="body.medium_r">해당 항목이 없습니다.</Typography>
+                    ) : (
+                        (isPurchasedSelected ? purchasedDesigns : onSaleDesigns).map((design, i) => {
+                            if (i > 4) return null;
+                            return (
+                                <DesignLayout
+                                    key={i}
+                                    design={design}
+                                    handleSelectAll={handleSelectAll}
+                                    openIndividual={openIndividual}
+                                    setOpenIndividual={setOpenIndividual}
+                                    handleSelectIndividual={handleSelectIndividual}
+                                />
+                            );
+                        })
+                    )}
                 </DesignContainer>
             </PopUpContainer>
         </Overlay>
@@ -182,35 +208,49 @@ const PopUpContainer = styled.div`
     animation: ${slideUp} 0.3s ease-out forwards;
 
     display: flex;
-    justify-content: center;
-
-    overflow-y: auto;
+    flex-direction: column;
+    align-items: center;
 `;
 
-const Title = styled.div`
+const FilterContainer = styled.div`
     width: 500px;
     height: 60px;
-    padding: 10px;
-    text-align: center;
+    border-bottom: 1px solid #707074;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 8px;
+
+    position: sticky;
+    top: 0;
     background-color: white;
-    color: black;
-    font-size: 20px;
-    font-weight: bold;
+    z-index: 10;
+`;
+
+const Filter = styled.div<{ isActive: boolean }>`
+    height: 100%;
+    text-align: center;
+    color: ${({ isActive, theme }) => (isActive ? theme.grayScale[600] : theme.grayScale[500])};
+    font-weight: ${({ isActive }) => (isActive ? "bold" : 300)};
+    border-bottom: ${({ isActive }) => (isActive ? "2px solid #111111" : "none")};
+    cursor: pointer;
 
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: start;
 
-    position: fixed;
-    top: 0;
-    z-index: 1200;
-
-    border-bottom: 1px solid #707074;
+    &:hover {
+        font-weight: bold;
+    }
 `;
 
 const DesignContainer = styled.div`
-    margin-top: 61px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    overflow-y: auto;
 `;
 
 const DesignLayoutContainer = styled.div`

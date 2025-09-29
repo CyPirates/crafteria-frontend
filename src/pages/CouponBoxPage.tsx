@@ -3,6 +3,7 @@ import Logo from "../assets/logoWithoutText.png";
 import { useEffect, useState } from "react";
 import { newAxios } from "../utils/axiosWithUrl";
 import { Coupon } from "../types/CouponType";
+import { Typography } from "../components/common/Typography";
 
 type CouponUseModeProps = {
     isCouponUseMode: true;
@@ -56,12 +57,12 @@ const CouponBoxPage = (props: CouponBoxProps) => {
     return (
         <>
             <Headder>
-                <img src={Logo} width={120} alt="logo" />
-                쿠폰함
+                <img src={Logo} width="80px" alt="logo" />
+                쿠폰
             </Headder>
             <Body>
                 <RowContainer>
-                    <StyledInput value={couponCode} onChange={(e) => setCouponCode(e.target.value)} />
+                    <StyledInput value={couponCode} placeholder="쿠폰 코드를 입력해주세요." onChange={(e) => setCouponCode(e.target.value)} />
                     <SubmitButton onClick={issuedCoupon}>쿠폰등록</SubmitButton>
                 </RowContainer>
                 <Title>사용 가능 쿠폰 {couponList.length}개</Title>
@@ -70,14 +71,29 @@ const CouponBoxPage = (props: CouponBoxProps) => {
                         const expiredDate = coupon.expiredAt.split("T")[0];
                         return (
                             <CardContainer key={coupon.id}>
-                                <CardTitle>
-                                    {coupon.name}
-                                    {coupon.id}
-                                </CardTitle>
+                                <CardHeader>
+                                    {coupon.type === "MODEL_PURCHASE" ? `${coupon.discountRate}%` : `${coupon.discountRate}원`}
+                                    <CouponCategory>
+                                        <Typography variant="body.small_m" color="text.body">
+                                            {coupon.type === "MODEL_PURCHASE" ? "도면 구매" : "프린트 주문"}
+                                        </Typography>
+                                    </CouponCategory>
+                                </CardHeader>
                                 <div>
-                                    {coupon.type === "MODEL_PURCHASE" ? "도면 구매 시" : "프린트 주문 시"} | 할인율: {coupon.discountRate}% | 최대 할인 금액: {coupon.maxDiscountAmount}
+                                    <Typography variant="body.medium_m" color="text.heading">
+                                        {coupon.name}
+                                    </Typography>
                                 </div>
-                                <div>만료일: {expiredDate}</div>
+                                <div>
+                                    <Typography variant="body.small_m" color="text.body">
+                                        {coupon.type === "MODEL_PURCHASE" ? "도면 구매 시" : "프린트 주문 시"} | 할인율: {coupon.discountRate}% | 최대 할인 금액: {coupon.maxDiscountAmount}
+                                    </Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="body.small_m" color="text.body">
+                                        {expiredDate} 까지
+                                    </Typography>
+                                </div>
 
                                 {props.isCouponUseMode && (
                                     <>
@@ -105,10 +121,10 @@ export default CouponBoxPage;
 
 const Headder = styled.div`
     width: 520px;
-    height: 80px;
-    background-color: black;
+    height: 72px;
+    background-color: ${({ theme }) => theme.grayScale[600]};
     color: white;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 500;
 
     display: flex;
@@ -126,13 +142,18 @@ const RowContainer = styled.div`
     display: flex;
 `;
 const StyledInput = styled.input`
-    width: 320px;
+    width: 360px;
+    height: 40px;
     margin-right: 8px;
+    padding-left: 8px;
+    border-radius: 8px;
 `;
 
 const SubmitButton = styled.button`
+    width: 120px;
     background-color: #ffffff;
-    border: 0.1px solid #b6b6b6;
+    border: 1px solid ${({ theme }) => theme.grayScale[200]};
+    border-radius: 8px;
 `;
 
 const Title = styled.div`
@@ -141,23 +162,23 @@ const Title = styled.div`
     border-bottom: 1px solid black;
     font-size: 16px;
     font-weight: bold;
-    margin: 12px 0;
+    margin: 16px 0;
 `;
 
 const CardWrapper = styled.div`
     width: 100%;
     height: 600px;
-    overflow-y: scroll;
+    overflow-y: auto;
 `;
 
 const CardContainer = styled.div`
     width: 100%;
-    height: 88px;
-    padding: 8px;
+    height: 128px;
+    padding: 0 12px 0 12px;
     margin-bottom: 8px;
-    border-radius: 10px;
+    border-radius: 8px;
     background-color: white;
-    border: 0.1px solid #b6b6b6;
+    border: 1px solid ${({ theme }) => theme.grayScale[200]};
 
     display: flex;
     flex-direction: column;
@@ -166,11 +187,28 @@ const CardContainer = styled.div`
     position: relative;
 `;
 
-const CardTitle = styled.div`
-    font-size: 16px;
-    font-weight: 600;
+const CardHeader = styled.div`
+    width: 100%;
+    height: 52px;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 4px;
+    border-bottom: 1px solid ${({ theme }) => theme.grayScale[200]};
 
     display: flex;
+    align-items: center;
+`;
+
+const CouponCategory = styled.div`
+    width: 72px;
+    height: 28px;
+    border-radius: 8px;
+    background-color: ${({ theme }) => theme.grayScale[100]};
+    margin-left: 8px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
 `;
 
 const SelectButton = styled.div`

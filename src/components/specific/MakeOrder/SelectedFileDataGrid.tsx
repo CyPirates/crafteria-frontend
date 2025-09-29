@@ -144,7 +144,7 @@ const SelectedFileDataGrid = ({ orderRows, setOrderRows, materials }: OwnProps) 
     return (
         <Container>
             <ButtonContainer>
-                <SelectFileButton onClick={() => setIsPop(true)}>구매한 도면에서 선택</SelectFileButton>
+                <SelectFileButton onClick={() => setIsPop(true)}>내 도면에서 선택</SelectFileButton>
                 <label htmlFor="file-upload" style={{ cursor: "pointer" }}>
                     <SelectFileButton>파일 직접 업로드</SelectFileButton>
                 </label>

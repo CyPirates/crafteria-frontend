@@ -11,16 +11,11 @@ import { useNavigate } from "react-router-dom";
 import CouponBoxPage from "../../../pages/CouponBoxPage";
 import { Coupon } from "../../../types/CouponType";
 import { Typography } from "../../common/Typography";
+import AddressSearchModal from "../../common/AddressSearchModal";
 
 type OrderInfoProps = {
     printOrders: PrintOrderData[];
     company: Company;
-};
-
-type ModalProps = {
-    setZipcode: React.Dispatch<React.SetStateAction<string>>;
-    setAddress: React.Dispatch<React.SetStateAction<string>>;
-    handleIsOpen: () => void;
 };
 
 const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
@@ -175,7 +170,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                     <StyledInput placeholder="도로명 주소" disabled={true} value={address} />
                     <StyledInput placeholder="상세 주소" value={detailAddress} onChange={setDetailAddress} />
                 </AddressInputContainer>
-                {isDesignSelectOpen && <Modal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
+                {isDesignSelectOpen && <AddressSearchModal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
                 <TitleTypography variant="misc.label" color="text.body">
                     구매자 정보
                 </TitleTypography>
@@ -245,26 +240,6 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     );
 };
 
-const Modal = ({ setZipcode, setAddress, handleIsOpen }: ModalProps) => {
-    return (
-        <ModalOverlay>
-            <ModalContainer>
-                <DaumPostCode
-                    style={{
-                        width: "100%",
-                        height: "100%",
-                    }}
-                    onComplete={(data) => {
-                        setZipcode(data.zonecode);
-                        setAddress(data.address);
-                        handleIsOpen();
-                    }}
-                />
-            </ModalContainer>
-        </ModalOverlay>
-    );
-};
-
 export default OrderInfoContainer;
 
 const UserArea = styled.div`
@@ -328,30 +303,6 @@ const Button = styled.button`
     &:hover {
         background-color: #2e2e2e;
     }
-`;
-
-const ModalOverlay = styled.div`
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000; /* Ensure the modal is on top of other content */
-`;
-
-const ModalContainer = styled.div`
-    width: 500px;
-    height: 500px;
-    background-color: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 `;
 
 const InformationContainer = styled.div`

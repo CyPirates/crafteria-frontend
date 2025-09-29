@@ -12,14 +12,9 @@ const MyPage = () => {
     const [userData, setUserData] = useState<User | undefined>(undefined);
     const [isNameEdited, setIsNameEdited] = useState<boolean>(false);
     const [newName, setNewName] = useState<string>("");
-    const [newAddress, setNewAddress] = useState<Address>({
-        id: "",
-        default: false,
-        label: "",
-        baseaddress: "",
-        detailAddress: "",
-    });
+
     const [addressEditMode, setAddressEditMode] = useState<boolean>(false);
+
     const fetchUserData = async () => {
         const token = localStorage.getItem("accessToken");
         try {
@@ -32,29 +27,17 @@ const MyPage = () => {
             console.log(e);
         }
     };
-    const postUserData = async (editType: string) => {
+    const postUserData = async () => {
         const token = localStorage.getItem("accessToken");
-        if (editType === "name") {
-            try {
-                const response = await newAxios.patch(
-                    `/api/v1/users/me`,
-                    { username: newName, realname: userData?.realname, addresses: userData?.addresses },
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-            } catch (e) {
-                console.log(e);
-            }
-        }
-        if (editType === "address") {
-            try {
-                const response = await newAxios.patch(
-                    `/api/v1/users/me`,
-                    { username: userData?.username, realname: userData?.realname, address: newAddress },
-                    { headers: { Authorization: `Bearer ${token}` } }
-                );
-            } catch (e) {
-                console.log(e);
-            }
+
+        try {
+            const response = await newAxios.patch(
+                `/api/v1/users/me`,
+                { username: newName, realname: userData?.realname, addresses: userData?.addresses },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } catch (e) {
+            console.log(e);
         }
     };
     const handleNameEditButtonClick = async () => {
@@ -67,7 +50,7 @@ const MyPage = () => {
                 alert("이름은 12글자를 초과할 수 없습니다.");
                 return;
             }
-            await postUserData("name");
+            await postUserData();
             fetchUserData();
         }
         setIsNameEdited(!isNameEdited);
@@ -101,12 +84,12 @@ const MyPage = () => {
                 <Typography variant="body.medium_b" color="text.heading">
                     구매 현황
                 </Typography>
-                <LevelContainer>
+                <GrayRoundContainer>
                     <img src={smallLevelImagesArray[userData.userLevel]} alt="x" />
                     <Typography variant="body.xs_m" color="grayScale.400">
                         LEVEL {userData.userLevel}
                     </Typography>
-                </LevelContainer>
+                </GrayRoundContainer>
             </div>
             <ContentsContainer>
                 <SpaceContainer>
@@ -136,12 +119,12 @@ const MyPage = () => {
                 <Typography variant="body.medium_b" color="text.heading">
                     판매 현황
                 </Typography>
-                <LevelContainer>
+                <GrayRoundContainer>
                     <img src={smallLevelImagesArray[userData.sellerLevel]} alt="x" />
                     <Typography variant="body.xs_m" color="grayScale.400">
                         LEVEL {userData.sellerLevel}
                     </Typography>
-                </LevelContainer>
+                </GrayRoundContainer>
             </div>
             <ContentsContainer>
                 <SpaceContainer>
@@ -161,9 +144,27 @@ const MyPage = () => {
                 배송지 관리
             </Typography>
             <ContentsContainer style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-                <AddressContainer>
-                    <input value={newAddress.label} onChange={(e) => setNewAddress((prev) => ({ ...prev, label: e.target.value }))} />
-                </AddressContainer>
+                {userData.addresses.map((address, i) => {
+                    return (
+                        <AddressContainer>
+                            <div style={{ display: "flex" }}>
+                                <Typography variant="heading.h6">{address.label}</Typography>
+                                {address.default && (
+                                    <GrayRoundContainer>
+                                        <Typography variant="body.xs_m" color="grayScale.400">
+                                            기본
+                                        </Typography>
+                                    </GrayRoundContainer>
+                                )}
+                            </div>
+                            <Typography variant="body.medium_m">{address.postalCode}</Typography>
+                            <Typography variant="body.medium_m">
+                                {address.baseAddress} {address.detailAddress}
+                            </Typography>
+                        </AddressContainer>
+                    );
+                })}
+                {addressEditMode && <EditAddressContainer />}
 
                 <LongButton onClick={() => setAddressEditMode(true)}>
                     <Typography variant="body.medium_m" color="grayScale.0">
@@ -177,6 +178,36 @@ const MyPage = () => {
     );
 };
 
+type EditAddressPops = {
+    address?: Address;
+};
+
+const EditAddressContainer = ({ address }: EditAddressPops) => {
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [newAddress, setNewAddress] = useState<Address>(
+        address || {
+            id: "",
+            default: false,
+            label: "",
+            baseAddress: "",
+            detailAddress: "",
+            postalCode: "",
+        }
+    );
+
+    return (
+        <AddressContainer>
+            <RowContainer>
+                <ZipcodeInput placeholder="우편번호" disabled={true} value={newAddress.postalCode} />
+                <Button style={{ width: "96px", height: "32px" }} onClick={() => setIsModalOpen(true)}>
+                    주소 검색
+                </Button>
+            </RowContainer>
+            <StyledInput placeholder="도로명 주소" disabled={true} value={newAddress.baseAddress} />
+            <StyledInput placeholder="상세 주소" value={newAddress.detailAddress} onChange={(e) => setNewAddress({ ...newAddress, detailAddress: e.target.value })} />
+        </AddressContainer>
+    );
+};
 export default MyPage;
 
 const PageWrapper = styled.div`
@@ -216,7 +247,7 @@ const VerticalLine = styled.div`
     border-left: 1px solid #ececec;
 `;
 
-const LevelContainer = styled.div`
+const GrayRoundContainer = styled.div`
     width: 76px;
     height: 24px;
     margin-left: 12px;
@@ -241,7 +272,10 @@ const AddressContainer = styled.div`
     border-radius: 8px;
 
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+
+    position: relative;
 `;
 
 const LongButton = styled.div`
@@ -257,5 +291,49 @@ const LongButton = styled.div`
     cursor: pointer;
     &:hover {
         background-color: ${({ theme }) => theme.text.disabled};
+    }
+`;
+
+const StyledInput = styled.input`
+    border: 1px solid ${({ theme }) => theme.grayScale[300]};
+    border-radius: 8px;
+    width: 548px;
+    height: 32px;
+    padding-left: 12px;
+
+    font-size: ${({ theme }) => theme.typography.misc.placeholder.fontSize};
+    font-weight: ${({ theme }) => theme.typography.misc.placeholder.fontWeight};
+    line-height: ${({ theme }) => theme.typography.misc.placeholder.lineHeight};
+
+    outline: none;
+`;
+const RowContainer = styled.div`
+    display: flex;
+    width: 272px;
+    margin: 4px 0;
+`;
+
+const ZipcodeInput = styled.input`
+    width: 168px;
+    height: 32px;
+    padding-left: 12px;
+    background-color: ${({ theme }) => theme.text.disabled};
+    border: 1px solid ${({ theme }) => theme.grayScale[300]};
+    border-radius: 8px;
+
+    font-size: ${({ theme }) => theme.typography.misc.placeholder.fontSize};
+    font-weight: ${({ theme }) => theme.typography.misc.placeholder.fontWeight};
+    line-height: ${({ theme }) => theme.typography.misc.placeholder.lineHeight};
+`;
+const Button = styled.button`
+    background-color: ${({ theme }) => theme.grayScale[100]};
+    border: 1px solid ${({ theme }) => theme.grayScale[300]};
+    border-radius: 4px;
+    margin-left: 8px;
+    cursor: pointer;
+
+    text-align: center;
+    &:hover {
+        background-color: #2e2e2e;
     }
 `;
