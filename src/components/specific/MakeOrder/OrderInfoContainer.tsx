@@ -12,6 +12,7 @@ import CouponBoxPage from "../../../pages/CouponBoxPage";
 import { Coupon } from "../../../types/CouponType";
 import { Typography } from "../../common/Typography";
 import AddressSearchModal from "../../common/AddressSearchModal";
+import SelectAddressModal from "./SelectAddressModal";
 
 type OrderInfoProps = {
     printOrders: PrintOrderData[];
@@ -20,7 +21,7 @@ type OrderInfoProps = {
 
 const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     const navigate = useNavigate();
-    const [isDesignSelectOpen, setIsDesignSelectOpen] = useState<boolean>(false);
+    const [isAddressModalOpen, setIsAddressModalOpen] = useState<boolean>(false);
     const [isCouponOpen, setIsCouponOpen] = useState<boolean>(false);
     const [coupon, setCoupon] = useState<Coupon | null>(null);
     const [zipcode, setZipcode] = useState<string>("");
@@ -89,7 +90,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
     }, [detailAddress, address]);
 
     const handleIsOpen = () => {
-        setIsDesignSelectOpen((prev) => !prev);
+        setIsAddressModalOpen((prev) => !prev);
     };
 
     const handleOnchange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -170,7 +171,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
                     <StyledInput placeholder="도로명 주소" disabled={true} value={address} />
                     <StyledInput placeholder="상세 주소" value={detailAddress} onChange={setDetailAddress} />
                 </AddressInputContainer>
-                {isDesignSelectOpen && <AddressSearchModal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
+                {isAddressModalOpen && <SelectAddressModal setZipcode={setZipcode} setAddress={setAddress} handleIsOpen={handleIsOpen} />}
                 <TitleTypography variant="misc.label" color="text.body">
                     구매자 정보
                 </TitleTypography>
@@ -295,6 +296,8 @@ const StyledInput = styled.input`
 const Button = styled.button`
     background-color: ${({ theme }) => theme.grayScale[100]};
     border: 1px solid ${({ theme }) => theme.grayScale[300]};
+    color: ${({ theme }) => theme.text.body};
+    font-size: 14px;
     border-radius: 4px;
     margin-left: 8px;
     cursor: pointer;
