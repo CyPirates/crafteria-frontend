@@ -30,10 +30,10 @@ function UserMenuDropdown(props: OwnProps) {
             </Dropdown.Toggle>
 
             <Dropdown.Menu style={{ minWidth: "100px" }}>
-                <Dropdown.Item onClick={() => navigate("my-page")}>
+                <Dropdown.Item onClick={() => navigate("my-page/user-info")}>
                     <div>내 정보</div>
                 </Dropdown.Item>
-                <Dropdown.Item onClick={() => navigate("my-order")}>
+                <Dropdown.Item onClick={() => navigate("my-page/order")}>
                     <div>내 주문</div>
                 </Dropdown.Item>
                 <Dropdown.Item onClick={handleLogout}>

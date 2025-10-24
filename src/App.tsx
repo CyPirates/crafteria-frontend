@@ -20,7 +20,6 @@ import CreateReviewPage from "./pages/CreateReviewPage";
 import AboutPage from "./pages/AboutPage";
 import { CartProvider } from "./hooks/useCart";
 import SearchResultPage from "./pages/SearchResultPage";
-import MyOrderPage from "./pages/MyOrderPage";
 import LoginPage from "./pages/LoginPage";
 import BottomBar from "./components/layout/BottomBar";
 import MyPage from "./pages/MyPage";
@@ -57,11 +56,10 @@ const AppRoutes: React.FC = () => {
                                     <Route path="/sell-design" element={<SellDesignPage />} />
                                     <Route path="/print-order" element={<MakeOrderPage />} />
                                     <Route path="/auth/success" element={<GetTokenPage />} />
-                                    <Route path="/my-order" element={<MyOrderPage />} />
                                     <Route path="/createReview" element={<CreateReviewPage />} />
                                     <Route path="/company-detail/:id" element={<AboutPage />} />
                                     <Route path="/search" element={<SearchResultPage />} />
-                                    <Route path="/my-page" element={<MyPage />} />
+                                    <Route path="/my-page/:id" element={<MyPage />} />
                                     <Route path="/policies/:type" element={<PoliciesPage />} />
                                     <Route path="/edit-design" element={<SellDesignPage editMode={true} />} />
                                     <Route path="/test" element={<Test />} />

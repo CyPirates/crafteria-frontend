@@ -45,7 +45,7 @@ const HomePage = () => {
         <>
             <PageWrapper>
                 <Carousel />
-                <div style={{ paddingLeft: "80px" }}>
+                <div style={{ paddingLeft: "80px", width: "100%" }}>
                     <Typography variant="heading.h6">인기리스트</Typography>
                     <TabContainer>
                         {TabImages.map((image, i) => {
@@ -89,6 +89,7 @@ const AuthorGrid = ({ authors }: { authors: User[] }) => {
     return (
         <>
             {authors.map((author, i) => {
+                if (author.totalSalesCount === 0) return;
                 const imgUrl = author.profileImageUrl != null ? author.profileImageUrl : DefaultUserImage;
                 return (
                     <AuthorCard key={i}>
@@ -158,6 +159,7 @@ const TabOpacity = styled.div<{ isActive: boolean }>`
 `;
 
 const DesignContainer = styled.div`
+    width: 1280px;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     gap: 16px;

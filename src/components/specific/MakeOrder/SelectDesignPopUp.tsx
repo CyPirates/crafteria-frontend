@@ -83,7 +83,9 @@ const SelectDesignPopUp = ({ handlePopUpOpen, handleFileUpload }: OwnProps) => {
                 </FilterContainer>
                 <DesignContainer>
                     {(isPurchasedSelected ? purchasedDesigns : onSaleDesigns).length === 0 ? (
-                        <Typography variant="body.medium_r">해당 항목이 없습니다.</Typography>
+                        <Typography variant="body.medium_r" style={{ marginTop: "80px" }}>
+                            해당 항목이 없습니다.
+                        </Typography>
                     ) : (
                         (isPurchasedSelected ? purchasedDesigns : onSaleDesigns).map((design, i) => {
                             if (i > 4) return null;

@@ -137,7 +137,7 @@ const OrderCard = ({ data }: OrderCardProps) => {
 export default OrderCard;
 
 const CardWrapper = styled.div`
-    width: 1120px;
+    width: 840px;
     height: auto;
     padding: 20px 0 20px 48px;
     margin-bottom: 16px;
@@ -158,7 +158,7 @@ const RowContainer = styled.div`
 `;
 
 const OrderInfoConatiner = styled.div`
-    width: 700px;
+    flex: 1;
     margin-top: 16px;
     padding: 16px;
     border: 1px solid #e6e6e6;
@@ -170,9 +170,8 @@ const OrderInfoConatiner = styled.div`
 `;
 
 const ButtonContainer = styled.div`
-    height: auto;
+    width: 240px;
     border-left: 1px solid #e6e6e6;
-    flex: 1;
     display: flex;
     gap: 20px;
     align-items: center;
@@ -180,7 +179,7 @@ const ButtonContainer = styled.div`
 `;
 
 const Button = styled.div`
-    width: 220px;
+    width: 180px;
     height: 40px;
     border-radius: 8px;
     border: 1px solid #e6e6e6;

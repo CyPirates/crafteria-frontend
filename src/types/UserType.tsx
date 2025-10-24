@@ -19,6 +19,8 @@ export type User = {
     profileImageUrl: string;
     identityVerified: boolean;
     identityVerifiedAt: string;
+    bankAccount: string;
+    accountType: string;
 };
 
 export type Address = {
