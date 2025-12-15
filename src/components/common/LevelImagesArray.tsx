@@ -10,6 +10,6 @@ import BigLevel3 from "../../assets/images/level/medal_32x.png";
 import BigLevel4 from "../../assets/images/level/medal_42x.png";
 import BigLevel5 from "../../assets/images/level/medal_52x.png";
 
-export const bigLevelImagesArray = [undefined, BigLevel1, BigLevel2, BigLevel3, BigLevel4, BigLevel5];
+export const bigLevelImagesArray = [BigLevel1, BigLevel1, BigLevel2, BigLevel3, BigLevel4, BigLevel5];
 
-export const smallLevelImagesArray = [undefined, SmallLevel1, SmallLevel2, SmallLevel3, SmallLevel4, SmallLevel5];
+export const smallLevelImagesArray = [SmallLevel1, SmallLevel1, SmallLevel2, SmallLevel3, SmallLevel4, SmallLevel5];

@@ -16,21 +16,39 @@ type DesignOutlineCardProps = {
 };
 
 const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) => {
+    console.log(designData);
     const { name, viewCount, downloadCount, modelFileUrls, id, downloadable, category, author } = designData;
     const navigate = useNavigate();
     const [volume, setVolume] = useState<number | undefined>(undefined);
 
-    const handleDownload = async (url: string, filename: string) => {
-        const file = await fetch(url);
-        const blob = await file.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        const newName = filename + ".stl";
-        const link = document.createElement("a");
-        link.download = newName;
-        link.href = objectUrl;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+    const handleDownload = async () => {
+        try {
+            const response = await newAxios.get(`/api/v1/model/user/download/${id}`, { responseType: "blob", headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } });
+            console.log(response.data);
+
+            const disposition = response.headers[`content-disposition`];
+            console.log(disposition);
+            let filename = `${name}.zip`;
+            if (disposition && disposition.includes("filename*=")) {
+                const filenameMatch = disposition.match(/filename\*=UTF-8''(.+)/);
+                if (filenameMatch?.[1]) {
+                    filename = decodeURIComponent(filenameMatch[1]);
+                }
+            }
+
+            // blob으로부터 다운로드 트리거
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", filename);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            alert("다운로드가 완료되었습니다.");
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     const handleDelete = async () => {
@@ -79,7 +97,7 @@ const DesignOutlineCard = ({ designData, published }: DesignOutlineCardProps) =>
                 </InformationContainer>
                 <ButtonConatiner>
                     <Button onClick={() => navigate(`/design/${id}`)}>상세보기</Button>
-                    {(published || downloadable) && <Button onClick={() => handleDownload(modelFileUrls[0], name)}>다운로드</Button>}
+                    {(published || downloadable) && <Button onClick={() => handleDownload()}>다운로드</Button>}
                     {published && <Button onClick={() => navigate(`/edit-design?modelId=${id}`)}>수정</Button>}
                     {published && <Button onClick={handleDelete}>삭제</Button>}
                 </ButtonConatiner>

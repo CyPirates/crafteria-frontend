@@ -167,6 +167,7 @@ type DesignRowProps = Omit<OwnProps, "orderRows"> & {
 
 const DesignRow = ({ row, materials, setOrderRows, index }: DesignRowProps) => {
     const time = calculateAndRoundPrintTime(row.magnification, row.volume, materials[row.materialType]?.printSpeed);
+    const defalutPrice = calculatePrice(row.materialPrice, row.volume, row.magnification, row.quantity);
 
     const Columns: Column[] = [
         { id: "fileUrl", label: "도면", width: "150px" },
@@ -201,7 +202,7 @@ const DesignRow = ({ row, materials, setOrderRows, index }: DesignRowProps) => {
 
                 // 시간과 가격 재계산
                 const printSpeed = materials[updatedItem.materialType]?.printSpeed;
-                updatedItem.time = calculateAndRoundPrintTime(updatedItem.magnification, updatedItem.volume, printSpeed) as number;
+                //updatedItem.time = calculateAndRoundPrintTime(updatedItem.magnification, updatedItem.volume, printSpeed) as number;
                 updatedItem.price = +calculatePrice(updatedItem.materialPrice, updatedItem.volume, updatedItem.magnification, updatedItem.quantity);
 
                 return updatedItem;
@@ -255,7 +256,7 @@ const DesignRow = ({ row, materials, setOrderRows, index }: DesignRowProps) => {
                         </StyledSelect>
                     </Td>
                     {/* <Td>{convertHoursToDHM(+time)}</Td> */}
-                    <Td>{row.price ?? "-"}</Td>
+                    <Td>{row.price ?? defalutPrice}</Td>
                     <Td>
                         <div onClick={handleDelete}>
                             <img src={DeleteIcon} alt="x" />

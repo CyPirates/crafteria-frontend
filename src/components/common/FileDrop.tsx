@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import StlRenderContainer from "../specific/designDetail/StlRenderContainer";
 import { DesignFormData } from "../../types/DesignType";
-import getStlModelSize from "../../utils/getStlModelSize";
 import { Typography } from "./Typography";
 import UploadIcon from "../../assets/images/icons/upload.png";
 
@@ -12,7 +10,6 @@ type OwnProps = {
 
 const FileDrop = ({ setData }: OwnProps) => {
     const [isActive, setIsActive] = useState<boolean>(false);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const handleDragStart = (event: React.DragEvent<HTMLLabelElement>) => {
         event.preventDefault();
@@ -28,40 +25,51 @@ const FileDrop = ({ setData }: OwnProps) => {
         event.preventDefault();
     };
 
-    const handleOnChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file && file.name.toLowerCase().endsWith(".stl")) {
-            setSelectedFile(file);
-            setData((prev) => {
-                return { ...prev, modelFiles: [...prev.modelFiles, file] };
-            });
-        } else {
-            alert("STL 파일만 업로드 가능합니다.");
+    const categorizeFiles = (files: FileList | null) => {
+        if (!files || files.length === 0) return;
+        const modelFiles: File[] = [];
+        const imageFiles: File[] = [];
+        Array.from(files).forEach((file) => {
+            const lower = file.name.toLowerCase();
+            if (lower.endsWith(".stl")) {
+                modelFiles.push(file);
+            } else if (lower.match(/\.(jpg|jpeg|png|webp)$/)) {
+                imageFiles.push(file);
+            }
+        });
+
+        if (modelFiles.length === 0 && imageFiles.length === 0) {
+            alert("지원하지 않는 파일 형식입니다.");
+            return;
         }
+
+        setData((prev) => ({
+            ...prev,
+            modelFiles: [...prev.modelFiles, ...modelFiles],
+            descriptionImages: [...prev.descriptionImages, ...imageFiles],
+        }));
+    };
+
+    const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        categorizeFiles(event.target.files);
     };
 
     const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
         event.preventDefault();
         setIsActive(false);
-
-        const file = event.dataTransfer.files[0];
-        if (file && file.name.toLowerCase().endsWith(".stl")) {
-            setSelectedFile(file);
-        } else {
-            alert("STL 파일만 업로드 가능합니다.");
-        }
+        categorizeFiles(event.dataTransfer.files);
     };
 
     return (
         <Label isActive={isActive} onDragEnter={handleDragStart} onDragOver={handleDragOver} onDragLeave={handleDragEnd} onDrop={handleDrop}>
-            <input type="file" accept=".stl" onChange={handleOnChange} style={{ display: "none" }} />
+            <input type="file" accept=".stl, .jpg, .jpeg, .png, .webp" multiple onChange={handleOnChange} style={{ display: "none" }} />
             <VerticalContainer>
                 <img src={UploadIcon} alt="x" width="24px" height="24px" />
                 <Typography variant="body.small_b" color="text.body">
-                    파일을 드롭하거나 클릭하여 업로드하세요
+                    파일 및 이미지를 드롭하거나 클릭하여 업로드하세요
                 </Typography>
                 <Typography variant="body.small_r" color="grayScale.400">
-                    (.stl)
+                    (.stl, .jpg, .png, .webp)
                 </Typography>
             </VerticalContainer>
         </Label>

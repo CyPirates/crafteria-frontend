@@ -139,7 +139,7 @@ const OrderInfoContainer = ({ printOrders, company }: OrderInfoProps) => {
             if (paymentId && orderId) {
                 const isPaymentSuccess = await initiatePortOnePayment(paymentId, orderId, finalPrice.toString(), "orderId");
                 if (isPaymentSuccess) {
-                    navigate("/my-order");
+                    navigate("/my-page/order");
                 }
             }
         } catch (e) {

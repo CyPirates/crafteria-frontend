@@ -28,6 +28,7 @@ const DesignDetailPage = () => {
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [isFileRendered, setIsFileRenderd] = useState<boolean>(true);
     const [design, setDesign] = useState<Design | undefined>(undefined);
     const [selectedFileIndex, setSelectedFileIndex] = useState<number>(0);
     const [selectedFileMeasureData, setSelectedFileMeasureData] = useState<DesignMeasureData | undefined>(undefined);
@@ -64,31 +65,48 @@ const DesignDetailPage = () => {
         measureModelVolume();
     }, [design, selectedFileIndex]);
 
-    const handleDownload = async (url: string, filename: string) => {
-        const file = await fetch(url);
-        const blob = await file.blob();
-        const objectUrl = URL.createObjectURL(blob);
-        const newName = filename + ".stl";
-        const link = document.createElement("a");
-        link.download = newName;
-        link.href = objectUrl;
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
+    const handleDownload = async () => {
+        try {
+            const response = await newAxios.get(`/api/v1/model/user/download/${id}`, { responseType: "blob", headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` } });
+            console.log(response.data);
+
+            const disposition = response.headers[`content-disposition`];
+            console.log(disposition);
+            let filename = `${design!.name}.zip`;
+            if (disposition && disposition.includes("filename*=")) {
+                const filenameMatch = disposition.match(/filename\*=UTF-8''(.+)/);
+                if (filenameMatch?.[1]) {
+                    filename = decodeURIComponent(filenameMatch[1]);
+                }
+            }
+
+            // blob으로부터 다운로드 트리거
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", filename);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            window.URL.revokeObjectURL(url);
+            alert("다운로드가 완료되었습니다.");
+        } catch (e) {
+            console.log(e);
+        }
     };
 
     if (!design) {
         return <div>Loading...</div>;
     }
 
-    const { author, name, description, price, downloadCount, modelFileUrls, purchaseAvailability, category, downloadable } = design;
+    const { author, name, description, price, downloadCount, modelFileUrls, descriptionImageUrls, purchaseAvailability, category, downloadable } = design;
     const handleButtonClick = async () => {
         if (!purchaseAvailability) {
             if (!downloadable) {
                 navigate("/print-order");
                 return;
             }
-            handleDownload(modelFileUrls[0], name); // todo
+            handleDownload(); // todo
             return;
         }
         if (price == "0") {
@@ -121,7 +139,35 @@ const DesignDetailPage = () => {
             {isOpen && <BuyDesignPopUp handleOnClick={setIsOpen} name={name} price={+price} filePath={modelFileUrls[0]} id={id} />}
             <OutlineContainer>
                 <RowContainer>
-                    {modelFileUrls ? <StlRenderContainer filePath={modelFileUrls[selectedFileIndex]} width="548px" height="439px" /> : <div style={{ width: "500px", height: "500px" }} />}
+                    <div>
+                        <FilterContainer>
+                            {descriptionImageUrls.length > 0 && (
+                                <Filter
+                                    isActive={!isFileRendered}
+                                    onClick={() => {
+                                        setIsFileRenderd(false);
+                                        setSelectedFileIndex(0);
+                                    }}
+                                >
+                                    이미지
+                                </Filter>
+                            )}
+                            <Filter
+                                isActive={isFileRendered}
+                                onClick={() => {
+                                    setIsFileRenderd(true);
+                                    setSelectedFileIndex(0);
+                                }}
+                            >
+                                파일
+                            </Filter>
+                        </FilterContainer>
+                        {isFileRendered ? (
+                            <StlRenderContainer filePath={modelFileUrls[selectedFileIndex]} width="548px" height="439px" />
+                        ) : (
+                            <img src={descriptionImageUrls[selectedFileIndex]} width="548px" height="439px" alt="image" style={{ objectFit: "contain" }} />
+                        )}
+                    </div>
                     <OutlineContentContainer>
                         <Typography variant="heading.h6">{name}</Typography>
                         <DetailTable>
@@ -133,15 +179,18 @@ const DesignDetailPage = () => {
                                     </DetailTitle>
                                     <td>{author.name}</td>
                                 </tr>
-                                <tr>
-                                    <DetailTitle>
-                                        <IconContainer src={SizeIcon} />
-                                        현재 모델 크기
-                                    </DetailTitle>
-                                    <td>
-                                        {selectedFileMeasureData?.volume}mm³ ({selectedFileMeasureData?.width}mm x {selectedFileMeasureData?.length}mm x {selectedFileMeasureData?.height}mm)
-                                    </td>
-                                </tr>
+                                {isFileRendered && (
+                                    <tr>
+                                        <DetailTitle>
+                                            <IconContainer src={SizeIcon} />
+                                            현재 모델 크기
+                                        </DetailTitle>
+                                        <td>
+                                            {selectedFileMeasureData?.volume}mm³ ({selectedFileMeasureData?.width}mm x {selectedFileMeasureData?.length}mm x {selectedFileMeasureData?.height}mm)
+                                        </td>
+                                    </tr>
+                                )}
+
                                 <tr>
                                     <DetailTitle>
                                         <IconContainer src={BuyIcon} />
@@ -166,13 +215,19 @@ const DesignDetailPage = () => {
                     </OutlineContentContainer>
                 </RowContainer>
                 <FilePreviewContainer>
-                    {modelFileUrls.map((url, i) => {
-                        return (
-                            <FilePreviewBox key={i} isSelected={i === selectedFileIndex} onClick={() => setSelectedFileIndex(i)}>
-                                <StlRenderContainer filePath={url} width="100%" height="100%" clickDisabled={true} />
-                            </FilePreviewBox>
-                        );
-                    })}
+                    {isFileRendered
+                        ? modelFileUrls.map((url, i) => {
+                              return (
+                                  <FilePreviewBox key={i} isSelected={i === selectedFileIndex} onClick={() => setSelectedFileIndex(i)}>
+                                      <StlRenderContainer filePath={url} width="100%" height="100%" clickDisabled={true} />
+                                  </FilePreviewBox>
+                              );
+                          })
+                        : descriptionImageUrls.map((url, i) => (
+                              <FilePreviewBox key={i} isSelected={i === selectedFileIndex} onClick={() => setSelectedFileIndex(i)}>
+                                  <img src={url} width="100%" height="100%" alt="image" style={{ borderRadius: "8px", objectFit: "contain" }} />
+                              </FilePreviewBox>
+                          ))}
                 </FilePreviewContainer>
             </OutlineContainer>
             <Divider />
@@ -194,6 +249,40 @@ const PageWrapper = styled.div`
 
 const OutlineContainer = styled.div`
     padding-bottom: 10px;
+`;
+
+const FilterContainer = styled.div`
+    width: 548px;
+    height: 60px;
+    border-bottom: 1px solid #707074;
+    margin-bottom: 4px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 8px;
+
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+`;
+
+const Filter = styled.div<{ isActive: boolean }>`
+    flex: 1;
+    height: 100%;
+    color: ${({ isActive, theme }) => (isActive ? theme.grayScale[600] : theme.grayScale[500])};
+    font-weight: ${({ isActive }) => (isActive ? "bold" : 300)};
+    border-bottom: ${({ isActive }) => (isActive ? "2px solid #111111" : "none")};
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+        font-weight: bold;
+    }
 `;
 
 const RowContainer = styled.div`

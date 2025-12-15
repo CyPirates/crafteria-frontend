@@ -4,6 +4,8 @@ import StlRenderContainer from "../designDetail/StlRenderContainer";
 import { newAxios } from "../../../utils/axiosWithUrl";
 import { Design } from "../../../types/DesignType";
 import { Typography } from "../../common/Typography";
+import { get } from "http";
+import { getFilenameFromUrl } from "../../../utils/getFileNameFromUrl";
 
 type OwnProps = {
     handlePopUpOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -117,8 +119,19 @@ type DesignLayoutProps = {
 
 const DesignLayout = ({ design, openIndividual, setOpenIndividual, handleSelectAll, handleSelectIndividual }: DesignLayoutProps) => {
     const designUrls = design.modelFileUrls;
+    const modelFiles = design.modelFiles;
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [selectedUrlIndex, setSelectedUrlIndex] = useState<number[]>([]);
+    const [fileNames, setFileNames] = useState<string[]>([]);
+
+    // useEffect(() => {
+    //     const fetchFileNames = async () => {
+    //         const fetchedFileNames = await Promise.all(designUrls.map((url) => getFilenameFromUrl(url)));
+    //         // setFileNames(fetchedFileNames);
+    //     };
+
+    //     fetchFileNames();
+    // }, []);
 
     const handleSelectedFiles = () => {
         const selectedUrls = selectedUrlIndex.map((index) => designUrls[index]);
@@ -148,7 +161,9 @@ const DesignLayout = ({ design, openIndividual, setOpenIndividual, handleSelectA
             {openIndividual === design.id && (
                 <IndividualSelectContainer>
                     <CheckboxContainer>
-                        {designUrls.map((url, i) => {
+                        {modelFiles.map((modelFile, i) => {
+                            const fileName = modelFile.originalName;
+                            const url = modelFile.url;
                             return (
                                 <Label key={i}>
                                     <input
@@ -159,7 +174,7 @@ const DesignLayout = ({ design, openIndividual, setOpenIndividual, handleSelectA
                                         }}
                                     />
                                     <StlRenderContainer filePath={url} width="50px" height="50px" clickDisabled />
-                                    <Typography variant="body.medium_r">{url.split("/")[url.split("/").length - 1]}</Typography>
+                                    <Typography variant="body.medium_r">{fileName}</Typography>
                                 </Label>
                             );
                         })}

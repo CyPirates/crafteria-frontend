@@ -32,13 +32,30 @@ const OrderCard = ({ data }: OrderCardProps) => {
         CANCELED: "주문 취소",
     };
 
+    const getTrackingUrl = (courier: string, trackingNumber: string): string => {
+        switch (courier) {
+            case "CJ대한통운":
+                return `https://trace.cjlogistics.com/web/detail.jsp?slipno=${trackingNumber}`;
+            case "롯데택배":
+                return `https://www.lotteglogis.com/open/tracking?InvNo=${trackingNumber}`;
+            case "로젠택배":
+                return `https://www.ilogen.com/web/personal/trace/${trackingNumber}`;
+            case "우체국택배":
+                return `https://service.epost.go.kr/trace.RetrieveDomRigiTraceList.comm?sid1=${trackingNumber}`;
+            case "경동택배":
+                return `https://kdexp.com/basicNewDelivery.kd?barcode=${trackingNumber}`;
+            default:
+                throw new Error("지원하지 않는 택배사입니다.");
+        }
+    };
+
     const openDeliveryTracking = () => {
         const width = 520;
         const height = 860;
-        const url = `/track?courier=${delivery.courier}&trackingNumber=${delivery.trackingNumber}`;
+        const url = getTrackingUrl(delivery.courier, delivery.trackingNumber);
 
         const features = `width=${width},height=${height},resizable=no,scrollbars=no`;
-        window.open(url, "_blank", features);
+        window.open(url, "_blank", "noopener, noreferrer");
     };
 
     const handleCancel = async () => {
@@ -173,6 +190,7 @@ const ButtonContainer = styled.div`
     width: 240px;
     border-left: 1px solid #e6e6e6;
     display: flex;
+    flex-direction: column;
     gap: 20px;
     align-items: center;
     justify-content: center;

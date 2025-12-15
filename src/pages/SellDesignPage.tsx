@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import FileDrop from "../components/common/FileDrop";
 import { DesignFormData } from "../types/DesignType";
@@ -44,6 +44,7 @@ const SellDesignPage = ({ editMode }: OwnProps) => {
         description: "",
         category: "INTERIOR_DECORATION",
         downloadable: false,
+        descriptionImages: [],
     });
     const [value, setValue] = useState(""); // description
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
@@ -53,12 +54,20 @@ const SellDesignPage = ({ editMode }: OwnProps) => {
         setData((prev) => ({ ...prev, [id]: value }));
     };
 
-    const handleRemoveFile = (index: number) => {
-        console.log("dd");
-        setData((prev) => ({
-            ...prev,
-            modelFiles: prev.modelFiles.filter((_, i) => i !== index), // 새 배열 생성
-        }));
+    const handleRemoveFile = ({ index, fileType }: { index: number; fileType: "model" | "image" }) => {
+        setData((prev) => {
+            const updatedData = { ...prev };
+            if (fileType === "model") {
+                const removedFile = prev.modelFiles[index];
+                URL.revokeObjectURL(URL.createObjectURL(removedFile));
+                updatedData.modelFiles = prev.modelFiles.filter((_, i) => i !== index);
+            } else {
+                const removedFile = prev.descriptionImages[index];
+                URL.revokeObjectURL(URL.createObjectURL(removedFile));
+                updatedData.descriptionImages = prev.descriptionImages.filter((_, i) => i !== index);
+            }
+            return updatedData;
+        });
     };
 
     const handleDescriptionChange = (value: string) => {
@@ -78,6 +87,11 @@ const SellDesignPage = ({ editMode }: OwnProps) => {
                     formData.append("modelFiles", file);
                 });
             }
+            if (key === "descriptionImages") {
+                (value as File[]).forEach((file) => {
+                    formData.append("descriptionImages", file);
+                });
+            }
 
             if (typeof value === "boolean") {
                 formData.append(key, value ? "true" : "false");
@@ -94,9 +108,10 @@ const SellDesignPage = ({ editMode }: OwnProps) => {
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
                 });
             } else {
-                await newAxios.post(`/api/v1/model/author/upload`, formData, {
+                const response = await newAxios.post(`/api/v1/model/author/upload`, formData, {
                     headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
                 });
+                console.log(response.data);
             }
 
             navigate("/my-design");
@@ -115,43 +130,53 @@ const SellDesignPage = ({ editMode }: OwnProps) => {
     }, [data.modelFiles]);
 
     useEffect(() => {
-        if (editMode && modelId) {
-            const fetchData = async () => {
-                try {
-                    const response = await newAxios.get(`/api/v1/model/user/view/${modelId}`);
-                    const fetchedData = response.data.data;
+        if (!editMode || !modelId) return;
 
-                    if (fetchedData.author.id != localStorage.getItem("user-id")) {
-                        alert("권한이 없습니다.");
-                        navigate("/");
-                        return;
-                    }
+        const fetchData = async () => {
+            try {
+                const response = await newAxios.get(`/api/v1/model/user/view/${modelId}`);
+                const fetchedData = response.data.data;
+                console.log(fetchedData);
 
-                    // 기존 데이터 세팅
-                    setData((prev) => ({
-                        ...prev,
-                        ...fetchedData,
-                        modelFiles: [], // File은 url로 받아온거 변환해야함
-                    }));
-
-                    setValue(fetchedData.description);
-
-                    // url File로  변환
-                    const filesWithNull: (File | null)[] = await Promise.all((fetchedData.modelFileUrls as string[]).map((url, i) => convertURLToFile(url, i)));
-                    const files: File[] = filesWithNull.filter((f): f is File => f !== null);
-
-                    setData((prev) => ({
-                        ...prev,
-                        modelFiles: files,
-                    }));
-                } catch (e) {
-                    console.log(e);
+                if (fetchedData.author.id != localStorage.getItem("user-id")) {
+                    alert("권한이 없습니다.");
+                    navigate("/");
+                    return;
                 }
-            };
+                console.log(fetchedData.descriptionImageUrls);
 
-            fetchData();
-        }
-    }, [editMode, modelId]);
+                // 편의상 원본 fetchedData에서 직접 필요한 값 뽑아오기
+                const fetchedModelUrls: string[] = Array.isArray(fetchedData.modelFileUrls) ? fetchedData.modelFileUrls : [];
+                const fetchedImageUrls: string[] = Array.isArray(fetchedData.descriptionImageUrls) ? fetchedData.descriptionImageUrls : [];
+
+                //병렬로 URL -> File 변환 수행 (각 배열이 비어있으면 빈 배열 Promise)
+                const [modelFilesWithNull, imageFilesWithNull] = await Promise.all([
+                    fetchedModelUrls.length > 0 ? Promise.all(fetchedModelUrls.map((url, i) => convertURLToFile(url, i))) : Promise.resolve<(File | null)[]>([]),
+                    fetchedImageUrls.length > 0 ? Promise.all(fetchedImageUrls.map((url, i) => convertURLToFile(url, i))) : Promise.resolve<(File | null)[]>([]),
+                ]);
+
+                // null 필터링
+                const modelFiles: File[] = modelFilesWithNull.filter((f): f is File => f !== null);
+                const imageFiles: File[] = imageFilesWithNull.filter((f): f is File => f !== null);
+
+                console.log(imageFiles);
+
+                // 한번에 상태 업데이트 (불필요한 리렌더 방지)
+                setData((prev) => ({
+                    ...prev,
+                    ...fetchedData,
+                    modelFiles: modelFiles,
+                    descriptionImages: imageFiles,
+                }));
+
+                setValue(fetchedData.description ?? "");
+            } catch (e) {
+                console.log(e);
+            }
+        };
+
+        fetchData();
+    }, [editMode, modelId, navigate]);
 
     return (
         <PageWrapper>
@@ -183,11 +208,26 @@ const SellDesignPage = ({ editMode }: OwnProps) => {
                         </div>
                     </InputContainer>
                 </RowContainer>
-                <RowContainer>
-                    {previewUrls.map((url, i) => (
-                        <UploadedFilePreviewBox key={i} filePath={url} fileIndex={i} removeFile={handleRemoveFile} />
-                    ))}
-                </RowContainer>
+                {data.modelFiles.length > 0 && (
+                    <>
+                        <Typography variant="body.medium_m">업로드 파일</Typography>
+                        <RowContainer>
+                            {previewUrls.map((url, i) => (
+                                <FilePreviewBox key={i} filePath={url} fileIndex={i} fileType="model" removeFile={handleRemoveFile} />
+                            ))}
+                        </RowContainer>
+                    </>
+                )}
+                {data.descriptionImages.length > 0 && (
+                    <>
+                        <Typography variant="body.medium_m">업로드 이미지</Typography>
+                        <RowContainer>
+                            {data.descriptionImages.map((image, i) => (
+                                <FilePreviewBox key={i} filePath={URL.createObjectURL(image)} fileIndex={i} fileType="image" removeFile={handleRemoveFile} />
+                            ))}
+                        </RowContainer>
+                    </>
+                )}
             </Headder>
 
             <Step>작품 소개</Step>
@@ -203,16 +243,22 @@ const SellDesignPage = ({ editMode }: OwnProps) => {
     );
 };
 
-const UploadedFilePreviewBox = ({ filePath, fileIndex, removeFile }: { filePath: string; fileIndex: number; removeFile: (index: number) => void }) => {
+type FilePrieviewBoxProps = {
+    filePath: string;
+    fileIndex: number;
+    fileType: "model" | "image";
+    removeFile: ({ index, fileType }: { index: number; fileType: "model" | "image" }) => void;
+};
+const FilePreviewBox = React.memo(({ filePath, fileIndex, fileType, removeFile }: FilePrieviewBoxProps) => {
     return (
         <FilePreviewContainer>
-            <RemoveFileButton onClick={() => removeFile(fileIndex)}>
+            <RemoveFileButton onClick={() => removeFile({ index: fileIndex, fileType })}>
                 <img src={RemoveIcon} alt="삭제" />
             </RemoveFileButton>
-            <StlRenderContainer filePath={filePath} width="180px" height="140px" clickDisabled={true} />
+            {fileType === "model" ? <StlRenderContainer filePath={filePath} width="180px" height="140px" clickDisabled={true} /> : <img src={filePath} alt="preview" width="180px" height="140px" />}
         </FilePreviewContainer>
     );
-};
+});
 
 export default SellDesignPage;
 
